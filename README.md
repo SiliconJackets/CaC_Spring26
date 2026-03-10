@@ -19,3 +19,14 @@ curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix 
     extra-trusted-public-keys = nix-cache.fossi-foundation.org:3+K59iFwXqKsL7BNu6Guy0v+uTlwsxYQxjspXzqLYQs=
 "
 ```
+2. Clone flow-steps repo into local directory.
+3. Create module folder under librelane/design
+4. Place RTL designs (verilog files + config.json file) into librelane/design/module_name
+5. Enter below command to enter nix-shell
+```bash
+nix-shell --pure ~/librelane/shell.nix
+```
+5. To run Librelane
+```bash
+librelane ~/design/module_name/config.json
+```
