@@ -20,9 +20,13 @@ curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix 
 "
 ```
 2. Clone flow-steps repo into local directory.
-3. Create module folder under librelane/design
-4. Place RTL designs (verilog files + config.json file) into librelane/design/module_name
-5. Enter below command to enter nix-shell
+```bash
+git clone --branch flow-setup --single-branch https://github.gatech.edu/SiliconJackets/Cac_Spring26.git
+```
+   
+4. Create module folder under librelane/design
+5. Place RTL designs (verilog files + config.json file) into librelane/design/module_name
+6. Enter below command to enter nix-shell
 ```bash
 nix-shell --pure ~/librelane/shell.nix
 ```
