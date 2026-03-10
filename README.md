@@ -8,3 +8,14 @@ Setting up the flow locally depends on the type of OS you are using.
 3. Navigate to `librelane/` and run `nix-shell`. The first run should take a bit, but future runs will be faster.
 4. Run `librelane --smoke-test` in the nix shell to test the installation. This takes ~1 minutes, and if all is well, it should say `Smoke test passed`.
 5. In the future, to run the flow, simply run `nix-shell` inside the `librelane/` directory.
+
+
+### MacOS
+Official Guide: https://librelane.readthedocs.io/en/stable/index.html
+1. Install Nix using the following command 
+```bash
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --prefer-upstream-nix --no-confirm --extra-conf "
+    extra-substituters = https://nix-cache.fossi-foundation.org
+    extra-trusted-public-keys = nix-cache.fossi-foundation.org:3+K59iFwXqKsL7BNu6Guy0v+uTlwsxYQxjspXzqLYQs=
+"
+```
