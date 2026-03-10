@@ -26,11 +26,11 @@ git clone --branch flow-setup --single-branch https://github.gatech.edu/SiliconJ
    
 4. Create module folder under librelane/design
 5. Place RTL designs (verilog files + config.json file) into librelane/design/module_name
-6. Enter below command to enter nix-shell
+6. Run command below to enter nix-shell
 ```bash
 nix-shell --pure ~/librelane/shell.nix
 ```
-5. To run Librelane
+5. Run command to start Librelane
 ```bash
 librelane ~/design/module_name/config.json
 ```
