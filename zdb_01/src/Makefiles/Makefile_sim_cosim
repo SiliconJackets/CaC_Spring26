@@ -1,0 +1,96 @@
+TOPLEVEL=vddb_ctl
+CURR_DIR = ./ 
+SIM_DIR = ./
+DEBUG := 0
+SIM := 1
+EXTERNAL_DATA:= 1
+COSIM := 1
+SDF_ANNOTATE := 0
+GAIN := 0
+PEX := 0
+BEHAV := 0
+STARTUP := 1
+VERILOG_DEFINES := 
+ifeq ($(SIM), 1)
+	VERILOG_DEFINES := $(VERILOG_DEFINES)+SIM=1
+endif
+ifeq ($(SDF_ANNOTATE), 1)
+	VERILOG_DEFINES := $(VERILOG_DEFINES)+SDF_ANNOTATE=1
+endif
+ifeq ($(EXTERNAL_DATA), 1)
+	VERILOG_DEFINES := $(VERILOG_DEFINES)+EXTERNAL_DATA=1
+endif
+ifeq ($(DEBUG), 1)
+	VERILOG_DEFINES := $(VERILOG_DEFINES)+DEBUG=1
+endif
+ifeq ($(GAIN), 1)
+	VERILOG_DEFINES := $(VERILOG_DEFINES)+GAIN=1
+endif
+ifeq ($(PEX), 1)
+	VERILOG_DEFINES := $(VERILOG_DEFINES)+PEX=1
+endif
+ifeq ($(COSIM), 1)
+	VERILOG_DEFINES := $(VERILOG_DEFINES)+COSIM=1
+endif
+ifeq ($(BEHAV), 1)
+	VERILOG_DEFINES := $(VERILOG_DEFINES)+BEHAV=1
+endif
+ifeq ($(STARTUP), 1)
+	VERILOG_DEFINES := $(VERILOG_DEFINES)+STARTUP=1
+endif
+
+include:
+	@-rm -rf $(TOPLEVEL).include	
+	@-rm -rf cosim.include
+	@-echo *.sv >> $(TOPLEVEL).include
+	@-echo *.sv >> cosim.include
+
+
+logan: 
+	-vlogan -sverilog -full64 -f $(TOPLEVEL).include -timescale=1ns/10ps 
+
+cosim: clean include
+	vcs -lca -ad=vcs.init \
+	-debug_accsess+all \
+	-f cosim.include \
+	-realport \
+	+v2k -debug_access+all +lint=IRIMW,NCEID,GCWM,IGSFPG,TFIPC,IPDP,PCWM -sverilog -full64 +plusarg_save \
+	-timescale=1ns/1ps -l cosim.log \
+	+neg_tchk \
+	+define$(VERILOG_DEFINES) | tee vcs_xa.log
+	./simv +vpdfile+cosim.vpd
+	echo $(VERILOG_DEFINES)
+
+
+#./simv +vpdfile+cosim.vpd
+clean:
+	@-rm -rf alib-52
+	@-rm -rf db
+	@-rm -rf ddc
+	@-rm -rf $(TOPLEVEL)
+	@-rm -rf reports
+	@-rm -rf netlist
+	@-rm -rf csrc
+	@-rm -rf simv.daidir
+	@-rm -rf DVEfiles
+	@-rm -rf vcdplus.vpd
+	@-rm -rf ucli.key
+	@-rm -rf default.svf
+	@-rm -rf simv
+	@-rm -rf *.vpd
+	@-rm -rf *.txt
+	@-rm -rf *.vcd
+	@-rm -rf *.vcd.vpd
+	@-rm -rf *.log*
+	@-rm -rf *.verify*
+	@-rm -rf *.include
+	@-rm -rf *.tar*
+	@-rm -rf scan_result_out
+	@-rm -rf AN.DB
+	@-rm -rf result_fs
+	@-rm -rf simv.msv
+viva:
+	-viva -data_dir result_fs/ &
+dve:
+	-dve -full64 &
+

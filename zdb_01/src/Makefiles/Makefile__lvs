@@ -1,0 +1,14 @@
+
+.PHONY: all clean
+
+all:
+	v2lvs \
+		-v v2lvs_source.v \
+		-o lp_ml_padring.sp \
+		-a '<>' \
+		-undef_mod \
+		-sl \
+		-l tphn65lpgv2od3_sl_3padDefs.v
+
+clean:
+	- rm *.log
