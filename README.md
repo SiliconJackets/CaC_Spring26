@@ -34,3 +34,8 @@ nix-shell --pure ~/librelane/shell.nix
 ```bash
 librelane ~/design/module_name/config.json
 ```
+
+## Visualization Framework
+A wrapper to visualize arbitrary data nicely. Look at examples on how to use.
+Need to `pip install bokeh` and other libraries probably.
+

@@ -1,0 +1,1 @@
+/tools/pdk/designkits/tsmc/tsmc65gp/spice/stdLibs.ctl

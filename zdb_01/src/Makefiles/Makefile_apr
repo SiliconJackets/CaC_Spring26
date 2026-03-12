@@ -1,0 +1,39 @@
+# TCL scripts
+TOPLEVEL=syn_dll
+PRJ=/gscratch/psylab/usr/kpatinos/syn_dll_prj
+
+SRC_TCL=../src/sapr/apr
+TCL_MAIN=apr.tcl
+
+SRC_VERILOG := $(PRJ)/syn/results/$(TOPLEVEL).syn.v \
+			   $(PRJ)/syn/results/$(TOPLEVEL).syn.sdc 	
+
+# Directories
+RESULTDIR=./results 
+REPORTDIR=./reports
+MACRODIR=../src/macro_prep
+
+SYN_FILES := $(shell find $(PRJ) -type f)
+TCL_FILES:= $(shell find $(SRC_TCL) -type f)
+
+icc: results/$(TOPLEVEL).apr.v
+
+synthesis_done: 
+	make -C $(PRJ)/syn/
+	touch synthesis_done
+
+link_tcl:
+	find $(SRC_TCL) -type f -exec ln -s -f {} ';'
+
+link_syn:
+	ln -s $(PRJ)/syn/results/$(TOPLEVEL).syn.v 
+	ln -s $(PRJ)/syn/results/$(TOPLEVEL).syn.sdc 
+
+results/$(TOPLEVEL).apr.v: $(TCL_FILES) $(SRC_VERILOG)
+	icc_shell -64bit -shared_license -gui -output_log_file icc.log -f $(TCL_MAIN)
+
+clean:
+	-@ rm -rf $(TOPLEVEL)_lib \
+			  $(RESULTDIR) \
+			  $(REPORTDIR) \
+			  alib-52 \

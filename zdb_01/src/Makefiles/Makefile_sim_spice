@@ -1,0 +1,98 @@
+# Modified EE476 Makefile
+# Version 1.3r3 (noStdSetup)
+# Maintained by Hansem Ro
+#
+# How to setup Makefile and scripts:
+# 	Create scripts folder at /home/projects/ee476/<NETID>/
+#
+# 		$ mkdir /home/projects/ee476/<NETID>/scripts
+#
+# 	Copy stdsetup.sh and meas_wrapper.sh scripts from /home/projects/ee476/hansem7/scripts/ to
+# 	/home/projects/ee476/<NETID>/scripts/
+#
+# 		$ cp /home/projects/ee476/hansem7/scripts/stdsetup.sh /home/projects/ee476/<NETID>/scripts
+# 		$ cp /home/projects/ee476/hansem7/scripts/meas_wrapper.sh /home/projects/ee476/<NETID>/scripts
+#
+# 	Copy Makefile to a project
+#
+# 		$ cp /home/projects/ee476/hansem7/scripts/Makefile /home/projects/ee476/<NETID>/cadN/spice/<cell>/
+#
+# 	Edit Makefile to work with current design
+#
+#		1. Set DESIGN_LIB to the correct library name
+#		2. Set DESIGN to a cell name
+#		3. Check sections below on PRB and EL variables if using a custom setup
+#
+#	If transitioning from ADE L to do netlisting, then remove the ckt symlink.
+#
+# Improvements:
+# 1. Auto-detection of measure files (.ms0/.mt0) using meas_wrapper.sh frontend
+# 2. Auto-create symlink to stdLibs.ctl using stdsetup.sh
+# 3. Auto-include stdLibs for given control file using stdsetup.sh
+# 4. Added more variables like PRB, EL to work flexibly with different setups. Read notes below.
+# 5. Added clean option to quickly clean netlist, sx logs, and hspice-generated files.
+
+DESIGN_LIB = syn_dll_lib
+DESIGN = syn_dll
+
+# PRB (current design problem) can be specified if borrowing a schematic from a different part.
+# By default, PRB=DESIGN
+#
+# 	Ex. Suppose we want to reuse netlist design from problem 'foo' for the problem 'bar'
+#
+# 		We can set DESIGN=foo and PRB=bar, so that we can reuse foo.ckt
+# 		Note that you need to then include "foo.ckt" since that is what is being
+# 		generated and placed in bar's directory
+
+PRB=$(DESIGN)
+
+# EL (extended/extra label) can be specified if there are different control files
+#
+# 	Ex. Working on PRB=mos_res_2 and we have 3 control files: mos_res_2_a.ctl, mos_res_2_b.ctl
+# 		and mos_res_2_c.ctl
+#
+#		If we want to run mos_res_2_a.ctl then define the extra label extension EL=_a
+
+#EL=<Extra Label>
+
+# USR can be left alone
+USR =$(USER)
+DESIGN_DIR = /gscratch/psylab/usr/kpatinos/syn_dll_prj/cadence
+#DESIGN_LIB is used below because it is assumed that your linux dir for sims will be the same as your cadence designLib
+NETLIST_DIR = /gscratch/psylab/usr/kpatinos/syn_dll_prj/cadence/netlists
+# VPATH=touchfiles
+XNETLIST = xnetlist.py
+SPICESETUP = /home/projects/ee476/common/scripts/spiceSetup.py
+GENERATEMEASTABLE = /home/projects/ee476/common/scripts/generateMeasTable.py
+MEASWRAPPER = /home/projects/ee476/$(USR)/scripts/meas_wrapper.sh
+HSPICE = hspice -mt 8 -mp 8
+all: hspice
+PHONY = netlist hspice clean
+
+$(DESIGN).ckt:$(DESIGN_DIR)/$(DESIGN_LIB)/$(DESIGN)/schematic/sch.oa 
+	$(XNETLIST) -l $(DESIGN_LIB) -c $(DESIGN) -v schematic -d $(DESIGN_DIR) -n $(NETLIST_DIR) --topsub
+	cp $(NETLIST_DIR)/$(DESIGN)/hspiceD/schematic/netlist/input.ckt $(DESIGN).ckt
+
+hspice: $(PRB)$(EL).ctl $(DESIGN).ckt
+	hspice -mp -i $(PRB)$(EL).ctl -o $(PRB)$(EL).lis
+	$(MEASWRAPPER) $(PRB)$(EL) $(GENERATEMEASTABLE)
+
+netlist:$(DESIGN_DIR)/$(DESIGN_LIB)/$(DESIGN)/schematic/sch.oa 
+	$(XNETLIST) -l $(DESIGN_LIB) -c $(DESIGN) -v schematic -d $(DESIGN_DIR) -n $(NETLIST_DIR) --topsub
+	$(SPICESETUP) -i $(NETLIST_DIR)/$(DESIGN)/hspiceD/schematic/netlist/input.ckt -o $(DESIGN).ckt
+
+genTable: $(PRB)$(EL)
+	-generateMeasTable.py -i $(PRB)$(EL).ms0 -o $(PRB)$(EL)_meas.tab -v r'*'
+
+clean: 
+	rm -rf $(NETLIST_DIR)/$(DESIGN_LIB)/$(DESIGN)
+	rm -rf $(DESIGN).ckt
+	rm -rf $(PRB)$(EL).ckt
+	rm -rf $(PRB)$(EL).s*
+	rm -rf sx*
+	rm -rf $(PRB)$(EL).lis
+	rm -rf $(PRB)$(EL).*0
+	rm -rf $(PRB)$(EL)_meas.tab
+	rm -rf logFile
+	rm -rf stdLibs.ctl
+
