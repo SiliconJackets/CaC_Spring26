@@ -8,14 +8,14 @@
 module tb_zdb_top;
     // Parameters
     parameter integer CTRL_BITS     = 6;
-    parameter integer DELAY_STEP    = 20;   // ps per DCDL step
-    parameter integer MIN_DELAY     = 0;    // ps
+    parameter integer DELAY_STEP    = 20; // ps per DCDL step
+    parameter integer MIN_DELAY     = 0; // ps
     parameter integer INIT_CTRL     = 20;
-    parameter integer TREE_DELAY_PS = 200;  // ps — simulated clock tree / feedback path delay
+    parameter integer TREE_DELAY_PS = 200; // ps — simulated clock tree / feedback path delay
     parameter real    CLK_HALF_PS   = 500.0; // ps — used in behavioral clock mode only
     parameter logic [1:0] RO_SEL    = 2'b11; // ring oscillator tap — used in USE_RO mode only
 
-    parameter integer RUN_CYCLES = 400;     // how many clk_in cycles to observe
+    parameter integer RUN_CYCLES = 400; // how many clk_in cycles to observe
 
     // Signals
     logic clk_in;
