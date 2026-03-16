@@ -14,7 +14,7 @@
 /* |======================================================================= */
 
 
-module tb_bangbang_pd;
+module tb_phase_detector;
 
     reg  clk_in;
     reg  clk_out;
@@ -23,7 +23,7 @@ module tb_bangbang_pd;
     wire down;
 
     // DUT
-    bangbang_pd dut (
+    phase_detector dut (
         .clk_in  (clk_in),
         .clk_out (clk_out),
         .rst     (rst),

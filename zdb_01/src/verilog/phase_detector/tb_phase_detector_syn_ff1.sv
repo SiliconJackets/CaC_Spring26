@@ -1,6 +1,6 @@
 `timescale 1ps/1ps
 
-module tb_bangbang_pd;
+module tb_phase_detector;
 
     logic clk_in;
     logic clk_out;
@@ -11,7 +11,7 @@ module tb_bangbang_pd;
     int errors;
 
     // DUT
-    bangbang_pd dut (
+    phase_detector dut (
         .clk_in  (clk_in),
         .clk_out (clk_out),
         .rst     (rst),

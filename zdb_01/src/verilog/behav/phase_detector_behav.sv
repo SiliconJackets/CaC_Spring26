@@ -11,7 +11,7 @@
 /* |======================================================================= */
 
 
-module bangbang_pd (
+module phase_detector (
     input  wire clk_in,    //Reference input clock
     input  wire clk_out,   //Feedback output clock
     input  wire rst,       //Posedge asynchronous reset
