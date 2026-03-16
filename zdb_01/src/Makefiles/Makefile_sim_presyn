@@ -1,6 +1,6 @@
-TOPLEVEL= nand_dcdl
+TOPLEVEL= controller
 TESTNAME=default
-SRC_VERILOG=../../src/verilog/dcdl
+SRC_VERILOG=../../src/verilog/
 SRC_FOLDER= $(SRC_VERILOG)
 SIM=1
 SDF=0

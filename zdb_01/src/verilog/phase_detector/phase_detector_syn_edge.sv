@@ -4,71 +4,62 @@
 |=======================================================================
 | Module      : edge_order_phase_detector
 | Author      : Mythri Muralikannan
-| Description : Edge-order bang-bang phase detector
+| Description : First-edge-wins binary phase detector
 |
 | Function:
-|   Determines which clock edge arrives first by detecting rising
-|   edges of the reference clock (clk_in) and feedback clock (clk_out).
+|   Determines which clock edge arrives first and holds that decision
+|   until the opposite clock edge arrives, at which point the outputs
+|   are cleared.
 |
 | Output meaning:
 |   up   = 1 -> reference clock leads feedback clock -> speed up loop
 |   down = 1 -> feedback clock leads reference clock -> slow down loop
 |
-| Operation:
-|   - Rising edges of both clocks are detected using delayed versions
-|     of the signals.
-|   - If a reference edge occurs before a feedback edge -> up = 1
-|   - If a feedback edge occurs before a reference edge -> down = 1
-|
 | Notes:
 |   - Fully synthesizable
-|   - Detects edge arrival order (binary phase detection)
-|=======================================================================
-*/
+|   - Simpler than a PFD, but less robust for close/simultaneous edges
+| 
+| Issues:
+| - Case 3 & 5: When clk_out leads clk_in, the detector still asserts UP because the "first-edge-wins" logic lets clk_in set UP before DOWN can capture the earlier feedback edge.
+| - Case 1 & 6: Aligned edges occasionally trigger both signals (UP=1, DOWN=1) due to simultaneous events on the two clocks, showing ambiguity in edge ordering without a proper reset/arbiter.|=======================================================================
+|*/
 
 module phase_detector (
-    input  wire clk_in,    // Reference clock
-    input  wire clk_out,   // Feedback clock
-    input  wire rst,       // Asynchronous active-high reset
-    output reg  up,        // Request to speed up
-    output reg  down       // Request to slow down
+    input  wire clk_in,
+    input  wire clk_out,
+    input  wire rst,
+    output reg  up,
+    output reg  down
 );
 
-    reg clk_in_d;
-    reg clk_out_d;
-
-    // Rising edge detection
-    wire rise_in;
-    wire rise_out;
-
-    assign rise_in  = clk_in  & ~clk_in_d;
-    assign rise_out = clk_out & ~clk_out_d;
-
-    // Phase decision logic
-    always @(posedge clk_in or posedge clk_out or posedge rst) begin
+    // Reference edge arrived first
+    always @(posedge clk_in or posedge rst) begin
         if (rst) begin
-            up   <= 1'b0;
-            down <= 1'b0;
+            up <= 1'b0;
+        end
+        else if (!down) begin
+            // Only assert UP if feedback has not already won
+            up <= 1'b1;
         end
         else begin
-            if (rise_in && !rise_out) begin
-                // Reference edge arrived first
-                up   <= 1'b1;
-                down <= 1'b0;
-            end
-            else if (rise_out && !rise_in) begin
-                // Feedback edge arrived first
-                up   <= 1'b0;
-                down <= 1'b1;
-            end
+            // Feedback edge already occurred; clear after pair completes
+            up <= 1'b0;
         end
     end
 
-    // Store previous clock values for edge detection
-    always @(posedge clk_in)
-        clk_in_d <= clk_in;
-
-    always @(posedge clk_out)
-        clk_out_d <= clk_out;
+    // Feedback edge arrived first
+    always @(posedge clk_out or posedge rst) begin
+        if (rst) begin
+            down <= 1'b0;
+        end
+        else if (!up) begin
+            // Only assert DOWN if reference has not already won
+            down <= 1'b1;
+        end
+        else begin
+            // Reference edge already occurred; clear after pair completes
+            down <= 1'b0;
+        end
+    end
 
 endmodule

@@ -24,6 +24,10 @@
 |   - Simple and low-cost implementation
 |   - Does not measure phase magnitude, only lead/lag
 |   - Zero phase error can be biased toward down depending on timing
+| 
+| Issues:
+|   - Case 1: Aligned clocks failed due to "excesive DOWN activity". There is not special "equal case"
+|   - Case 6: Asynch results in same biased behavior (no equal clock stage).
 |=======================================================================
 */
 

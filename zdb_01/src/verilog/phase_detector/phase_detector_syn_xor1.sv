@@ -30,6 +30,10 @@
 |   - XOR detects phase difference but not direction
 |   - Direction is inferred by sampling clk_out
 |   - Accuracy depends on duty cycle and timing alignment
+|
+| Issues:
+|   - Case 3 & 5: When clk_out leads clk_in, the XOR term is often 0 at the clk_in sampling edge, so the detector clears/holds instead of asserting DOWN; this design only samples on clk_in, so it misses true lead information.
+|   s- Overall: XOR only indicates mismatch, not direction; direction is inferred from clk_out level, making the detector duty-cycle/timing dependent and biased toward lag detection (UP) while weak for lead detection near lock.
 |=======================================================================
 */
 
