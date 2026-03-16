@@ -1,1 +1,1 @@
-../../src/verilog/fsm.sv
+../../src/verilog/fsm/fsm.sv

@@ -1,0 +1,376 @@
+Command: vcs -f controller.include +v2k -R +lint=all -sverilog -full64 -timescale=1ns/10ps \
+-debug_access+all -debug_region+cell+encrypt -debug_access -l controller.log +define++SIM=1 \
++testname=default -lca -kdb
+                         Chronologic VCS (TM)
+       Version X-2025.06-SP2_Full64 -- Sun Mar 15 23:31:49 2026
+
+                    Copyright (c) 1991 - 2025 Synopsys, Inc.
+   This software and the associated documentation are proprietary to Synopsys,
+ Inc. This software may only be used in accordance with the terms and conditions
+ of a written license agreement with Synopsys, Inc. All other use, reproduction,
+   or distribution of this software is strictly prohibited.  Licensed Products
+     communicate with Synopsys servers for the purpose of providing software
+    updates, detecting software piracy and verifying that customers are using
+    Licensed Products in conformity with the applicable License Key for such
+  Licensed Products. Synopsys will use information gathered in connection with
+    this process to deliver software updates and pursue software pirates and
+                                   infringers.
+
+ Inclusivity & Diversity - Visit SolvNetPlus to read the "Synopsys Statement on
+            Inclusivity and Diversity" (Refer to article 000036315 at
+                        https://solvnetplus.synopsys.com)
+
+
+Warning-[LCA_FEATURES_ENABLED] Usage warning
+  LCA features enabled by '-lca' argument on the command line.  For more 
+  information regarding list of LCA features please refer to Chapter "LCA 
+  features" in the VCS Release Notes
+
+Parsing design file './controller_variable_step.sv'
+Parsing design file './tb_controller.sv'
+
+Lint-[NS] Null statement
+./tb_controller.sv, 104
+  Null statement is used in following verilog source.
+  Source info:                 @(posedge clk_in);
+
+
+Lint-[NS] Null statement
+./tb_controller.sv, 105
+  Null statement is used in following verilog source.
+  Source info:                 #1;
+
+
+Lint-[NS] Null statement
+./tb_controller.sv, 173
+  Null statement is used in following verilog source.
+  Source info:         #1;
+
+
+Lint-[NS] Null statement
+./tb_controller.sv, 176
+  Null statement is used in following verilog source.
+  Source info:         #2000;
+
+
+Lint-[NS] Null statement
+./tb_controller.sv, 178
+  Null statement is used in following verilog source.
+  Source info:         @(posedge clk_in);
+
+
+Lint-[NS] Null statement
+./tb_controller.sv, 179
+  Null statement is used in following verilog source.
+  Source info:         #1;
+
+
+Lint-[NS] Null statement
+./tb_controller.sv, 252
+  Null statement is used in following verilog source.
+  Source info:         #2000;
+
+
+Lint-[NS] Null statement
+./tb_controller.sv, 254
+  Null statement is used in following verilog source.
+  Source info:         #1;
+
+
+Lint-[NS] Null statement
+./tb_controller.sv, 257
+  Null statement is used in following verilog source.
+  Source info:         #3000;
+
+
+Lint-[NS] Null statement
+./tb_controller.sv, 259
+  Null statement is used in following verilog source.
+  Source info:         @(posedge clk_in);
+
+
+Lint-[NS] Null statement
+./tb_controller.sv, 260
+  Null statement is used in following verilog source.
+  Source info:         #1;
+
+Top Level Modules:
+       tb_controller
+TimeScale is 1 ps / 1 ps
+
+Lint-[ULCO] Unequal length in comparison operator
+./controller_variable_step.sv, 73
+controller, "(same_dir_count >= BIG_THRESH)"
+  A left 4-bit expression is compared to a right 32-bit expression.
+  Comparing 'same_dir_count' of type reg [3:0]
+  with 'BIG_THRESH' of type integer.
+
+
+Lint-[ULCO] Unequal length in comparison operator
+./controller_variable_step.sv, 75
+controller, "(same_dir_count >= MED_THRESH)"
+  A left 4-bit expression is compared to a right 32-bit expression.
+  Comparing 'same_dir_count' of type reg [3:0]
+  with 'MED_THRESH' of type integer.
+
+
+Lint-[ULCO] Unequal length in comparison operator
+./controller_variable_step.sv, 94
+controller, "(same_dir_count >= BIG_THRESH)"
+  A left 4-bit expression is compared to a right 32-bit expression.
+  Comparing 'same_dir_count' of type reg [3:0]
+  with 'BIG_THRESH' of type integer.
+
+
+Lint-[ULCO] Unequal length in comparison operator
+./controller_variable_step.sv, 96
+controller, "(same_dir_count >= MED_THRESH)"
+  A left 4-bit expression is compared to a right 32-bit expression.
+  Comparing 'same_dir_count' of type reg [3:0]
+  with 'MED_THRESH' of type integer.
+
+
+Lint-[WMIA-L] Width mismatch in assignment
+./tb_controller.sv, 186
+  Width mismatch between LHS and RHS is found in assignment:
+  The following 6-bit wide expression is assigned to a 32-bit LHS target:
+  Source info: start_ctrl = ctrl;
+  Expression: start_ctrl
+
+
+Lint-[WMIA-L] Width mismatch in assignment
+./tb_controller.sv, 192
+  Width mismatch between LHS and RHS is found in assignment:
+  The following 6-bit wide expression is assigned to a 32-bit LHS target:
+  Source info: start_ctrl = ctrl;
+  Expression: start_ctrl
+
+
+Lint-[WMIA-L] Width mismatch in assignment
+./tb_controller.sv, 198
+  Width mismatch between LHS and RHS is found in assignment:
+  The following 6-bit wide expression is assigned to a 32-bit LHS target:
+  Source info: start_ctrl = ctrl;
+  Expression: start_ctrl
+
+
+Lint-[WMIA-L] Width mismatch in assignment
+./tb_controller.sv, 204
+  Width mismatch between LHS and RHS is found in assignment:
+  The following 6-bit wide expression is assigned to a 32-bit LHS target:
+  Source info: start_ctrl = ctrl;
+  Expression: start_ctrl
+
+
+Lint-[ULCO] Unequal length in comparison operator
+./tb_controller.sv, 209
+tb_controller, "(ctrl > (start_ctrl + 1))"
+  A left 6-bit expression is compared to a right 32-bit expression.
+  Comparing 'ctrl' of type wire [(CTRL_BITS - 1):0]
+  with '(start_ctrl + 1)' of type integer.
+
+
+Lint-[ULCO] Unequal length in comparison operator
+./tb_controller.sv, 209
+tb_controller, "(ctrl < (start_ctrl - 1))"
+  A left 6-bit expression is compared to a right 32-bit expression.
+  Comparing 'ctrl' of type wire [(CTRL_BITS - 1):0]
+  with '(start_ctrl - 1)' of type integer.
+
+
+Lint-[WMIA-L] Width mismatch in assignment
+./tb_controller.sv, 237
+  Width mismatch between LHS and RHS is found in assignment:
+  The following 6-bit wide expression is assigned to a 32-bit LHS target:
+  Source info: start_ctrl = ctrl;
+  Expression: start_ctrl
+
+
+Lint-[WMIA-L] Width mismatch in assignment
+./tb_controller.sv, 244
+  Width mismatch between LHS and RHS is found in assignment:
+  The following 6-bit wide expression is assigned to a 32-bit LHS target:
+  Source info: start_ctrl = ctrl;
+  Expression: start_ctrl
+
+Starting vcs inline pass...
+1 module and 0 UDP read.
+recompiling module tb_controller
+make[1]: Entering directory '/nethome/mmuralikannan3/Cac_Spring26/zdb_01/sim/behav/csrc' \
+
+rm -f _cuarc*.so _csrc*.so pre_vcsobj_*.so share_vcsobj_*.so
+if [ -x ../simv ]; then chmod a-x ../simv; fi
+g++  -o ../simv      -rdynamic  -Wl,-rpath='$ORIGIN'/simv.daidir -Wl,-rpath=./simv.daidir \
+-Wl,-rpath=/tools/software/synopsys/vcs/latest/linux64/lib -L/tools/software/synopsys/vcs/latest/linux64/lib \
+-Wl,-rpath-link=./   objs/amcQw_d.o   _3932843_archive_1.so _prev_archive_1.so   \
+SIM_l.o       rmapats_mop.o rmapats.o rmar.o rmar_nd.o  rmar_llvm_0_1.o rmar_llvm_0_0.o \
+-lnuma -lvirsim -lerrorinf -lsnpsmalloc -lvfs      -lvcsnew -ldistsimclient -lsimprofile \
+-luclinative /tools/software/synopsys/vcs/latest/linux64/lib/vcs_tls.o   -Wl,-whole-archive \
+-lvcsucli    -Wl,-no-whole-archive        _vcs_pli_stub_.o   /tools/software/synopsys/vcs/latest/linux64/lib/vcs_save_restore_new.o \
+/tools/software/synopsys/verdi/latest/share/PLI/VCS/LINUX64/pli.a -ldl  -lc -lm -lpthread \
+-ldl 
+../simv up to date
+make[1]: Leaving directory '/nethome/mmuralikannan3/Cac_Spring26/zdb_01/sim/behav/csrc' \
+
+Command: /nethome/mmuralikannan3/Cac_Spring26/zdb_01/sim/behav/./simv +v2k +lint=all -a controller.log +define++SIM=1 +testname=default -lca
+Chronologic VCS simulator copyright 1991-2025
+Contains Synopsys proprietary information.
+Compiler version X-2025.06-SP2_Full64; Runtime version X-2025.06-SP2_Full64;  Mar 15 23:32 2026
+ time   rst up down | ctrl
+--------------------------
+     0   1   0   0   | 32
+  2001   0   0   0   | 32
+
+=== TEST 1: Hold behavior ===
+
+=== TEST 2: Repeated UP requests increase ctrl ===
+165001   0   1   0   | 32
+175000   0   1   0   | 33
+185000   0   1   0   | 34
+195000   0   1   0   | 35
+205000   0   1   0   | 36
+215000   0   1   0   | 38
+225000   0   1   0   | 40
+235000   0   1   0   | 42
+245000   0   1   0   | 44
+255000   0   1   0   | 48
+265000   0   1   0   | 52
+275000   0   1   0   | 56
+285000   0   1   0   | 60
+295000   0   1   0   | 63
+
+=== TEST 3: Repeated DOWN requests decrease ctrl ===
+325001   0   0   1   | 63
+335000   0   0   1   | 62
+345000   0   0   1   | 61
+355000   0   0   1   | 60
+365000   0   0   1   | 59
+375000   0   0   1   | 57
+385000   0   0   1   | 55
+395000   0   0   1   | 53
+405000   0   0   1   | 51
+415000   0   0   1   | 47
+425000   0   0   1   | 43
+435000   0   0   1   | 39
+445000   0   0   1   | 35
+455000   0   0   1   | 31
+465000   0   0   1   | 27
+475000   0   0   1   | 23
+485000   0   0   1   | 19
+
+=== TEST 4: Simultaneous up/down does not run away ===
+485001   0   1   1   | 19
+
+=== TEST 5: Upper saturation / upper bound ===
+645001   0   1   0   | 19
+655000   0   1   0   | 20
+665000   0   1   0   | 21
+675000   0   1   0   | 22
+685000   0   1   0   | 23
+695000   0   1   0   | 25
+705000   0   1   0   | 27
+715000   0   1   0   | 29
+725000   0   1   0   | 31
+735000   0   1   0   | 35
+745000   0   1   0   | 39
+755000   0   1   0   | 43
+765000   0   1   0   | 47
+775000   0   1   0   | 51
+785000   0   1   0   | 55
+795000   0   1   0   | 59
+805000   0   1   0   | 63
+
+=== TEST 6: Lower saturation / lower bound ===
+1925001   0   0   1   | 63
+1935000   0   0   1   | 62
+1945000   0   0   1   | 61
+1955000   0   0   1   | 60
+1965000   0   0   1   | 59
+1975000   0   0   1   | 57
+1985000   0   0   1   | 55
+1995000   0   0   1   | 53
+2005000   0   0   1   | 51
+2015000   0   0   1   | 47
+2025000   0   0   1   | 43
+2035000   0   0   1   | 39
+2045000   0   0   1   | 35
+2055000   0   0   1   | 31
+2065000   0   0   1   | 27
+2075000   0   0   1   | 23
+2085000   0   0   1   | 19
+2095000   0   0   1   | 18
+2105000   0   0   1   | 17
+2115000   0   0   1   | 16
+2125000   0   0   1   | 15
+2135000   0   0   1   | 13
+2145000   0   0   1   | 11
+2155000   0   0   1   | 9
+2165000   0   0   1   | 7
+2175000   0   0   1   | 3
+2185000   0   0   1   | 0
+
+=== TEST 7: Recovery from low end ===
+3205001   0   1   0   | 0
+3215000   0   1   0   | 1
+3225000   0   1   0   | 2
+3235000   0   1   0   | 3
+3245000   0   1   0   | 4
+3255000   0   1   0   | 6
+3265000   0   1   0   | 8
+3275000   0   1   0   | 10
+3285000   0   1   0   | 12
+3295000   0   1   0   | 16
+3305000   0   1   0   | 20
+3315000   0   1   0   | 24
+3325000   0   1   0   | 28
+3335000   0   1   0   | 32
+3345000   0   1   0   | 36
+3355000   0   1   0   | 40
+3365000   0   1   0   | 44
+
+=== TEST 8: Recovery from high end ===
+3375000   0   1   0   | 45
+3385000   0   1   0   | 46
+3395000   0   1   0   | 47
+3405000   0   1   0   | 48
+3415000   0   1   0   | 50
+3425000   0   1   0   | 52
+3435000   0   1   0   | 54
+3445000   0   1   0   | 56
+3455000   0   1   0   | 60
+3465000   0   1   0   | 63
+4645001   0   0   1   | 63
+4655000   0   0   1   | 62
+4665000   0   0   1   | 61
+4675000   0   0   1   | 60
+4685000   0   0   1   | 59
+4695000   0   0   1   | 57
+4705000   0   0   1   | 55
+4715000   0   0   1   | 53
+4725000   0   0   1   | 51
+4735000   0   0   1   | 47
+4745000   0   0   1   | 43
+4755000   0   0   1   | 39
+4765000   0   0   1   | 35
+4775000   0   0   1   | 31
+4785000   0   0   1   | 27
+4795000   0   0   1   | 23
+4805000   0   0   1   | 19
+
+=== TEST 9: Asynchronous reset ===
+4805001   0   1   0   | 19
+4807001   1   1   0   | 32
+4810002   0   1   0   | 32
+4815000   0   1   0   | 33
+
+======================================
+TEST PASSED
+======================================
+$finish called from file "./tb_controller.sv", line 271.
+$finish at simulation time              4815001
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 4815001 ps
+CPU Time:      0.180 seconds;       Data structure size:   0.0Mb
+Sun Mar 15 23:32:27 2026
+CPU time: .356 seconds to compile + .249 seconds to elab + .279 seconds to link + .208 seconds in simulation
+Verdi KDB elaboration done and the database successfully generated

@@ -1,6 +1,6 @@
-TOPLEVEL= fsm
+TOPLEVEL= controller
 TESTNAME=default
-SRC_VERILOG=../../src/verilog
+SRC_VERILOG=../../src/verilog/
 SRC_FOLDER= $(SRC_VERILOG)
 SIM=1
 SDF=0

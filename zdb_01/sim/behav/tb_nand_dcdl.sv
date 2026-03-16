@@ -1,0 +1,1 @@
+../../src/verilog/dcdl/tb_nand_dcdl.sv

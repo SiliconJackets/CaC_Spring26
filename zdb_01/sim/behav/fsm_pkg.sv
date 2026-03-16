@@ -1,1 +1,1 @@
-../../src/verilog/fsm_pkg.sv
+../../src/verilog/fsm/fsm_pkg.sv

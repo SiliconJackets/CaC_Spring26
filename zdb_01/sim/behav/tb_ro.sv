@@ -1,1 +1,0 @@
-../../src/verilog/tb_ro.sv
