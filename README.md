@@ -41,11 +41,11 @@ Need to `pip install bokeh` and other libraries probably.
 
 
 ## Steps to run tb with synopsys
-- `tcsh
+- `tcsh`
 - go to top_module.include : and add the file names 
 - go to src/Makefiles/Makefile_sim_presyn and change top module
-- `cd sim/behav
-- `make wipe
-- `make link_src
-- `make vcs
+- `cd sim/behav`
+- `make wipe`
+- `make link_src`
+- `make vcs`
 
