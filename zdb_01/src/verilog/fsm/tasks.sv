@@ -85,6 +85,7 @@ task test_full_state_sequence();
 
         // WAIT: two more cycles (wait_cycle=3 means 3 total WAIT evaluations)
         @(posedge clk_i); check_outputs(1'b1, 1'b0, "WAIT cycle 2: rd_o=1");
+        @(posedge clk_i); check_outputs(1'b1, 1'b0, "WAIT cycle 3: rd_o=1");
 
         // WAIT -> DONE on this clock: ds_o=1, rd_o=0
         @(posedge clk_i); check_outputs(1'b0, 1'b1, "DONE: ds_o=1, rd_o=0");
@@ -213,6 +214,8 @@ task test_multiple_full_cycles();
                     $sformatf("cycle%0d WAIT-1", cycle));
                 @(posedge clk_i); check_outputs(1'b1, 1'b0,
                     $sformatf("cycle%0d WAIT-2", cycle));
+                @(posedge clk_i); check_outputs(1'b1, 1'b0,
+                    $sformatf("cycle%0d WAIT-3", cycle));
                 @(posedge clk_i); check_outputs(1'b0, 1'b1,
                     $sformatf("cycle%0d DONE", cycle));
                 @(posedge clk_i); check_outputs(1'b0, 1'b0,
