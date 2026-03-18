@@ -1,1 +1,0 @@
-../../src/verilog/ring_oscillator/ring_oscillator.sv

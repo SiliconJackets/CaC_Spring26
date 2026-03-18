@@ -280,6 +280,81 @@ module tb_phase_detector;
         run_aligned_cycles(4, 10);
         check_aligned_behavior();
 
+        // Idle gap
+        #10;
+        clk_in  = 1'b0;
+        clk_out = 1'b0;
+
+        // Case 7: large lag (4 ns in 10 ns period — near half-cycle)
+        start_scoreboard("CASE 7: large lag (4 ns, near half-period)");
+        run_cycles(8, 4, 10);
+        check_lag_behavior();
+
+        // Idle gap
+        #10;
+        clk_in  = 1'b0;
+        clk_out = 1'b0;
+
+        // Case 8: large lead (4 ns in 10 ns period)
+        start_scoreboard("CASE 8: large lead (4 ns, near half-period)");
+        run_cycles(8, -4, 10);
+        check_lead_behavior();
+
+        // Idle gap
+        #10;
+        clk_in  = 1'b0;
+        clk_out = 1'b0;
+
+        // Case 9: lag with longer period (20 ns clock, 3 ns offset)
+        start_scoreboard("CASE 9: lag 3 ns, period 20 ns");
+        run_cycles(8, 3, 20);
+        check_lag_behavior();
+
+        // Idle gap
+        #20;
+        clk_in  = 1'b0;
+        clk_out = 1'b0;
+
+        // Case 10: lead with longer period (20 ns clock, 3 ns offset)
+        start_scoreboard("CASE 10: lead 3 ns, period 20 ns");
+        run_cycles(8, -3, 20);
+        check_lead_behavior();
+
+        // Idle gap
+        #20;
+        clk_in  = 1'b0;
+        clk_out = 1'b0;
+
+        // Case 11: reset during active lag run, then resume
+        start_scoreboard("CASE 11: reset mid-lag then resume");
+        run_cycles(4, 2, 10);
+        rst = 1'b1;
+        check_reset_clears_outputs();
+        #5;
+        rst = 1'b0;
+        run_cycles(4, 2, 10);
+        check_lag_behavior();
+
+        // Idle gap
+        #10;
+        clk_in  = 1'b0;
+        clk_out = 1'b0;
+
+        // Case 12: extended run with consistent lag (16 cycles) — checks sustained behavior
+        start_scoreboard("CASE 12: sustained lag 2 ns, 16 cycles");
+        run_cycles(16, 2, 10);
+        check_lag_behavior();
+
+        // Idle gap
+        #10;
+        clk_in  = 1'b0;
+        clk_out = 1'b0;
+
+        // Case 13: extended run with consistent lead (16 cycles)
+        start_scoreboard("CASE 13: sustained lead 2 ns, 16 cycles");
+        run_cycles(16, -2, 10);
+        check_lead_behavior();
+
         if (error_count == 0) begin
             $display("\n======================================");
             $display("TEST PASSED");

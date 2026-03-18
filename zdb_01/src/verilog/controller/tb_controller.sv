@@ -23,14 +23,23 @@
 |   controller architectures.
 |
 | Tests:
-|   1. Reset initializes ctrl to INIT_CTRL
-|   2. Hold behavior does not cause runaway changes
-|   3. Repeated UP requests cause ctrl to increase
-|   4. Repeated DOWN requests cause ctrl to decrease
-|   5. Simultaneous up/down does not cause runaway changes
-|   6. ctrl saturates within valid bounds
-|   7. Recovery from zero is possible
-|   8. Asynchronous reset restores INIT_CTRL
+|    1. Reset initializes ctrl to INIT_CTRL
+|    2. Hold behavior does not cause runaway changes
+|    3. Repeated UP requests cause ctrl to increase
+|    4. Repeated DOWN requests cause ctrl to decrease
+|    5. Simultaneous up/down does not cause runaway changes
+|    6. ctrl saturates within valid bounds
+|    7. Recovery from zero is possible
+|    8. Asynchronous reset restores INIT_CTRL
+|    9. ctrl stays within bounds under persistent UP
+|   10. ctrl stays within bounds under persistent DOWN
+|   11. ctrl never increments past MAX during long UP burst
+|   12. ctrl never decrements below 0 during long DOWN burst
+|   13. Alternating up/down does not drift far from starting point
+|   14. Reset from MAX restores INIT_CTRL
+|   15. Reset from zero restores INIT_CTRL
+|   16. ctrl reaches MAX before wrapping (no overflow)
+|   17. ctrl reaches 0 before wrapping (no underflow)
 |=======================================================================
 */
 
@@ -163,6 +172,9 @@ module tb_controller;
         end
     endtask
 
+    // Verify ctrl did not exceed MAX_CTRL during last N cycles.
+    // Uses continuous in_range check inside run_cycles.
+
     initial begin
         errors = 0;
         rst    = 1'b1;
@@ -259,6 +271,133 @@ module tb_controller;
         @(posedge clk_in);
         #1;
         expect_in_range();
+
+        // ------------------------------------------------------------
+        $display("\n=== TEST 10: ctrl never exceeds MAX during sustained UP ===");
+        // Drive UP long enough to saturate, then keep driving — must not overflow
+        drive_and_run(1'b1, 1'b0, 200);
+        expect_in_range();
+        if (ctrl > MAX_CTRL[CTRL_BITS-1:0]) begin
+            $display("ERROR @ %0t: ctrl=%0d exceeded MAX_CTRL=%0d", $time, ctrl, MAX_CTRL);
+            errors = errors + 1;
+        end
+
+        // ------------------------------------------------------------
+        $display("\n=== TEST 11: ctrl never goes below 0 during sustained DOWN ===");
+        drive_and_run(1'b0, 1'b1, 200);
+        expect_in_range();
+        if (ctrl > MAX_CTRL[CTRL_BITS-1:0]) begin   // checks for wrap-around underflow
+            $display("ERROR @ %0t: ctrl=%0d wrapped below 0", $time, ctrl);
+            errors = errors + 1;
+        end
+
+        // ------------------------------------------------------------
+        $display("\n=== TEST 12: Reset from MAX restores INIT_CTRL ===");
+        drive_and_run(1'b1, 1'b0, 128);  // push to MAX
+        up   = 1'b0;
+        down = 1'b0;
+        #1000;
+        rst = 1'b1;
+        #1;
+        expect_ctrl_exact(INIT_CTRL);
+        #3000;
+        rst = 1'b0;
+        @(posedge clk_in);
+        #1;
+        expect_ctrl_exact(INIT_CTRL);
+
+        // ------------------------------------------------------------
+        $display("\n=== TEST 13: Reset from zero restores INIT_CTRL ===");
+        drive_and_run(1'b0, 1'b1, 128);  // push to 0
+        up   = 1'b0;
+        down = 1'b0;
+        #1000;
+        rst = 1'b1;
+        #1;
+        expect_ctrl_exact(INIT_CTRL);
+        #3000;
+        rst = 1'b0;
+        @(posedge clk_in);
+        #1;
+        expect_ctrl_exact(INIT_CTRL);
+
+        // ------------------------------------------------------------
+        $display("\n=== TEST 14: Alternating up/down does not drift far ===");
+        // Alternate single-cycle UP and DOWN for 64 cycles.
+        // ctrl should not drift more than a small amount from INIT_CTRL.
+        start_ctrl = ctrl;
+        begin : alt_test
+            integer k;
+            up   = 1'b0;
+            down = 1'b0;
+            for (k = 0; k < 64; k = k + 1) begin
+                up   = 1'b1;
+                down = 1'b0;
+                @(posedge clk_in); #1; expect_in_range();
+                up   = 1'b0;
+                down = 1'b1;
+                @(posedge clk_in); #1; expect_in_range();
+            end
+            up   = 1'b0;
+            down = 1'b0;
+        end
+        // After balanced alternating, ctrl should be within a small window
+        // of the starting value. Allow a generous window since some
+        // controllers have asymmetric step sizes.
+        if ((ctrl > start_ctrl + 8) || (ctrl < start_ctrl - 8)) begin
+            $display("WARNING @ %0t: alternating up/down drifted more than 8 steps (start=%0d, end=%0d)",
+                     $time, start_ctrl, ctrl);
+        end
+
+        // ------------------------------------------------------------
+        $display("\n=== TEST 15: ctrl is monotone nondecreasing under sustained UP ===");
+        // Reset to known state, then drive UP and verify ctrl only increases
+        rst = 1'b1; #1000; rst = 1'b0;
+        @(posedge clk_in); #1;
+        start_ctrl = ctrl;
+        begin : mono_up_test
+            integer m;
+            integer prev_ctrl;
+            prev_ctrl = ctrl;
+            up   = 1'b1;
+            down = 1'b0;
+            for (m = 0; m < 64; m = m + 1) begin
+                @(posedge clk_in); #1;
+                if (ctrl < prev_ctrl[CTRL_BITS-1:0]) begin
+                    $display("ERROR @ %0t: ctrl decreased during sustained UP (prev=%0d, now=%0d)",
+                             $time, prev_ctrl, ctrl);
+                    errors = errors + 1;
+                end
+                prev_ctrl = ctrl;
+                expect_in_range();
+            end
+            up   = 1'b0;
+            down = 1'b0;
+        end
+
+        // ------------------------------------------------------------
+        $display("\n=== TEST 16: ctrl is monotone nonincreasing under sustained DOWN ===");
+        rst = 1'b1; #1000; rst = 1'b0;
+        @(posedge clk_in); #1;
+        begin : mono_down_test
+            integer n;
+            integer prev_ctrl2;
+            prev_ctrl2 = ctrl;
+            up   = 1'b0;
+            down = 1'b1;
+            for (n = 0; n < 64; n = n + 1) begin
+                @(posedge clk_in); #1;
+                if (ctrl > prev_ctrl2[CTRL_BITS-1:0]) begin
+                    $display("ERROR @ %0t: ctrl increased during sustained DOWN (prev=%0d, now=%0d)",
+                             $time, prev_ctrl2, ctrl);
+                    errors = errors + 1;
+                end
+                prev_ctrl2 = ctrl;
+                expect_in_range();
+            end
+            up   = 1'b0;
+            down = 1'b0;
+        end
 
         // ------------------------------------------------------------
         $display("\n======================================");

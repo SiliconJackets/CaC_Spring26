@@ -209,6 +209,100 @@ module tb_phase_detector;
         clk_in = 1'b0;
 
         // --------------------------------------------------------
+        // Test 10:
+        // Long run of clk_in with clk_out fixed low — UP must dominate
+        // --------------------------------------------------------
+        clk_out = 1'b0;
+        begin : test10
+            int i;
+            $display("\n=== TEST 10: 10 clk_in pulses, clk_out=0 throughout ===");
+            for (i = 0; i < 10; i++) begin
+                pulse_clk_in();
+            end
+        end
+        check_outputs(1'b1, 1'b0, "after 10 pulses with clk_out=0 -> UP");
+
+        // --------------------------------------------------------
+        // Test 11:
+        // Long run of clk_in with clk_out fixed high — DOWN must dominate
+        // --------------------------------------------------------
+        clk_out = 1'b1;
+        begin : test11
+            int j;
+            $display("\n=== TEST 11: 10 clk_in pulses, clk_out=1 throughout ===");
+            for (j = 0; j < 10; j++) begin
+                pulse_clk_in();
+            end
+        end
+        check_outputs(1'b0, 1'b1, "after 10 pulses with clk_out=1 -> DOWN");
+
+        // --------------------------------------------------------
+        // Test 12:
+        // Alternating clk_out per clk_in cycle
+        // clk_out toggles: low on cycle 1, high on cycle 2, etc.
+        // Verify output tracks current clk_out state at each clk_in edge
+        // --------------------------------------------------------
+        $display("\n=== TEST 12: Alternating clk_out per clk_in pulse ===");
+        clk_out = 1'b0;
+        pulse_clk_in();
+        check_outputs(1'b1, 1'b0, "alt cycle 1: clk_out=0 -> UP");
+
+        clk_out = 1'b1;
+        pulse_clk_in();
+        check_outputs(1'b0, 1'b1, "alt cycle 2: clk_out=1 -> DOWN");
+
+        clk_out = 1'b0;
+        pulse_clk_in();
+        check_outputs(1'b1, 1'b0, "alt cycle 3: clk_out=0 -> UP");
+
+        clk_out = 1'b1;
+        pulse_clk_in();
+        check_outputs(1'b0, 1'b1, "alt cycle 4: clk_out=1 -> DOWN");
+
+        clk_out = 1'b0;
+        pulse_clk_in();
+        check_outputs(1'b1, 1'b0, "alt cycle 5: clk_out=0 -> UP");
+
+        // --------------------------------------------------------
+        // Test 13:
+        // Back-to-back reset cycles — verify outputs clear each time
+        // --------------------------------------------------------
+        $display("\n=== TEST 13: Back-to-back resets ===");
+        begin : test13
+            int k;
+            for (k = 0; k < 3; k++) begin
+                clk_out = 1'b1;
+                pulse_clk_in();                  // establish DOWN
+                rst = 1'b1;
+                #1;
+                check_outputs(1'b0, 1'b0, "reset clears DOWN state");
+                rst = 1'b0;
+                #2;
+                check_outputs(1'b0, 1'b0, "outputs remain 0 after reset release");
+            end
+        end
+
+        // --------------------------------------------------------
+        // Test 14:
+        // clk_out transitions during clk_in high (not a new posedge)
+        // The PD should only react to posedge clk_in, so a clk_out
+        // change during clk_in=1 must not retroactively change output
+        // --------------------------------------------------------
+        $display("\n=== TEST 14: clk_out changes while clk_in is high ===");
+        clk_out = 1'b0;
+        clk_in  = 1'b0;
+        #5;
+        clk_in  = 1'b1;   // posedge — samples clk_out=0 -> UP
+        #1;
+        check_outputs(1'b1, 1'b0, "posedge clk_in with clk_out=0 -> UP");
+        // Now change clk_out while clk_in is still high
+        clk_out = 1'b1;
+        #1;
+        check_outputs(1'b1, 1'b0, "clk_out changes while clk_in=1, output unchanged (UP)");
+        #3;
+        clk_in = 1'b0;
+
+        // --------------------------------------------------------
         // Final report
         // --------------------------------------------------------
         $display("==========================================");
