@@ -1,96 +1,87 @@
-/* |======================================================================= */
-/* | */  
-/* | Created by         :PSyLab */                                           
-/* | Filename           :fsm.sv */                                  
-/* | Author             :sathe(UW) */                                    
-/* | Created On         :2022-07-14 07:38 */                   
-/* | Last Modified      : */                                                 
-/* | Update Count       :2022-07-14 07:38 */                   
-/* | Description        : Basic FSM description*/                                            
-/* | */                                                                      
-/* | */                                                                      
-/* |======================================================================= */
-
-/* Using parameters is a great (and sometimes absolutely critical) way to provide */
-/* flexibility to your code. This  approach not only lets you  setup MWEs with low */ 
-/* bitwidth, or lower tile-counts etc. for trailblazing your sapr flow, it will also */ 
-/* help promote the re-usability of your solution. */
-module fsm 
+module fsm
     #(
-        parameter    wait_cycle = 3,
-        parameter    unused_for_demo_only = 0
+        parameter DEAD_ZONE = 3, // DEAD_ZONE * d_r << d_sw and DEAD_ZONE * d_r >> 0.5T
+        parameter CONTROL_BITS = 4
     )
     (
-        input logic rst_i, //reset
-        input logic clk_i,   //clock
-        input logic go_i,    //go signal
-        input logic wb_i,    //wait_bypass
-        output logic rd_o,   //read output signal
-        output logic ds_o    //done output signal
+        input logic rst_i,
+        input logic clk_i,
+        input logic up, // Asserted to speed up
+        input logic down, // Asserted to slow down
+        output logic [CONTROL_BITS-1:0] ctrl
     );
 
 
-    /* Import the fsm package where you have encoded your state variables to integer values */
-    /* using typedef enum. This approach will help with readability of your code, and your */
-    /* waveforms during debug. */
-    import fsm_pkg::*;
-    state_struct state_r, next_state_r;  //Define state and next of type state_struct
-    
-    //Use $clog2 to derive the bitwidth of the wait cycle counter since it 
-    //can be changed by the calling module at a higher level.
-    logic [$clog2(wait_cycle)-1:0] wait_cycle_count_r, count_next_state_r;
+    typedef enum logic[2:0] {
+        RESET,
+        LOCKING,
+        WAIT,
+        INC,
+        DEC
+    } state_struct;
 
-    //always statement for defining FSM state related update
-    //Why did i do postedge clk_i or posedge rst_i? Why not exclude rst_i? 
-    //Why not posedge clk_i or rst_i? What do those alternatives do?
+    state_struct state, next_state;
+
+    logic [$clog2(DEAD_ZONE)-1:0] current_wait_count, next_wait_count;
+    
 	always_ff @(posedge clk_i or posedge rst_i) 
         if(rst_i) begin
-            state_r<=RESET;
-            wait_cycle_count_r<='0;
+            state <= RESET;
+            current_wait_count <= 0;
         end
         else begin
-            state_r<=next_state_r;
-            wait_cycle_count_r<=count_next_state_r;
+            state <= next_state;
+            current_wait_count <= next_wait_count;
         end
 
-//always statement for defining next_state_r state
 	always_comb begin
-		next_state_r = STATEX;  //default state to X for debug. I prefer lining up the "<=".
-        count_next_state_r='0;
-        case (state_r)
-	    RESET: next_state_r=(go_i)? READ:RESET;
-	    READ: next_state_r=WAIT; //after read state, automatically go into wait state  
-            WAIT: begin 
-                    next_state_r=(wait_cycle_count_r==wait_cycle-1 || wb_i==1'b1)? DONE:WAIT;
-                    count_next_state_r = (wait_cycle_count_r == wait_cycle-1)? '0 : wait_cycle_count_r+1'b1;
-                  end
-            DONE: next_state_r = RESET;
-            default: next_state_r=STATEX;
+        next_state = state;
+        next_wait_count = current_wait_count;
+
+        case (state)
+	        RESET: next_state = LOCKING;
+	        LOCKING: begin
+                if (down) begin 
+                    next_state = WAIT;
+                end else begin
+                    next_state = LOCKING;
+                end
+                next_wait_count = 0;
+            end
+            WAIT: begin
+                next_wait_count = current_wait_count + 1;
+                next_state = (current_wait_count < DEAD_ZONE - 1) ? WAIT : INC;
+            end
+            INC: begin
+                if (up) begin 
+                    next_state = INC;
+                end else if (down) begin
+                    next_state = DEC;
+                end 
+            end
+            DEC: begin
+                if (up) begin 
+                    next_state = INC;
+                end else if (down) begin
+                    next_state = DEC;
+                end 
+            end
+            default: next_state = state;
         endcase
     end
 
-//always statement for outputs.
     always_ff @(posedge clk_i or posedge rst_i)
-        if(rst_i) begin //Default assignments
-		    ds_o<=1'b0;
-		    rd_o<=1'b0;
+        if(rst_i) begin
+            ctrl <= 0;
+        end else begin
+            case (state)
+                LOCKING: ctrl <= ctrl + 1;
+                WAIT: begin
+                    ctrl <= ctrl + 1;
+                end
+                INC: ctrl <= ctrl + 1;
+                DEC: ctrl <= ctrl - 1;
+                default: ctrl <= ctrl;
+            endcase
         end
-        else begin
-                  rd_o<=1'b0;//Assign defaults
-                  ds_o<=1'b0;//Assign defaults
-        case (next_state_r)
-            RESET: ; //Why do I need this?
-            READ: rd_o<=1'b1;
-            WAIT: rd_o<=1'b1;
-            DONE: ds_o<=1'b1;
-            default: {rd_o,ds_o} <='x; //What does 'x syntax do? 
-        endcase
-        end
-
 endmodule
-
-////////////////////Some points to ponder and try out////////////
-//1. Why did I need to use the $clog2 function? Why not just hard_o code the width of the counter
-//2. What's the benefit of going through all the trouble to define typedefs for the state? 
-//3. Why not just go with `define statements which look like they will do the same thing?
-//4. I want to build a design based on a "double-edged" flop, i.e. it will trigger on rising and falling edges of the clock. Will it work for me to do always_ff @(clk or posedge rst_i)? What happens in simulation? What happens in Synthesis? Try it!! 
