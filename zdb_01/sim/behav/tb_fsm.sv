@@ -1,1 +1,0 @@
-../../src/verilog/fsm/tb_fsm.sv

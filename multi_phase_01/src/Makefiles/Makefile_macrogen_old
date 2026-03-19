@@ -1,0 +1,117 @@
+##########################################################################
+# Physical Library Preparation  Reference Methodology <setup file> for GDS_IN flow
+# Version: K-2015.06 (July 13, 2015)
+# Copyright (C) 2007-2015 Synopsys, Inc. All rights reserved.
+##########################################################################
+#
+# 2013.03 Version 1.0 Mar 18, 2013
+
+# Library Preparation Script Environment
+# GDS + Milkyway Tech File
+
+# Variables:
+# ----------
+# FLOW_CONFIG points to the configuration file to be used by the flow. By  
+# default, this is ./config/setup.tcl; but you may change to another config 
+# file by either modifyingthe file name here, or by starting the flow target(s) 
+# like this:
+#
+# % make complete FLOW_CONFIG=./config/my_config_file.tcl
+PHONY: clean generate_db complete
+FLOW_CONFIG=libprep.setup.tcl
+TCL_MAIN :=reg_module_qtm.tcl
+
+# Make the config file location known to the unix shell (don't remove this):
+export FLOW_CONFIG
+
+# ACODE contains the Milkyway launch command. You may add a path, but be sure 
+# to not remove the -tcl switch.
+# If a different path is needed to access Hercules (for example, an Astro 
+# installation), change the HCODE variable accordingly.#
+ACODE=Milkyway -tcl
+HCODE=Milkyway -tcl
+ICODE=icc_shell -64
+
+# The variable OPTIONS is used for each launch of Milkyway, and determines the 
+# graphics mode for the Milkyway runs.
+#OPTIONS=-nullDisplay
+OPTIONS=-nogui
+#OPTIONS=-iconic
+
+# VPATH tells the gmake utility to create and look for the target 
+# touchfiles in a certain directory. You should not modify this variable.
+VPATH=touchfiles
+
+# Here are the flow targets. If you make any changes, be careful to maintain a 
+# valid dependency chain.
+init:
+	/bin/rm -rf touchfiles .avntrc
+	/bin/mkdir -p log dump touchfiles
+	/bin/grep ^set $(FLOW_CONFIG) > ./dump/libprep_setup.rep
+
+clean:
+	/bin/rm -f *.log* *_replaced
+	/bin/rm -f pr_bdry multi_height wire_tracks check_wire_tracks
+	/bin/rm -f *LAYOUT_ERRORS
+	/bin/rm -f -r log
+	/bin/mkdir log
+	-@ rm -rf *.db
+	-@ rm -rf *.rpt
+	-@ rm *.log
+
+
+create_ref_libs:
+	$(ACODE) -file rm_libprep_gds_in_scripts/create_ref_libs.tcl -cmd log/As.tcl -log log/create_ref_libs.log $(OPTIONS)
+
+read_gds: create_ref_libs
+	$(ACODE) -file rm_libprep_gds_in_scripts/read_gds.tcl -cmd log/As.tcl -log log/read_gds.log $(OPTIONS)
+        
+smash: read_gds
+	$(ACODE) -file rm_libprep_gds_in_scripts/smash.tcl -cmd log/As.tcl -log log/smash.log $(OPTIONS)
+        
+set_port_types: smash
+	$(ACODE) -file rm_libprep_gds_in_scripts/set_port_types.tcl -cmd log/As.tcl -log log/set_port_types.log $(OPTIONS)
+        
+bpv: set_port_types
+	$(ACODE) -file rm_libprep_gds_in_scripts/bpv.tcl -cmd log/As.tcl -log log/bpv.log $(OPTIONS)
+
+pr_bdry: bpv
+	$(ACODE) -file rm_libprep_gds_in_scripts/pr_bdry.tcl -cmd log/As.tcl -log log/pr_bdry.log $(OPTIONS)
+
+multi_height: pr_bdry
+	$(ACODE) -file rm_libprep_gds_in_scripts/multi_height.tcl -cmd log/As.tcl -log log/multi_height.log $(OPTIONS)
+
+wire_tracks: multi_height
+	$(ACODE) -file rm_libprep_gds_in_scripts/wire_tracks.tcl -cmd log/As.tcl -log log/wire_tracks.log $(OPTIONS)
+        
+check_wire_tracks: wire_tracks
+	$(ACODE) -file rm_libprep_gds_in_scripts/check_wire_tracks.tcl -cmd log/As.tcl -log log/check_wire_tracks.log $(OPTIONS)
+        
+extract_antenna: check_wire_tracks
+	$(HCODE) -file rm_libprep_gds_in_scripts/extract_antenna.tcl -cmd log/As.tcl -log log/extract_antenna.log $(OPTIONS)
+        
+#Extract antenna does not work because we dont have some ICV license. Working around it.
+# diode_ports: extract_antenna
+diode_ports: check_wire_tracks
+	$(ACODE) -file rm_libprep_gds_in_scripts/diode_ports.tcl -cmd log/As.tcl -log log/diode_ports.log $(OPTIONS)
+
+lib_db: diode_ports
+	$(ACODE) -file rm_libprep_gds_in_scripts/lib_db.tcl -cmd log/As.tcl -log log/lib_db.log $(OPTIONS)
+        
+read_final_gds: lib_db
+	$(ACODE) -file rm_libprep_gds_in_scripts/read_final_gds.tcl -cmd log/As.tcl -log log/read_final_gds.log $(OPTIONS)
+
+check_lib: read_final_gds
+	$(ACODE) -file rm_libprep_gds_in_scripts/check_lib.tcl -cmd log/As.tcl -log log/check_lib.log $(OPTIONS)
+
+analyze_lib: check_lib
+	$(ICODE) -f rm_libprep_gds_in_scripts/analyze_lib.tcl |tee log/analyze_lib.log
+        
+complete: analyze_lib
+	touch touchfiles/complete
+        
+start_mw:
+	$(ACODE) -cmdd log/Milkyway -logd log/Milkyway
+
+generate_db:
+	-pt_shell -topo -64bit -f $(TCL_MAIN) | tee pt_shell.log

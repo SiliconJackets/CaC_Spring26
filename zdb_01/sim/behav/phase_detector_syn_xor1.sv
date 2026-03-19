@@ -1,1 +1,0 @@
-../../src/verilog/phase_detector/phase_detector_syn_xor1.sv

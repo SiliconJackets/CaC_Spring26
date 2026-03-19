@@ -1,0 +1,14 @@
+./tb_tdc_top.sv
+
+./tdc_top.sv
+
+./phase_detector_syn_pfd.sv
+
+./controller_saturate.sv
+
+./thermo_encoder.sv
+
+./nand_dcdl_cell.sv
+./nand_dcdl.sv
+./nand_dcdl_top.sv
+
