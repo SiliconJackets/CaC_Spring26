@@ -1,0 +1,1 @@
+../../src/verilog/zdb_top/tb_zdb_top.sv

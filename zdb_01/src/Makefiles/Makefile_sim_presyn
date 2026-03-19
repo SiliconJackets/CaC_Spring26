@@ -1,4 +1,4 @@
-TOPLEVEL= fsm
+TOPLEVEL= inv_dcdl
 TESTNAME=default
 SRC_VERILOG=../../src/verilog/
 SRC_FOLDER= $(SRC_VERILOG)

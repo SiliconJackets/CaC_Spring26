@@ -1,0 +1,100 @@
+Command: vcs -f inv_dcdl.include +v2k -R +lint=all -sverilog -full64 -timescale=1ns/10ps \
+-debug_access+all -debug_region+cell+encrypt -debug_access -l inv_dcdl.log +define++SIM=1 \
++testname=default -lca -kdb
+                         Chronologic VCS (TM)
+       Version X-2025.06-SP2_Full64 -- Thu Mar 19 10:14:38 2026
+
+                    Copyright (c) 1991 - 2025 Synopsys, Inc.
+   This software and the associated documentation are proprietary to Synopsys,
+ Inc. This software may only be used in accordance with the terms and conditions
+ of a written license agreement with Synopsys, Inc. All other use, reproduction,
+   or distribution of this software is strictly prohibited.  Licensed Products
+     communicate with Synopsys servers for the purpose of providing software
+    updates, detecting software piracy and verifying that customers are using
+    Licensed Products in conformity with the applicable License Key for such
+  Licensed Products. Synopsys will use information gathered in connection with
+    this process to deliver software updates and pursue software pirates and
+                                   infringers.
+
+ Inclusivity & Diversity - Visit SolvNetPlus to read the "Synopsys Statement on
+            Inclusivity and Diversity" (Refer to article 000036315 at
+                        https://solvnetplus.synopsys.com)
+
+
+Warning-[LCA_FEATURES_ENABLED] Usage warning
+  LCA features enabled by '-lca' argument on the command line.  For more 
+  information regarding list of LCA features please refer to Chapter "LCA 
+  features" in the VCS Release Notes
+
+Parsing design file '../../src/verilog/dcdl/inv_dcdl.sv'
+Parsing design file '../../src/verilog/dcdl/tb_inv_dcdl.sv'
+Top Level Modules:
+       tb_inv_dcdl
+TimeScale is 1 ns / 1 ps
+
+Lint-[WMIA-L] Width mismatch in assignment
+../../src/verilog/dcdl/tb_inv_dcdl.sv, 17
+  Width mismatch between LHS and RHS is found in assignment:
+  The following 32-bit wide expression is assigned to a 1-bit LHS target:
+  Source info: A = 0;
+  Expression: A
+
+Starting vcs inline pass...
+1 module and 0 UDP read.
+recompiling module tb_inv_dcdl
+make[1]: Entering directory '/nethome/araj92/Cac_Spring26/zdb_01/sim/behav/csrc' \
+
+rm -f _cuarc*.so _csrc*.so pre_vcsobj_*.so share_vcsobj_*.so
+if [ -x ../simv ]; then chmod a-x ../simv; fi
+g++  -o ../simv      -rdynamic  -Wl,-rpath='$ORIGIN'/simv.daidir -Wl,-rpath=./simv.daidir \
+-Wl,-rpath=/tools/software/synopsys/vcs/latest/linux64/lib -L/tools/software/synopsys/vcs/latest/linux64/lib \
+-Wl,-rpath-link=./   objs/amcQw_d.o   _960818_archive_1.so   SIM_l.o       rmapats_mop.o \
+rmapats.o rmar.o rmar_nd.o  rmar_llvm_0_1.o rmar_llvm_0_0.o            -lnuma -lvirsim \
+-lerrorinf -lsnpsmalloc -lvfs      -lvcsnew -ldistsimclient -lsimprofile -luclinative \
+/tools/software/synopsys/vcs/latest/linux64/lib/vcs_tls.o   -Wl,-whole-archive  -lvcsucli \
+-Wl,-no-whole-archive        _vcs_pli_stub_.o   /tools/software/synopsys/vcs/latest/linux64/lib/vcs_save_restore_new.o \
+/tools/software/synopsys/verdi/latest/share/PLI/VCS/LINUX64/pli.a -ldl  -lc -lm -lpthread \
+-ldl 
+../simv up to date
+make[1]: Leaving directory '/nethome/araj92/Cac_Spring26/zdb_01/sim/behav/csrc'
+Command: /nethome/araj92/Cac_Spring26/zdb_01/sim/behav/./simv +v2k +lint=all -a inv_dcdl.log +define++SIM=1 +testname=default -lca
+Chronologic VCS simulator copyright 1991-2025
+Contains Synopsys proprietary information.
+Compiler version X-2025.06-SP2_Full64; Runtime version X-2025.06-SP2_Full64;  Mar 19 10:14 2026
+Starting inverter DCDL test
+t=7000 A=1 Q=00 tap0=1 tap1=1 tap2=1 tap3=1 Y=1
+t=14000 A=0 Q=00 tap0=0 tap1=0 tap2=0 tap3=0 Y=0
+t=21000 A=0 Q=01 tap0=0 tap1=0 tap2=0 tap3=0 Y=0
+t=28000 A=1 Q=01 tap0=1 tap1=1 tap2=1 tap3=1 Y=1
+t=35000 A=0 Q=01 tap0=0 tap1=0 tap2=0 tap3=0 Y=0
+t=42000 A=0 Q=10 tap0=0 tap1=0 tap2=0 tap3=0 Y=0
+t=49000 A=1 Q=10 tap0=1 tap1=1 tap2=1 tap3=1 Y=1
+t=56000 A=1 Q=10 tap0=1 tap1=1 tap2=1 tap3=1 Y=1
+t=63000 A=0 Q=11 tap0=0 tap1=0 tap2=0 tap3=0 Y=0
+t=70000 A=1 Q=11 tap0=1 tap1=1 tap2=1 tap3=1 Y=1
+t=77000 A=1 Q=11 tap0=1 tap1=1 tap2=1 tap3=1 Y=1
+t=84000 A=0 Q=11 tap0=0 tap1=0 tap2=0 tap3=0 Y=0
+t=91000 A=0 Q=00 tap0=0 tap1=0 tap2=0 tap3=0 Y=0
+t=98000 A=1 Q=00 tap0=1 tap1=1 tap2=1 tap3=1 Y=1
+t=105000 A=0 Q=00 tap0=0 tap1=0 tap2=0 tap3=0 Y=0
+t=112000 A=0 Q=00 tap0=0 tap1=0 tap2=0 tap3=0 Y=0
+t=119000 A=1 Q=01 tap0=1 tap1=1 tap2=1 tap3=1 Y=1
+t=126000 A=1 Q=01 tap0=1 tap1=1 tap2=1 tap3=1 Y=1
+t=133000 A=0 Q=10 tap0=0 tap1=0 tap2=0 tap3=0 Y=0
+t=140000 A=1 Q=10 tap0=1 tap1=1 tap2=1 tap3=1 Y=1
+t=147000 A=1 Q=10 tap0=1 tap1=1 tap2=1 tap3=1 Y=1
+t=154000 A=0 Q=10 tap0=0 tap1=0 tap2=0 tap3=0 Y=0
+t=161000 A=0 Q=11 tap0=0 tap1=0 tap2=0 tap3=0 Y=0
+t=168000 A=1 Q=11 tap0=1 tap1=1 tap2=1 tap3=1 Y=1
+t=175000 A=0 Q=11 tap0=0 tap1=0 tap2=0 tap3=0 Y=0
+t=182000 A=0 Q=11 tap0=0 tap1=0 tap2=0 tap3=0 Y=0
+t=189000 A=1 Q=11 tap0=1 tap1=1 tap2=1 tap3=1 Y=1
+t=196000 A=1 Q=11 tap0=1 tap1=1 tap2=1 tap3=1 Y=1
+$finish called from file "../../src/verilog/dcdl/tb_inv_dcdl.sv", line 28.
+$finish at simulation time               199000
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 199000 ps
+CPU Time:      0.340 seconds;       Data structure size:   0.1Mb
+Thu Mar 19 10:14:41 2026
+CPU time: .591 seconds to compile + .449 seconds to elab + .454 seconds to link + .411 seconds in simulation
+Verdi KDB elaboration done and the database successfully generated

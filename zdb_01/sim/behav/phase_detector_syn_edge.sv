@@ -1,0 +1,1 @@
+../../src/verilog/phase_detector/phase_detector_syn_edge.sv
