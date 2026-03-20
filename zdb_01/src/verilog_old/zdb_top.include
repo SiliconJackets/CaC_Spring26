@@ -1,6 +1,0 @@
-./phase_detector.sv
-./dcdl_behavioral.sv
-./dll_controller.sv
-./ring_oscillator.sv
-./inverter.sv
-./tb_zdb_top.sv
