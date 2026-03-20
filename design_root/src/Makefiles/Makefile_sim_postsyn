@@ -1,0 +1,42 @@
+TOPLEVEL=syn_dll
+
+TSMC_STD_CELL=$(PDKS)/tsmc/N65LP/digital/Front_End/verilog/tcbn65lp_200a/tcbn65lp.v
+
+SRC=./syn_dll.syn.v \
+	./delay_cell.sv \
+	./tb.v \
+	$(TSMC_STD_CELL)
+
+
+.DEFAULT_GOAL := vcs
+
+$(TOPLEVEL).include:Makefile
+	rm -rf $@
+	echo $(SRC) > $@
+
+vcs:$(TOPLEVEL).include
+	vcs -f $(TOPLEVEL).include +v2k -R +lint=all +optconfigfile+$(TOPLEVEL).cfg \
+		-sverilog -full64 \
+		-timescale=1ns/10ps -debug_acc+pp+dmptf -debug_region+cell+encrypt \
+		-debug_access +neg_tchk -l $(TOPLEVEL).log +define+SYN=1 +define+SIM=1 \
+		+define+SAPR +define+INITIALIZE_MEMORY +define+ARM_UD_MODEL
+
+clean_hex:
+	make -C $(PRJ)/src/firmware clean	
+
+clean:
+	rm -rf $(TOPLEVEL).include
+	rm -rf alib-52
+	rm -rf db
+	rm -rf ddc
+	rm -rf $(TOPLEVEL)
+	rm -rf reports
+	rm -rf netlist
+	rm -rf csrc
+	rm -rf simv.daidir
+	rm -rf DVEfiles
+	rm -rf *.log
+	rm -rf vcdplus.vpd
+	rm -rf ucli.key
+	rm -rf default.svf
+	rm -rf simv
