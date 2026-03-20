@@ -1,0 +1,25 @@
+
+.PHONY: all clean
+
+RUN_TYPE = apr
+RESULT_DIR = ../../$(RUN_TYPE)/results
+SCRIPT_DIR = ../../src
+SIM_DIR = ../../sim/$(RUN_TYPE)
+all: link_data trng_dut.vcd
+	pt_shell -f pt-pwr.tcl | tee ptpx.log
+
+link_data:
+	-@find -type l -delete
+	-@ln -s $(SCRIPT_DIR)/macro_prep/*.lib ./
+	# -@ln -s $(SIM_DIR)/trng_dut.vpd ./
+	# -@ln -s $(SCRIPT_DIR)/apr ./scripts; # TODO verify this is fine
+	# -@ln -s $(RESULT_DIR)/trng_logic.spef.max ./trng_logic.$(RUN_TYPE).spef
+	# -@ln -s $(RESULT_DIR)/trng_logic.$(RUN_TYPE).sdc
+	# -@ln -s $(RESULT_DIR)/trng_logic.$(RUN_TYPE).v
+
+%.vcd: %.vpd
+	vpd2vcd -full64 +start+160000000 +end+2000000000 $< $@
+
+clean:
+	-rm -rf \
+		*.log
