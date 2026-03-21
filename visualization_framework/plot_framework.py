@@ -1,5 +1,5 @@
 """
-Interactive Pretty Graph Goes BRR
+Interactive Pretty Graph Goes BRR 
 
 Usage in Jupyter Notebook:
     from bokeh.io import output_notebook
@@ -13,20 +13,10 @@ Usage in Jupyter Notebook:
     ioverlay({label: (x, y)}, ...)                             # legend toggle
     isweep_overlay({label: {trace: (x, y)}}, ...)              # 1 slider + legend
     isweep_overlay(deep_nested_dict_with_trace_leaves, ...)    # N sliders + legend
-
-GitHub Rendering:
-    Plots are saved as static PNG images in notebook outputs so GitHub can
-    display them. When opened in VSCode or Colab the interactive Bokeh plot
-    is also shown below the static preview.
 """
 
 
 import numpy as np
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-from IPython.display import display as _ipy_display
-
 from bokeh.plotting import figure, show
 from bokeh.models import (
     ColumnDataSource, CustomJS, Slider,
@@ -41,91 +31,6 @@ COLORS = [
     "#bcbd22", "#17becf",
 ]
 
-# Matplotlib equivalents for static rendering
-_MPL_COLORS = COLORS  # hex strings work for both
-
-
-# ---------------------------------------------------------------------------
-# Environment detection
-# ---------------------------------------------------------------------------
-
-def _is_live_kernel():
-    """True when running inside an actual Jupyter kernel (VSCode, Colab, …)."""
-    try:
-        from IPython import get_ipython
-        shell = get_ipython()
-        return shell is not None and hasattr(shell, "kernel")
-    except Exception:
-        return False
-
-
-# ---------------------------------------------------------------------------
-# Matplotlib static helpers
-# ---------------------------------------------------------------------------
-
-def _mpl_figure(title, xlabel, ylabel, width, height, x_log=False, y_log=False):
-    fig, ax = plt.subplots(figsize=(width / 100, height / 100), dpi=100)
-    ax.set_title(title, fontsize=14)
-    ax.set_xlabel(xlabel, fontsize=12)
-    ax.set_ylabel(ylabel, fontsize=12)
-    ax.grid(alpha=0.3)
-    if x_log:
-        ax.set_xscale("log")
-    if y_log:
-        ax.set_yscale("log")
-    return fig, ax
-
-
-def _mpl_add_trace(ax, x, y, kind, color, label, lw=2, size=20):
-    kind = kind.lower().strip()
-    if kind == "line":
-        ax.plot(x, y, color=color, linewidth=lw, label=label)
-    elif kind == "scatter":
-        ax.scatter(x, y, color=color, s=size, label=label)
-    elif kind == "line+scatter":
-        ax.plot(x, y, color=color, linewidth=lw, label=label)
-        ax.scatter(x, y, color=color, s=size)
-    elif kind == "step":
-        ax.step(x, y, color=color, linewidth=lw, where="post", label=label)
-    elif kind == "area":
-        ax.plot(x, y, color=color, linewidth=lw, label=label)
-        ax.fill_between(x, 0, y, color=color, alpha=0.2)
-    elif kind == "bar":
-        ax.bar(x, y, color=color, alpha=0.7, width=0.7, label=label)
-    elif kind in ("histogram", "hist"):
-        ax.hist(y, bins="auto", color=color, alpha=0.65,
-                edgecolor="white", label=label)
-    elif kind in ("bell", "bell curve", "kde"):
-        from scipy.stats import gaussian_kde
-        samples = np.asarray(y, dtype=float)
-        kde = gaussian_kde(samples)
-        xs = np.linspace(samples.min() - 3 * samples.std(),
-                         samples.max() + 3 * samples.std(), 500)
-        ys = kde(xs)
-        ax.plot(xs, ys, color=color, linewidth=lw, label=label)
-        ax.fill_between(xs, 0, ys, color=color, alpha=0.15)
-    else:
-        raise ValueError(
-            f"Unknown kind '{kind}'. Choose from: line, scatter, "
-            f"line+scatter, step, area, bar, histogram, bell/kde"
-        )
-
-
-def _mpl_style_legend(ax):
-    handles, labels = ax.get_legend_handles_labels()
-    if handles:
-        ax.legend(fontsize=10, framealpha=0.7, loc="best")
-
-
-def _show_static(fig):
-    """Display matplotlib figure as PNG (saved into notebook output for GitHub)."""
-    _ipy_display(fig)
-    plt.close(fig)
-
-
-# ---------------------------------------------------------------------------
-# Bokeh helpers (unchanged from original)
-# ---------------------------------------------------------------------------
 
 def _make_figure(title, xlabel, ylabel, width, height,
                  x_axis_type="linear", y_axis_type="linear"):
@@ -301,24 +206,16 @@ def iplot(
 ):
     """Plot a single dataset."""
     x, y = np.asarray(x, dtype=float), np.asarray(y, dtype=float)
-
-    # Static matplotlib output — always shown; GitHub renders this PNG
-    fig, ax = _mpl_figure(title, xlabel, ylabel, width, height, x_log, y_log)
-    _mpl_add_trace(ax, x, y, kind, color or COLORS[0], title or "data")
-    _show_static(fig)
-
-    # Interactive Bokeh — only rendered in live kernels (VSCode / Colab)
-    if _is_live_kernel():
-        source = ColumnDataSource(data=dict(x=x, y=y))
-        p = _make_figure(
-            title, xlabel, ylabel, width, height,
-            x_axis_type="log" if x_log else "linear",
-            y_axis_type="log" if y_log else "linear",
-        )
-        _add_trace(p, source, kind, color or COLORS[0], label=title or "data")
-        if p.legend:
-            p.legend.visible = False
-        show(p)
+    source = ColumnDataSource(data=dict(x=x, y=y))
+    p = _make_figure(
+        title, xlabel, ylabel, width, height,
+        x_axis_type="log" if x_log else "linear",
+        y_axis_type="log" if y_log else "linear",
+    )
+    _add_trace(p, source, kind, color or COLORS[0], label=title or "data")
+    if p.legend:
+        p.legend.visible = False
+    show(p)
 
 
 def ioverlay(
@@ -328,30 +225,19 @@ def ioverlay(
     x_log=False, y_log=False,
 ):
     """Overlay multiple datasets. Click legend to hide/show."""
-
-    # Static matplotlib output
-    fig, ax = _mpl_figure(title, xlabel, ylabel, width, height, x_log, y_log)
+    p = _make_figure(
+        title, xlabel, ylabel, width, height,
+        x_axis_type="log" if x_log else "linear",
+        y_axis_type="log" if y_log else "linear",
+    )
     for i, (label, (x, y)) in enumerate(datasets.items()):
-        _mpl_add_trace(ax, np.asarray(x, dtype=float), np.asarray(y, dtype=float),
-                       kind, COLORS[i % len(COLORS)], label)
-    _mpl_style_legend(ax)
-    _show_static(fig)
-
-    # Interactive Bokeh
-    if _is_live_kernel():
-        p = _make_figure(
-            title, xlabel, ylabel, width, height,
-            x_axis_type="log" if x_log else "linear",
-            y_axis_type="log" if y_log else "linear",
+        source = ColumnDataSource(
+            data=dict(x=np.asarray(x, dtype=float),
+                      y=np.asarray(y, dtype=float))
         )
-        for i, (label, (x, y)) in enumerate(datasets.items()):
-            source = ColumnDataSource(
-                data=dict(x=np.asarray(x, dtype=float),
-                          y=np.asarray(y, dtype=float))
-            )
-            _add_trace(p, source, kind, COLORS[i % len(COLORS)], label=label)
-        _style_legend(p)
-        show(p)
+        _add_trace(p, source, kind, COLORS[i % len(COLORS)], label=label)
+    _style_legend(p)
+    show(p)
 
 
 def isweep(
@@ -379,22 +265,22 @@ def isweep(
             "T=85": {"VDD=0.9": (x,y), "VDD=1.1": (x,y)}})
     """
     levels, flat_data = _parse_sweep_tree(datasets)
+    n_dims = len(levels)
     dims = [len(lvl) for lvl in levels]
 
-    # Pre-process KDE / histogram data for Bokeh sweep
+    # Pre-process data for kinds that derive display data from raw samples
     render_kind = kind
-    processed_flat = flat_data
     if kind in ("bell", "kde"):
         from scipy.stats import gaussian_kde
         processed = []
         for _, y_raw in flat_data:
             samples = np.asarray(y_raw, dtype=float)
-            kde_fn = gaussian_kde(samples)
+            kde = gaussian_kde(samples)
             xs = np.linspace(samples.min() - 3 * samples.std(),
                              samples.max() + 3 * samples.std(), 500)
-            ys = kde_fn(xs)
+            ys = kde(xs)
             processed.append((xs, ys))
-        processed_flat = processed
+        flat_data = processed
         render_kind = "area"
     elif kind in ("histogram", "hist"):
         processed = []
@@ -403,112 +289,98 @@ def isweep(
             counts, edges = np.histogram(samples, bins="auto")
             centers = (edges[:-1] + edges[1:]) / 2
             processed.append((centers, counts))
-        processed_flat = processed
+        flat_data = processed
         render_kind = "bar"
 
-    # --- Static matplotlib: overlay all sweep datasets ---
-    fig, ax = _mpl_figure(title, xlabel, ylabel, width, height, x_log, y_log)
-    flat_labels = [
-        "  ·  ".join(lvl[i] for lvl, i in
-                     zip(levels, _flat_idx_to_indices(n, dims)))
-        for n in range(len(flat_data))
-    ]
-    for n, (xy, label) in enumerate(zip(processed_flat, flat_labels)):
+    # Build flat source array
+    all_sources = []
+    for xy in flat_data:
         x, y = xy
-        color = COLORS[n % len(COLORS)]
-        _mpl_add_trace(ax, np.asarray(x, dtype=float), np.asarray(y, dtype=float),
-                       render_kind if render_kind != "area" else "line",
-                       color, label)
-    _mpl_style_legend(ax)
-    # Add subtitle noting this is a static view of all sweep values
-    ax.set_title(f"{title}\n(static: all sweep values overlaid)", fontsize=12)
-    _show_static(fig)
+        all_sources.append(ColumnDataSource(
+            data=dict(x=np.asarray(x, dtype=float),
+                      y=np.asarray(y, dtype=float))
+        ))
 
-    # --- Interactive Bokeh sweep ---
-    if _is_live_kernel():
-        all_sources = []
-        for xy in processed_flat:
-            x, y = xy
-            all_sources.append(ColumnDataSource(
-                data=dict(x=np.asarray(x, dtype=float),
-                          y=np.asarray(y, dtype=float))
-            ))
+    # Active source
+    first_x, first_y = flat_data[0]
+    active_source = ColumnDataSource(
+        data=dict(x=np.asarray(first_x, dtype=float),
+                  y=np.asarray(first_y, dtype=float))
+    )
 
-        first_x, first_y = processed_flat[0]
-        active_source = ColumnDataSource(
-            data=dict(x=np.asarray(first_x, dtype=float),
-                      y=np.asarray(first_y, dtype=float))
-        )
+    p = _make_figure(
+        title, xlabel, ylabel, width, height,
+        x_axis_type="log" if x_log else "linear",
+        y_axis_type="log" if y_log else "linear",
+    )
+    _add_trace(p, active_source, render_kind, COLORS[0],
+               label=levels[0][0] if levels else "data")
+    if p.legend:
+        p.legend.visible = False
 
-        p = _make_figure(
-            title, xlabel, ylabel, width, height,
-            x_axis_type="log" if x_log else "linear",
-            y_axis_type="log" if y_log else "linear",
-        )
-        _add_trace(p, active_source, render_kind, COLORS[0],
-                   label=levels[0][0] if levels else "data")
-        if p.legend:
-            p.legend.visible = False
+    # Label showing current selection
+    init_label = "  &middot;  ".join(lvl[0] for lvl in levels)
+    label_div = Div(
+        text=f"<b style='font-size:13px;'>{init_label}</b>",
+        width=width,
+        styles={"text-align": "center"},
+    )
 
-        init_label = "  &middot;  ".join(lvl[0] for lvl in levels)
-        label_div = Div(
-            text=f"<b style='font-size:13px;'>{init_label}</b>",
-            width=width,
-            styles={"text-align": "center"},
-        )
+    # Build sliders
+    sliders = []
+    for d in range(n_dims):
+        s = Slider(start=0, end=dims[d] - 1, value=0, step=1,
+                   title="", show_value=False, width=width - 60)
+        sliders.append(s)
 
-        n_dims = len(levels)
-        sliders = []
-        for d in range(n_dims):
-            s = Slider(start=0, end=dims[d] - 1, value=0, step=1,
-                       title="", show_value=False, width=width - 60)
-            sliders.append(s)
+    # Single JS callback shared by all sliders
+    # Each slider is passed as s0, s1, ... to avoid circular reference
+    # (slider -> callback -> sliders list -> slider)
+    slider_idx_code = " ".join(
+        f"indices.push(s{d}.value);" for d in range(n_dims)
+    )
+    js_code = f"""
+        const indices = [];
+        {slider_idx_code}
+        let flat_idx = 0;
+        for (let d = 0; d < dims.length; d++) {{
+            flat_idx = flat_idx * dims[d] + indices[d];
+        }}
+        active.data = {{...all_sources[flat_idx].data}};
+        active.change.emit();
 
-        slider_idx_code = " ".join(
-            f"indices.push(s{d}.value);" for d in range(n_dims)
-        )
-        js_code = f"""
-            const indices = [];
-            {slider_idx_code}
-            let flat_idx = 0;
-            for (let d = 0; d < dims.length; d++) {{
-                flat_idx = flat_idx * dims[d] + indices[d];
-            }}
-            active.data = {{...all_sources[flat_idx].data}};
-            active.change.emit();
+        let parts = [];
+        for (let d = 0; d < dims.length; d++) {{
+            parts.push(levels[d][indices[d]]);
+        }}
+        label_div.text = "<b style='font-size:13px;'>" + parts.join("  &middot;  ") + "</b>";
 
-            let parts = [];
-            for (let d = 0; d < dims.length; d++) {{
-                parts.push(levels[d][indices[d]]);
-            }}
-            label_div.text = "<b style='font-size:13px;'>" + parts.join("  &middot;  ") + "</b>";
+        const color = colors[flat_idx % colors.length];
+        for (const r of renderers) {{
+            if (r.glyph && r.glyph.line_color !== undefined)
+                r.glyph.line_color = color;
+            if (r.glyph && r.glyph.fill_color !== undefined)
+                r.glyph.fill_color = color;
+        }}
+    """
 
-            const color = colors[flat_idx % colors.length];
-            for (const r of renderers) {{
-                if (r.glyph && r.glyph.line_color !== undefined)
-                    r.glyph.line_color = color;
-                if (r.glyph && r.glyph.fill_color !== undefined)
-                    r.glyph.fill_color = color;
-            }}
-        """
+    cb_args = dict(
+        active=active_source,
+        all_sources=all_sources,
+        levels=levels,
+        dims=dims,
+        label_div=label_div,
+        renderers=p.renderers,
+        colors=COLORS,
+    )
+    for d, s in enumerate(sliders):
+        cb_args[f"s{d}"] = s
 
-        cb_args = dict(
-            active=active_source,
-            all_sources=all_sources,
-            levels=levels,
-            dims=dims,
-            label_div=label_div,
-            renderers=p.renderers,
-            colors=COLORS,
-        )
-        for d, s in enumerate(sliders):
-            cb_args[f"s{d}"] = s
+    for s in sliders:
+        s.js_on_change("value", CustomJS(args=cb_args, code=js_code))
 
-        for s in sliders:
-            s.js_on_change("value", CustomJS(args=cb_args, code=js_code))
-
-        layout = column(p, label_div, *sliders, sizing_mode="fixed")
-        show(layout)
+    layout = column(p, label_div, *sliders, sizing_mode="fixed")
+    show(layout)
 
 
 def isweep_overlay(
@@ -544,115 +416,91 @@ def isweep_overlay(
     })
     """
     levels, trace_names, flat_data = _parse_sweep_overlay_tree(sweep_groups)
+    n_dims = len(levels)
     dims = [len(lvl) for lvl in levels]
     n_traces = len(trace_names)
 
-    # --- Static matplotlib: show first sweep position with all overlaid traces ---
+    # Active sources — one per trace
     first_cell = flat_data[0]
-    sweep_label = "  ·  ".join(lvl[0] for lvl in levels)
-    fig, ax = _mpl_figure(title, xlabel, ylabel, width, height, x_log, y_log)
-    for i, tname in enumerate(trace_names):
+    active_sources = []
+    for tname in trace_names:
         x, y = first_cell[tname]
-        _mpl_add_trace(ax, np.asarray(x, dtype=float), np.asarray(y, dtype=float),
-                       kind, COLORS[i % len(COLORS)], tname)
-    _mpl_style_legend(ax)
-    ax.set_title(f"{title}\n(static: {sweep_label})", fontsize=12)
-    _show_static(fig)
+        active_sources.append(ColumnDataSource(
+            data=dict(x=np.asarray(x, dtype=float),
+                      y=np.asarray(y, dtype=float))
+        ))
 
-    # --- Interactive Bokeh ---
-    if _is_live_kernel():
-        active_sources = []
+    # Master: flat list of lists-of-sources, one inner list per grid cell
+    all_cells = []
+    for cell_dict in flat_data:
+        cell_srcs = []
         for tname in trace_names:
-            x, y = first_cell[tname]
-            active_sources.append(ColumnDataSource(
+            x, y = cell_dict[tname]
+            cell_srcs.append(ColumnDataSource(
                 data=dict(x=np.asarray(x, dtype=float),
                           y=np.asarray(y, dtype=float))
             ))
+        all_cells.append(cell_srcs)
 
-        all_cells = []
-        for cell_dict in flat_data:
-            cell_srcs = []
-            for tname in trace_names:
-                x, y = cell_dict[tname]
-                cell_srcs.append(ColumnDataSource(
-                    data=dict(x=np.asarray(x, dtype=float),
-                              y=np.asarray(y, dtype=float))
-                ))
-            all_cells.append(cell_srcs)
+    p = _make_figure(
+        title, xlabel, ylabel, width, height,
+        x_axis_type="log" if x_log else "linear",
+        y_axis_type="log" if y_log else "linear",
+    )
 
-        p = _make_figure(
-            title, xlabel, ylabel, width, height,
-            x_axis_type="log" if x_log else "linear",
-            y_axis_type="log" if y_log else "linear",
-        )
+    for i, tname in enumerate(trace_names):
+        _add_trace(p, active_sources[i], kind,
+                   COLORS[i % len(COLORS)], label=tname)
 
-        for i, tname in enumerate(trace_names):
-            _add_trace(p, active_sources[i], kind,
-                       COLORS[i % len(COLORS)], label=tname)
+    _style_legend(p)
 
-        _style_legend(p)
+    init_label = "  &middot;  ".join(lvl[0] for lvl in levels)
+    label_div = Div(
+        text=f"<b style='font-size:13px;'>{init_label}</b>",
+        width=width,
+        styles={"text-align": "center"},
+    )
 
-        init_label = "  &middot;  ".join(lvl[0] for lvl in levels)
-        label_div = Div(
-            text=f"<b style='font-size:13px;'>{init_label}</b>",
-            width=width,
-            styles={"text-align": "center"},
-        )
+    sliders = []
+    for d in range(n_dims):
+        s = Slider(start=0, end=dims[d] - 1, value=0, step=1,
+                   title="", show_value=False, width=width - 60)
+        sliders.append(s)
 
-        n_dims = len(levels)
-        sliders = []
-        for d in range(n_dims):
-            s = Slider(start=0, end=dims[d] - 1, value=0, step=1,
-                       title="", show_value=False, width=width - 60)
-            sliders.append(s)
+    slider_idx_code = " ".join(
+        f"indices.push(s{d}.value);" for d in range(n_dims)
+    )
+    js_code = f"""
+        const indices = [];
+        {slider_idx_code}
+        let flat_idx = 0;
+        for (let d = 0; d < dims.length; d++) {{
+            flat_idx = flat_idx * dims[d] + indices[d];
+        }}
+        const cell = all_cells[flat_idx];
+        for (let t = 0; t < active_sources.length; t++) {{
+            active_sources[t].data = {{...cell[t].data}};
+            active_sources[t].change.emit();
+        }}
+        let parts = [];
+        for (let d = 0; d < dims.length; d++) {{
+            parts.push(levels[d][indices[d]]);
+        }}
+        label_div.text = "<b style='font-size:13px;'>" + parts.join("  &middot;  ") + "</b>";
+    """
 
-        slider_idx_code = " ".join(
-            f"indices.push(s{d}.value);" for d in range(n_dims)
-        )
-        js_code = f"""
-            const indices = [];
-            {slider_idx_code}
-            let flat_idx = 0;
-            for (let d = 0; d < dims.length; d++) {{
-                flat_idx = flat_idx * dims[d] + indices[d];
-            }}
-            const cell = all_cells[flat_idx];
-            for (let t = 0; t < active_sources.length; t++) {{
-                active_sources[t].data = {{...cell[t].data}};
-                active_sources[t].change.emit();
-            }}
-            let parts = [];
-            for (let d = 0; d < dims.length; d++) {{
-                parts.push(levels[d][indices[d]]);
-            }}
-            label_div.text = "<b style='font-size:13px;'>" + parts.join("  &middot;  ") + "</b>";
-        """
+    cb_args = dict(
+        active_sources=active_sources,
+        all_cells=all_cells,
+        levels=levels,
+        dims=dims,
+        label_div=label_div,
+    )
+    for d, s in enumerate(sliders):
+        cb_args[f"s{d}"] = s
 
-        cb_args = dict(
-            active_sources=active_sources,
-            all_cells=all_cells,
-            levels=levels,
-            dims=dims,
-            label_div=label_div,
-        )
-        for d, s in enumerate(sliders):
-            cb_args[f"s{d}"] = s
+    for s in sliders:
+        s.js_on_change("value", CustomJS(args=cb_args, code=js_code))
 
-        for s in sliders:
-            s.js_on_change("value", CustomJS(args=cb_args, code=js_code))
-
-        layout = column(p, label_div, *sliders, sizing_mode="fixed")
-        show(layout)
-
-
-# ---------------------------------------------------------------------------
-# Internal utility
-# ---------------------------------------------------------------------------
-
-def _flat_idx_to_indices(flat_idx, dims):
-    """Convert a flat row-major index back to per-dimension indices."""
-    indices = []
-    for d in reversed(dims):
-        indices.append(flat_idx % d)
-        flat_idx //= d
-    return list(reversed(indices))
+    layout = column(p, label_div, *sliders, sizing_mode="fixed")
+    show(layout)
