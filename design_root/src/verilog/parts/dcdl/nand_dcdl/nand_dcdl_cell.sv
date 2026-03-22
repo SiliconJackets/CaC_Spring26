@@ -9,9 +9,14 @@ module nand_dcdl_cell(
     input logic ctl, 
     output logic out
 );
-    (* keep = "true" *) logic n1; //extra synthesis protection
-    (* keep = "true" *) logic n2;
-    assign n1 = ~(in1 & ~ctl);
-    assign n2 = ~(in0 & ctl);
-    assign out = ~(n1 & n2);
+    (* keep = "true" *) logic inv1_output;
+    (* keep = "true" *) logic nand_cell_1;
+    (* keep = "true" *) logic nand_cell_2;
+    inverter inv1 (.in(ctl), .out(inv1_output));
+    nand2 nand2_1 (.a(in1), .b(inv1_output), .out(nand_cell_1)); //the commented below line is the actual action. 
+    //assign n1 = ~(in1 & ~ctl);
+    nand2 nand2_2 (.a(in0), .b(ctl), .out(nand_cell_2));
+    //assign n2 = ~(in0 & ctl);
+    nand2 nand2_3 (.a(nand_cell_1), .b(nand_cell_2), .out(out));
+    //assign out = ~(n1 & n2);
 endmodule
