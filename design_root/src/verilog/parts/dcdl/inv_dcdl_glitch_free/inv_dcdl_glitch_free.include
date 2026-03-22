@@ -1,0 +1,2 @@
+../../src/verilog/dcdl/inv_dcdl_glitch_free.sv
+../../src/verilog/dcdl/tb_inv_dcdl_glitch_free.sv
