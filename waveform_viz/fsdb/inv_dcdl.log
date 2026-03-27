@@ -1,0 +1,108 @@
+Command: vcs -f inv_dcdl_viz.include +v2k -R +lint=all -sverilog -full64 -timescale=1ps/1ps \
+-debug_access+all -l /nethome/ehuang303/SiliconJackets/Cac_Spring26/waveform_viz/fsdb/inv_dcdl.log \
++define+SIM=1 +fsdbpath=/nethome/ehuang303/SiliconJackets/Cac_Spring26/waveform_viz/fsdb/inv_dcdl.fsdb \
+-lca -kdb
+                         Chronologic VCS (TM)
+       Version X-2025.06-SP2_Full64 -- Fri Mar 27 17:02:57 2026
+
+                    Copyright (c) 1991 - 2025 Synopsys, Inc.
+   This software and the associated documentation are proprietary to Synopsys,
+ Inc. This software may only be used in accordance with the terms and conditions
+ of a written license agreement with Synopsys, Inc. All other use, reproduction,
+   or distribution of this software is strictly prohibited.  Licensed Products
+     communicate with Synopsys servers for the purpose of providing software
+    updates, detecting software piracy and verifying that customers are using
+    Licensed Products in conformity with the applicable License Key for such
+  Licensed Products. Synopsys will use information gathered in connection with
+    this process to deliver software updates and pursue software pirates and
+                                   infringers.
+
+ Inclusivity & Diversity - Visit SolvNetPlus to read the "Synopsys Statement on
+            Inclusivity and Diversity" (Refer to article 000036315 at
+                        https://solvnetplus.synopsys.com)
+
+
+Warning-[LCA_FEATURES_ENABLED] Usage warning
+  LCA features enabled by '-lca' argument on the command line.  For more 
+  information regarding list of LCA features please refer to Chapter "LCA 
+  features" in the VCS Release Notes
+
+Parsing design file './inverter.sv'
+
+Warning-[CIWC] Ignored /* within /* */ comment
+./inverter.sv, 5
+  Nested comments is found. Ignoring nested '/*'. 
+  /* | */                                                                     
+  ^
+
+Parsing design file './mux.sv'
+Parsing design file './inv_dcdl.sv'
+Parsing design file './tb_inv_dcdl_viz.sv'
+
+Lint-[NS] Null statement
+./tb_inv_dcdl_viz.sv, 27
+  Null statement is used in following verilog source.
+  Source info:         A = 0; #5000;
+
+Top Level Modules:
+       tb_inv_dcdl_viz
+TimeScale is 1 ps / 1 ps
+
+Lint-[WMIA-L] Width mismatch in assignment
+./tb_inv_dcdl_viz.sv, 15
+  Width mismatch between LHS and RHS is found in assignment:
+  The following 72-bit wide expression is assigned to a 4096-bit LHS target:
+  Source info: fsdbpath = "dump.fsdb";
+  Expression: fsdbpath
+
+
+Lint-[WMIA-L] Width mismatch in assignment
+./tb_inv_dcdl_viz.sv, 20
+  Width mismatch between LHS and RHS is found in assignment:
+  The following 32-bit wide expression is assigned to a 1-bit LHS target:
+  Source info: A = 0;
+  Expression: A
+
+
+Lint-[WMIA-L] Width mismatch in assignment
+./tb_inv_dcdl_viz.sv, 27
+  Width mismatch between LHS and RHS is found in assignment:
+  The following 32-bit wide expression is assigned to a 1-bit LHS target:
+  Source info: A = 0;
+  Expression: A
+
+Starting vcs inline pass...
+2 modules and 0 UDP read.
+recompiling module inv_dcdl
+recompiling module tb_inv_dcdl_viz
+Both modules done.
+rm -f _cuarc*.so _csrc*.so pre_vcsobj_*.so share_vcsobj_*.so
+if [ -x ../simv ]; then chmod a-x ../simv; fi
+g++  -o ../simv      -rdynamic  -Wl,-rpath='$ORIGIN'/simv.daidir -Wl,-rpath=./simv.daidir \
+-Wl,-rpath=/tools/software/synopsys/vcs/latest/linux64/lib -L/tools/software/synopsys/vcs/latest/linux64/lib \
+-Wl,-rpath-link=./   objs/amcQw_d.o   _195067_archive_1.so   SIM_l.o       rmapats_mop.o \
+rmapats.o rmar.o rmar_nd.o  rmar_llvm_0_1.o rmar_llvm_0_0.o            -lnuma -lvirsim \
+-lerrorinf -lsnpsmalloc -lvfs      -lvcsnew -ldistsimclient -lsimprofile -luclinative \
+/tools/software/synopsys/vcs/latest/linux64/lib/vcs_tls.o   -Wl,-whole-archive  -lvcsucli \
+-Wl,-no-whole-archive        _vcs_pli_stub_.o   /tools/software/synopsys/vcs/latest/linux64/lib/vcs_save_restore_new.o \
+/tools/software/synopsys/verdi/latest/share/PLI/VCS/LINUX64/pli.a -ldl  -lc -lm -lpthread \
+-ldl 
+../simv up to date
+Command: /nethome/ehuang303/SiliconJackets/Cac_Spring26/design_root/sim/behav/./simv +v2k +lint=all -a /nethome/ehuang303/SiliconJackets/Cac_Spring26/waveform_viz/fsdb/inv_dcdl.log +define+SIM=1 +fsdbpath=/nethome/ehuang303/SiliconJackets/Cac_Spring26/waveform_viz/fsdb/inv_dcdl.fsdb -lca
+Chronologic VCS simulator copyright 1991-2025
+Contains Synopsys proprietary information.
+Compiler version X-2025.06-SP2_Full64; Runtime version X-2025.06-SP2_Full64;  Mar 27 17:02 2026
+*Verdi* Loading libsscore_vcs202506.so
+FSDB Dumper for VCS, Release Verdi_X-2025.06-SP2, Linux x86_64/64bit, 11/27/2025
+(C) 1996 - 2025 by Synopsys, Inc.
+*Verdi* : Create FSDB file '/nethome/ehuang303/SiliconJackets/Cac_Spring26/waveform_viz/fsdb/inv_dcdl.fsdb'
+*Verdi* : Begin traversing the scope (tb_inv_dcdl_viz.dut), layer (0).
+*Verdi* : End of traversing.
+$finish called from file "./tb_inv_dcdl_viz.sv", line 29.
+$finish at simulation time               165000
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 165000 ps
+CPU Time:      0.370 seconds;       Data structure size:   0.0Mb
+Fri Mar 27 17:03:00 2026
+CPU time: .649 seconds to compile + .470 seconds to elab + .528 seconds to link + .436 seconds in simulation
+Verdi KDB elaboration done and the database successfully generated
