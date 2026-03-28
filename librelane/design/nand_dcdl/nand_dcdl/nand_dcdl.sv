@@ -5,6 +5,7 @@
 (* dont_touch = "true" *)
 module nand_dcdl(
     input logic A,
+    input logic chain_in,
     input logic [3:0] Q, 
     output logic Y
 );
@@ -14,7 +15,7 @@ module nand_dcdl(
     (* keep = "true" *) logic s0;
     //delay cell 3 :)
     nand_dcdl_cell cell3 (
-        .in1(1'b0),
+        .in1(chain_in),
         .in0(A),
         .ctl(Q[3]),
         .out(s3)
