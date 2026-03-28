@@ -1,0 +1,6 @@
+./inverter.sv
+./nand2.sv
+./mux.sv
+./xnor2.sv
+./inv_dcdl_cond.sv
+./tb_inv_dcdl_cond_viz.sv
