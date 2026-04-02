@@ -1,4 +1,4 @@
-TOPLEVEL=nand_dcdl
+TOPLEVEL=inv_dcdl_glitch_free
 TESTNAME=default
 SRC_VERILOG=../../src/verilog/
 SRC_FOLDER= $(SRC_VERILOG)

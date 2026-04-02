@@ -1,2 +1,4 @@
+../../src/verilog/dcdl/gates/inverter.sv
+../../src/verilog/dcdl/gates/nand2.sv
 ../../src/verilog/dcdl/inv_dcdl_glitch_free.sv
 ../../src/verilog/dcdl/tb_inv_dcdl_glitch_free.sv
