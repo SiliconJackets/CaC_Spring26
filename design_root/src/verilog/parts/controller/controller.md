@@ -1,5 +1,9 @@
-# Digital Delay Locked Loop (DLL) Controller
 
+---
+
+# 📘 Digital Phase Detector (DLL / PLL)
+
+---
 
 ## Signal Flow
 
@@ -9,185 +13,151 @@ Phase Detector → Controller → Delay Line → Clock Output
 
 * **Phase Detector (PD)**
 
-  * generates `up/down` signals
-  * tells **direction**
+  * compares `clk_in` and `clk_out`
+  * generates `up/down`
+  * tells **direction of error**
+
 * **Controller**
 
-  * integrates error into a control word
-  * decides **how much to adjust**
+  * converts direction into delay updates
+
 * **DCDL**
 
-  * adjusts delay accordingly
   * applies **physical delay**
 
 Together, they form a **closed feedback system** that converges to phase alignment.
 
 ---
 
-## 1. Controller System Context
+## 1. Phase Detector System Context
 
-The goal of a Delay Locked Loop (DLL) is to align the phase of an output clock with a reference clock. It does so by adjusting the delay through a digitally controlled delay line (DCDL). The controller forms the bridge that translates phase error into delay control updates.
+The goal of a phase detector is to determine the **relative timing between two clocks**:
 
-The controller converts **phase error → delay adjustment**
+* `clk_in` → reference clock
+* `clk_out` → feedback clock
 
-#### Inputs
+The phase detector converts:
 
-* `up` → output clock is **late** → increase delay
-* `down` → output clock is **early** → decrease delay
+> **phase difference → directional control signal**
 
-#### Output
+---
 
-* `ctrl[N-1:0]` → sets delay of DCDL
+### Inputs
+
+* `clk_in` → reference clock
+* `clk_out` → feedback clock
+
+---
+
+### Outputs
+
+* `up` → reference leads → **speed up loop**
+* `down` → feedback leads → **slow down loop**
+
+---
 
 ```
-CLK_IN -------> +-------------------+      up[1:0], down[1:0]      +-------------------+
-                |   Phase Detector  | ----------------------------> |    Controller     |
-CLK_OUT  <----- |                   |                               |   THIS SECTION    |
-                +-------------------+                               +---------+---------+
-                                                                          |
-                                                                          | ctrl[N-1:0]
-                                                                          v
-                                                                   +-----------------------+
-                                                                   |   Delay Line (DCDL)   |
-                                                                   |                       |
-                                                                   +-----------+-----------+
-                                                                          |
-                                                                          v
-                                                                       CLK_OUT
-
-                               Simple Delay Locked Loop Diagram
+CLK_IN -------> +-------------------+      up, down       +-------------------+
+                |   Phase Detector  | ------------------> |    Controller     |
+CLK_OUT  <----- |   THIS SECTION    |                     |                   |
+                +-------------------+                     +---------+---------+
+                                                                  |
+                                                                  v
+                                                           Delay Line (DCDL)
+                                                                  |
+                                                                  v
+                                                               CLK_OUT
 ```
 
 ---
 
-#### Core Behavior (Step-by-Step)
+### Core Behavior (Step-by-Step)
 
-At every clock cycle:
+At each clock interaction:
 
-1. **Read phase detector output**
+1. **Observe edges**
 
-   * `(up, down) ∈ { (1,0), (0,1), (0,0), (1,1) }`
+   * detect rising edges of `clk_in` and `clk_out`
 
-2. **Interpret phase error**
+2. **Compare timing**
 
-   * `(1,0)` → output clock is **late** → increase delay
-   * `(0,1)` → output clock is **early** → decrease delay
-   * `(0,0)` or `(1,1)` → no valid correction → hold
+   * determine which edge arrived first
 
-3. **Update control word**
+3. **Generate output**
 
-   The controller behaves like a simple digital accumulator (a counter):
-
-   `ctrl[k+1] = ctrl[k] + up - down`
-
-   Equivalent interpretation:
-
-   * `+1` when `up = 1`
-   * `-1` when `down = 1`
-   * `0` when both are equal
-
-4. **Apply limits (saturation)**
-
-   `0 ≤ ctrl ≤ 2^N - 1`
+   * `clk_in` first → `up = 1`
+   * `clk_out` first → `down = 1`
+   * simultaneous → no decision
 
 ---
 
-#### Intuition
+### Intuition
 
-* `up` pushes the delay **forward**
-* `down` pulls the delay **backward**
-* The controller **accumulates corrections over time** until phase alignment is reached
-
----
-
-#### Mathematical View
-
-The controller behaves like a **digital accumulator**:
-
-`ctrl[k+1] = ctrl[k] + K * e[k]`
-
-Where:
-
-* `e[k] ∈ {-1, 0, +1}` from `up/down`
-* `K` = step size (loop gain)
+* `up` → output clock is **late**
+* `down` → output clock is **early**
+* Only **direction** is provided (not magnitude)
 
 ---
 
-## 2. Controller Design Space
+### Mathematical View
 
-#### Why Controller Design Matters
+```
+e[k] ∈ { -1, 0, +1 }
+```
 
-Controller behavior determines:
-
-* **Lock Time**
-
-  * How fast the system converges
-
-* **Stability**
-
-  * Avoid oscillations or overshoot
-
-* **Jitter**
-
-  * Small fluctuations near lock
+* `+1` → up
+* `-1` → down
+* `0` → no decision
 
 ---
 
-##### Key Trade-Offs
+## 2. Phase Detector Design Space
 
-Different controllers optimize different goals:
+### Why Phase Detector Design Matters
 
-* Fast acquisition  ↔  Low jitter
-* Simple logic      ↔  Adaptive behavior
-* Robustness        ↔  Responsiveness
+Phase detector behavior directly affects:
+
+* **Loop stability**
+* **Jitter near lock**
+* **Lock correctness**
+* **Frequency tracking ability**
 
 ---
 
-No single controller is optimal.
+### Key Trade-Offs
+
+* Simplicity ↔ Accuracy
+* Low area ↔ Robustness
+* Fast response ↔ Clean steady-state
+
+---
+
+No single phase detector is optimal.
 
 This project allows:
 
 * Direct comparison of architectures
-* Understanding trade-offs in practice
-* Testing under identical conditions
-* Building intuition for real DLL design
+* Understanding real trade-offs
+* Observing behavior near lock
+* Connecting theory to implementation
 
 ---
 
-This project explores **5 controller types**:
+### Implemented Detector Types
 
-### 🔹 1. Saturating Controller
-
-* Fixed ±1 step
-* Simple and robust
-
-### 🔹 2. Filtered Controller
-
-* Updates only after repeated requests
-* Reduces noise / chatter
-
-### 🔹 3. Acquire / Track Controller
-
-* Large steps → fast lock
-* Small steps → low jitter
-
-### 🔹 4. Coarse / Fine Controller
-
-* Split control word:
-
-  * Coarse → large jumps
-  * Fine → precision tuning
-
-### 🔹 5. Variable-Step Controller
-
-* Step size increases with repeated error
-* Adaptive behavior
+1. Behavioral Timestamp Detector
+2. Edge-Order Detector
+3. Single Flip-Flop Detector
+4. Phase-Frequency Detector (PFD)
+5. Sampled XOR Detector
 
 ---
 
 ## 3. Control Theory Background
 
-DLL controllers behave as **discrete-time integrators** driven by a bang-bang phase detector. It is essentially a counter that keeps adjusting until the clocks line up. The feedback loop helps with the self correcting behavior. The latency that it takes to converge depends heavily on the granularity and the features of the controller. The corrections are constantly accumulated until the error is small enough.
+Phase detectors behave as **binary decision elements** in a feedback loop.
+
+They do **not measure magnitude**, only direction.
 
 ---
 
@@ -197,673 +167,321 @@ DLL controllers behave as **discrete-time integrators** driven by a bang-bang ph
 
 #### • Binary phase error (`up/down`)
 
-* Only the **direction** of error matters, not the amount
-* Implemented using a **bang-bang phase detector**
+* Only the **direction** matters
 
 ```
-Late  → up = 1 → increase delay
-Early → down = 1 → decrease delay
-```
-
----
-
-#### • Loop gain (set by step size)
-
-* **Step size** = how big each correction is
-* **Loop gain** = how strongly the system reacts to error
-
-> “If the clock is wrong, how big of a correction do we make?”
-
-* Large step size:
-
-  * Faster correction
-  * More overshoot / jitter
-
-* Small step size:
-
-  * Slower correction
-  * Smoother behavior
-
-```
-High gain:   32 → 36 → 40 → overshoot
-Low gain:    32 → 33 → 34 → smooth approach
+Late  → up = 1
+Early → down = 1
 ```
 
 ---
 
-#### • Digital (Quantized) control
+#### • Bang-Bang behavior
 
-* Everything is **digital**
-* `ctrl` changes in **discrete steps** (no continuous values)
-* Updates happen **once per clock cycle**
+* Output ∈ { +1, -1, 0 }
+* Leads to **nonlinear system behavior**
+
+---
+
+#### • Digital (Quantized) detection
+
+* No continuous phase measurement
 
 ```
-ctrl: 32 → 33 → 34 → 35   (step-by-step)
+Decision: up / down only
 ```
 
 ---
 
 #### • Limit cycles (steady-state oscillation)
 
-* The system **never becomes perfectly still**
-* Near lock, it keeps correcting back and forth
-
 ```
-ctrl: 32 ↔ 33 ↔ 32 ↔ 33
+up → down → up → down
 ```
 
-* These small oscillations appear as **jitter**
+→ causes jitter
 
 ---
 
-#### • Stability depends on update behavior
+#### • Metastability & sampling
 
-* Large / frequent updates:
-
-  * Fast response
-  * More oscillation
-
-* Small / infrequent updates:
-
-  * Slower response
-  * More stable
-
-```
-Fast:   big jumps → oscillation
-Slow:   small steps → stable
-```
+* Occurs when edges are very close
+* Can produce ambiguous or incorrect decisions
 
 ---
 
-## 4. Controller Design Space
+#### • Stability dependency
 
-Different controller architectures trade off:
+* Clean detector → stable loop
+* Noisy detector → jitter / drift
 
-* Speed vs stability
-* Resolution vs complexity
-* Noise immunity vs responsiveness
+---
 
-#### Conceptual Waveform
-```
-clk_in:   ─┐ ─┐ ─┐ ─┐ ─┐ ─┐ ─┐
-           └─┘ └─┘ └─┘ └─┘ └─┘
+## 4. Phase Detector Behavior (Waveforms)
 
-up:        1   1   1   0   0
-down:      0   0   0   1   1
+---
 
-ctrl:     32  33  34  34  33  32
-```
-
-#### Saturation Behavior
-```
-ctrl:   ... 60 61 62 63 63 63 63
-                 ↑  ↑
-              saturates at MAX
-```
-
-#### Filtered (noise suppression)
-```
-up:        1 1 1 1    0
-counter:   1 2 3 4 -> trigger
-ctrl:     32      33
-```
-
-#### Multi-mode (coarse/fine or acquire/track)
-Acquire --> Track Transition
+### Conceptual Behavior
 
 ```
-mode:     A   A   A   A   T   T   T
-step:     4   4   4   4   1   1   1
+clk_in:   ─┐ ─┐ ─┐ ─┐ ─┐
+           └─┘ └─┘ └─┘ └─┘
 
-ctrl:    32 36 40 44 45 46 47
-```
+clk_out:    ─┐ ─┐ ─┐ ─┐
+             └─┘ └─┘ └─┘
 
-Coarse/Fine Behavior
-```
-coarse:   3   4   5   5   5
-fine:     0   0   0   1   2
-
-ctrl:    24  32  40  41  42
-```
-
-
-#### Adaptive (variable step)
-
-```
-same_dir_count: 1 2 3 4 5 6
-step size:      1 1 2 2 4 4
-
-ctrl:          32 33 34 36 38 42
+up:        1   1   0   0
+down:      0   0   1   1
 ```
 
 ---
 
-## 5. Controller Implementations
+### Near-Lock Behavior
 
-This project implements five controller architectures:
+```
+up:     1 0 1 0 1 0
+down:   0 1 0 1 0 1
+```
+
+✔ steady oscillation → jitter
 
 ---
 
-#### Internal Controller Architecture (Generic)
-
-```
-           +-----------------------+
-UP  -----> |                       |
-DOWN ----> |   Control Logic       | ---> ctrl[N-1:0]
-           | (state / arithmetic)  |
-CLK ------>|                       |
-RST ------>|                       |
-           +-----------------------+
-```
+## 5. Phase Detector Implementations
 
 ---
 
-### 5.1 Saturating Up/Down Controller
-
-**Baseline implementation**
-
-* ±1 step per cycle
-* Hard saturation at bounds
-* Simple and robust
-
-✔ Industry baseline
-✖ Slow convergence near lock
+### Internal Architecture (Generic)
 
 ```
-          +------------------+
-UP -----> |                  |
-DOWN ---> |  +1 / -1 Logic   |
-          |  (Adder/Sub)     |
-          +--------+---------+
-                   |
-                   v
-            +-------------+
-            | Saturation  |
-            |  Clamp      |
-            +------+------+
-                   |
-                   v
-                 ctrl
+            +----------------------+
+CLK_IN  --->|                      |
+CLK_OUT --->|   Phase Detection    | ---> up
+RST    --->|                      | ---> down
+            +----------------------+
 ```
 
 ---
 
-### 5.2 Filtered Controller
+### 5.1 Behavioral Timestamp Detector
 
-* Requires repeated requests before update
-* Reduces jitter and chatter
+* Compares edge timestamps (`$time`)
+* Ideal phase comparison
 
-✔ Stable near lock
-✖ Slower response
+✔ Perfect reference
+✖ Not synthesizable
+
+---
+
+#### Diagram
 
 ```
-UP -----> +-------------+         +------------------+
-          | UP Counter  |-------> |                  |
-          +-------------+         |                  |
-                                 |   Update Logic   | ---> ctrl
-DOWN ---> +-------------+         | (only on threshold)
-          | DOWN Counter|-------> |                  |
-          +-------------+         +------------------+
+clk_in  ----> +---------------------+
+              |                     |
+clk_out ----> |  Time Compare       | ---> up / down
+              +---------------------+
 ```
 
 ---
 
-### 5.3 Acquire / Track Controller
-
-* Dual-mode operation:
-
-  * **Acquire**: large steps (fast lock)
-  * **Track**: small steps (low jitter)
-
-✔ Widely used in industry
-✔ Balanced performance
+#### Waveform
 
 ```
-                +----------------------+
-UP/DOWN ------> |   Step Selection     |
-                | (Acquire / Track)    |
-                +----------+-----------+
-                           |
-                           v
-                     +-----------+
-                     | Adder     |
-                     | (+/- step)|
-                     +-----+-----+
-                           |
-                           v
-                         ctrl
-
-          +------------------------------+
-          | Quiet Counter (mode switch)  |
-          +------------------------------+
+up:   1       1
+down: 0       0
 ```
 
 ---
 
-### 5.4 Coarse / Fine Controller
+### 5.2 Edge-Order Detector
 
-* Splits control word:
+* First edge wins
+* Holds until opposite edge
 
-  * Coarse bits → large adjustments
-  * Fine bits → precise tuning
+✔ Simple
+✖ Race conditions
 
-✔ High resolution
-✔ Efficient hardware scaling
+---
+
+#### Diagram
 
 ```
-                 +-------------------+
-UP/DOWN -------> |   Mode Select     |
-                 | (Coarse / Fine)   |
-                 +----+---------+----+
-                      |         |
-                      v         v
-                +---------+  +---------+
-                | Coarse  |  |  Fine   |
-                | Counter |  | Counter |
-                +----+----+  +----+----+
-                     \          /
-                      \        /
-                       v      v
-                    {coarse, fine}
-                          |
-                          v
-                        ctrl
+clk_in  ----> Edge Arbitration ---> up/down
+clk_out ---->
 ```
 
 ---
 
-### 5.5 Variable-Step Controller
-
-* Step size adapts based on persistence of error
-* Nonlinear control behavior
-
-✔ Fast convergence
-✖ Requires careful tuning
+#### Issue
 
 ```
-UP/DOWN -----> +----------------------+
-               | Direction Tracker    |
-               +----------+-----------+
-                          |
-                          v
-               +----------------------+
-               | Step Size Generator  |
-               | (based on history)   |
-               +----------+-----------+
-                          |
-                          v
-                    +-----------+
-                    | Adder     |
-                    | (+/- step)|
-                    +-----+-----+
-                          |
-                          v
-                        ctrl
+up = 1, down = 1   (ambiguous)
+```
+
+---
+
+### 5.3 Single Flip-Flop Detector
+
+* Samples `clk_out` at `clk_in`
+
+✔ Minimal hardware
+✖ Biased near lock
+
+---
+
+#### Diagram
+
+```
+clk_out → DFF → up/down
+clk_in  → CLK
+```
+
+---
+
+### 5.4 Phase-Frequency Detector (PFD)
+
+* Two flip-flops + reset
+
+✔ Industry standard
+✔ Detects frequency
+
+---
+
+#### Diagram
+
+```
+clk_in  → UP FF
+clk_out → DN FF
+           ↓
+         reset
+```
+
+---
+
+#### Waveform
+
+```
+UP:   ┌───┐
+DOWN:    ┌───┐
+```
+
+---
+
+### 5.5 Sampled XOR Detector
+
+* XOR + sampling
+
+✔ Simple
+✖ Weak near lock
+
+---
+
+#### Diagram
+
+```
+clk_in ─┐
+        XOR → sample → up/down
+clk_out ┘
+```
+
+---
+
+#### Failure Case
+
+```
+clk_in ≈ clk_out → no update
 ```
 
 ---
 
 ## 6. Design Trade-Off Matrix
 
-| Controller Type | Lock Speed | Jitter   | Complexity | Industry Use |
-| --------------- | ---------- | -------- | ---------- | ------------ |
-| Saturating      | Low        | Medium   | Low        | Common       |
-| Filtered        | Low        | Low      | Medium     | Moderate     |
-| Acquire/Track   | High       | Low      | Medium     | Very Common  |
-| Coarse/Fine     | High       | Very Low | High       | Very Common  |
-| Variable-Step   | Very High  | Medium   | High       | Specialized  |
+| Detector Type | Accuracy | Complexity | Frequency Detection | Near-Lock | Use     |
+| ------------- | -------- | ---------- | ------------------- | --------- | ------- |
+| Behavioral    | Ideal    | Low        | Limited             | Perfect   | Sim     |
+| Edge-Order    | Medium   | Low        | Limited             | Unstable  | Rare    |
+| Single FF     | Low      | Very Low   | No                  | Biased    | Edu     |
+| PFD           | High     | Medium     | Yes                 | Good      | Std     |
+| XOR           | Medium   | Low        | No                  | Weak      | Limited |
 
 ---
 
-### !!!!!!!!!!!!!!!!!!      TODO: FIX THE REST AI GENERATED       !!!!!!!!
----
+## 7. Practical Considerations
 
-## 7. Design, Tuning & Practical Considerations
-
-Designing a DLL controller requires careful tuning of parameters that directly impact **lock speed, stability, and jitter**. Because the system is fully digital and operates with discrete updates, small parameter changes can significantly affect loop behavior.
-
----
-
-### 🔷 Key Parameters
-
-* **`CTRL_BITS` (Resolution)**
-
-  * Determines the number of discrete delay steps:
-    [
-    \text{Range} = [0, 2^N - 1]
-    ]
-  * More bits → finer delay control → lower jitter
-  * Fewer bits → faster convergence but coarser resolution
+* Clock alignment sensitivity
+* Sampling edge choice
+* Reset correctness
 
 ---
 
-* **`INIT_CTRL` (Startup Bias)**
+## 8. Non-Idealities
 
-  * Initial value of the control word after reset
-  * Ideally chosen near the expected lock point
-  * Poor choice → longer lock time or saturation at startup
-
----
-
-* **Step Size (Loop Gain)**
-
-  * Determines how much `ctrl` changes per update
-  * Large step:
-
-    * Faster lock
-    * Higher overshoot and jitter
-  * Small step:
-
-    * Slower lock
-    * Smoother steady-state behavior
+* Quantization → no fine resolution
+* Limit cycles → jitter
+* Metastability → uncertainty
+* Ambiguous edges → errors
 
 ---
 
-* **Thresholds (Mode Switching / Adaptive Logic)**
+## 9. Verification Strategy
 
-  * Used in:
-
-    * Acquire/Track controllers
-    * Variable-step controllers
-  * Define when the controller:
-
-    * switches modes
-    * increases/decreases step size
-  * Poor tuning → premature switching or instability
-
----
-
-* **Filter Length (Filtered Controllers)**
-
-  * Number of consecutive `up/down` signals required before update
-  * Larger value:
-
-    * Better noise immunity
-    * Slower response
-  * Smaller value:
-
-    * Faster response
-    * More sensitive to noise
-
----
-
-## 8. Digital Effects, Non-Idealities & Stability
-
-Because DLL controllers are fully digital, they exhibit behaviors that differ from ideal continuous systems.
-
----
-
-### 🔷 Quantization Effects
-
-* Control updates happen in **discrete steps**
-* The system cannot settle exactly at the ideal point
-* Result: small oscillations around lock
-
----
-
-### 🔷 Limit Cycles (Steady-State Oscillation)
-
-```id="limit"
-ctrl: 32 ↔ 33 ↔ 32 ↔ 33
-```
-
-* The loop continuously toggles near the correct delay
-* This appears as **jitter** in the output clock
-
----
-
-### 🔷 Bang-Bang Control Behavior
-
-* Phase detector only provides **direction**, not magnitude
-* Leads to:
-
-  * oscillatory behavior near lock
-  * nonlinear loop dynamics
-
----
-
-### 🔷 Metastability & Sampling Effects
-
-* Phase detector decisions depend on clock sampling
-* Near alignment:
-
-  * signals may be ambiguous
-  * incorrect `up/down` decisions can occur
-
----
-
-### 🔷 Stability vs Update Dynamics
-
-* Large / frequent updates:
-
-  * Fast convergence
-  * Increased oscillation
-
-* Small / infrequent updates:
-
-  * Slower convergence
-  * Improved stability
-
----
-
-## 9. Boundary Conditions & Saturation
-
-Controllers must enforce strict limits to ensure safe operation:
-
-[
-0 \le ctrl \le 2^N - 1
-]
-
----
-
-### 🔷 Required Behaviors
-
-* No overflow above maximum value
-* No underflow below zero
-* Proper clamping at boundaries
-* Stable behavior when saturated
-
----
-
-### 🔷 Edge Case Handling
-
-* Recovery from `ctrl = 0` or `ctrl = MAX`
-* No wrap-around (prevents instability)
-* Consistent behavior under persistent `up` or `down`
-
----
-
-## 10. Verification Strategy
-
-A **unified testbench** is used to validate all controller implementations under consistent conditions.
-
----
-
-### 🔷 Philosophy
-
-* Behavior-based (not cycle-exact)
-* Architecture-independent
-* Focused on correctness and robustness
-
----
-
-### 🔷 Core Behaviors Verified
-
-* Reset initialization (`INIT_CTRL`)
-* Monotonic response:
-
-  * `up` → nondecreasing
-  * `down` → nonincreasing
-* Saturation at bounds
-* Stability under idle conditions
-* Recovery from extreme values
+* Reset validation
+* Direction correctness
+* Stability near lock
 * Alternating input robustness
 
 ---
 
-### 🔷 Example Guarantees
+## 10. Implementation Notes
 
-* No overflow or underflow
-* No runaway behavior
-* Correct response to persistent inputs
-* Stable operation across all controller types
-
-✔ Reusable across all designs
+* Edge-triggered logic
+* Asynchronous reset
+* Synthesizable (except behavioral)
 
 ---
 
-## 11. Timing & Implementation Considerations
+## 11. Interaction with Controller
+
+```
+Phase Detector → Controller → Delay Line
+```
+
+* PD → **direction**
+* Controller → **magnitude**
 
 ---
 
-### 🔷 Clocking
+## 12. Selection Guide
 
-* Fully synchronous operation (`clk_in`)
-* Updates occur **once per clock cycle**
-
----
-
-### 🔷 Reset Behavior
-
-* Asynchronous reset supported
-* Initializes controller to `INIT_CTRL`
+| Use Case     | Detector   |
+| ------------ | ---------- |
+| Simulation   | Behavioral |
+| Minimal HW   | Single FF  |
+| Simple       | Edge-order |
+| Production   | PFD        |
+| Experimental | XOR        |
 
 ---
 
-### 🔷 Latency
+## 13. Industry Practices
 
-* One-cycle update latency:
-
-  * phase error → control update → delay adjustment
-
----
-
-### 🔷 Synthesizability
-
-* All designs are:
-
-  * RTL-compliant
-  * Fully synthesizable
-  * Scalable with parameterization
+* **PFD → standard**
+* Coarse/fine + PFD → common
+* XOR / FF → limited use
 
 ---
 
-## 12. Integration with Delay Line (DCDL)
+## 14. Limitations
 
-The controller directly drives the delay line via `ctrl[N-1:0]`.
-
----
-
-### 🔷 Key Considerations
-
-* **Control word → delay mapping**
-
-  * Each increment corresponds to a delay step
-
-* **Resolution matching**
-
-  * `CTRL_BITS` must align with DCDL granularity
-
-* **Dynamic range**
-
-  * Coarse/fine architectures improve range and precision
+* Jitter near lock
+* Metastability
+* Bias in simple detectors
 
 ---
 
-## 13. Stability & Loop Behavior in Practice
+## 15. Future Work
 
----
-
-### 🔷 Observed Behaviors
-
-* High-gain (large step):
-
-  * Fast lock
-  * Overshoot and oscillation
-
-* Low-gain (small step):
-
-  * Slower lock
-  * Reduced jitter
-
----
-
-### 🔷 Bandwidth Intuition
-
-* Step size effectively controls **loop bandwidth**
-* Trade-off:
-
-  * Fast response vs smooth steady-state
-
----
-
-## 14. Controller Selection Guide
-
-| Use Case        | Recommended Controller |
-| --------------- | ---------------------- |
-| Simple system   | Saturating             |
-| Low jitter      | Filtered               |
-| Balanced design | Acquire/Track          |
-| High resolution | Coarse/Fine            |
-| Fastest lock    | Variable-Step          |
-
----
-
-## 15. Industry Practices
-
----
-
-### 🔷 Common Architectures
-
-* **Acquire + Track**
-
-  * Standard in ASIC designs
-  * Balances speed and stability
-
-* **Coarse + Fine**
-
-  * Used in high-resolution DLLs
-  * Improves precision and range
-
----
-
-### 🔷 Hybrid Designs
-
-* Combine multiple techniques:
-
-  * e.g., coarse + fine + filtered
-
----
-
-### 🔷 Less Common
-
-* Pure variable-step controllers
-
-  * Typically research-oriented
-  * Require careful tuning
-
----
-
-## 16. Limitations & Failure Modes
-
----
-
-### 🔷 Common Issues
-
-* Limit-cycle oscillation near lock
-* Slow convergence (filtered designs)
-* Sensitivity to noisy phase detector
-* Incorrect parameter tuning
-
----
-
-## 17. Future Extensions
-
----
-
-* Hybrid controllers (filtered + adaptive)
-* Dynamic threshold tuning
-* Calibration-assisted control
-
----
+* Hybrid detectors
+* Adaptive sampling
+* Calibration methods
 
