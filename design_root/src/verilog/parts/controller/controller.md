@@ -548,144 +548,337 @@ ctrl:          32 33 34 36 38 42
 | Variable-Step   | Very High  | Medium   | High       | Specialized  |
 
 ---
+## !!!!!! TODO: ADD SOME NUMBERS AND DIAGRAMS HERE TO SHOW CONVERGENCE  !!!!!!!!!!
 
-## 7. Mode Switching & State Behavior
+## 7. Design, Tuning & Practical Considerations
 
-Many controllers rely on **state transitions**:
-
-
-### Mechanisms
-
-* Quiet-cycle detection
-* Threshold-based switching
-* Implicit vs explicit FSM
-
-### Risks
-
-* Premature switching
-* Oscillation between modes
+Designing a DLL controller requires careful tuning of parameters that directly impact **lock speed, stability, and jitter**. Because the system is fully digital and operates with discrete updates, small parameter changes can significantly affect loop behavior.
 
 ---
 
-## 8. Parameterization & Tuning
+### 🔷 Key Parameters
 
-Key parameters across implementations:
+* **`CTRL_BITS` (Resolution)**
 
-* `CTRL_BITS` → resolution
-* `INIT_CTRL` → startup bias
-* Step sizes → loop gain
-* Thresholds → switching sensitivity
-* Filter length → noise immunity
-
----
-
-## 9. Numerical Effects & Non-Idealities
-
-Due to digital control:
-
-* Quantization introduces limit cycles
-* Bang-bang control creates oscillations
-* Metastability from PD affects correctness 
+  * Determines the number of discrete delay steps:
+    ` Range = [0, 2^N - 1] `
+  * More bits → finer delay control → lower jitter
+  * Fewer bits → faster convergence but coarser resolution
 
 ---
 
-## 10. Boundary Conditions & Saturation
+* **`INIT_CTRL` (Startup Bias)**
 
-Controllers enforce:
+  * Initial value of the control word after reset
+  * Ideally chosen near the expected lock point
+  * Poor choice → longer lock time or saturation at startup
 
-* No overflow above max control value
+---
+
+* **Step Size (Loop Gain)**
+
+  * Determines how much `ctrl` changes per update
+  * Large step:
+
+    * Faster lock
+    * Higher overshoot and jitter
+   
+  * Small step:
+
+    * Slower lock
+    * Smoother steady-state behavior
+
+---
+
+* **Thresholds (Mode Switching / Adaptive Logic)**
+
+  * Used in:
+
+    * Acquire/Track controllers
+    * Variable-step controllers
+      
+  * Define when the controller:
+
+    * switches modes
+    * increases/decreases step size
+      
+  * Poor tuning → premature switching or instability
+
+---
+
+* **Filter Length (Filtered Controllers)**
+
+  * Number of consecutive `up/down` signals required before update
+  * Larger value:
+
+    * Better noise immunity
+    * Slower response
+      
+  * Smaller value:
+
+    * Faster response
+    * More sensitive to noise
+
+---
+
+## 8. Digital Effects, Non-Idealities & Stability
+
+Because DLL controllers are fully digital, they exhibit behaviors that differ from ideal continuous systems.
+
+---
+
+### 🔷 Quantization Effects
+
+* Control updates happen in **discrete steps**
+* The system cannot settle exactly at the ideal point
+* Result: small oscillations around lock
+
+---
+
+### 🔷 Limit Cycles (Steady-State Oscillation)
+
+```id="limit"
+ctrl: 32 ↔ 33 ↔ 32 ↔ 33
+```
+
+* The loop continuously toggles near the correct delay
+* This appears as **jitter** in the output clock
+
+---
+
+### 🔷 Bang-Bang Control Behavior
+
+* Phase detector only provides **direction**, not magnitude
+* Leads to:
+
+  * oscillatory behavior near lock
+  * nonlinear loop dynamics
+
+---
+
+### 🔷 Metastability & Sampling Effects
+
+* Phase detector decisions depend on clock sampling
+* Near alignment:
+
+  * signals may be ambiguous
+  * incorrect `up/down` decisions can occur
+
+---
+
+### 🔷 Stability vs Update Dynamics
+
+* Large / frequent updates:
+
+  * Fast convergence
+  * Increased oscillation
+
+* Small / infrequent updates:
+
+  * Slower convergence
+  * Improved stability
+
+---
+
+## 9. Boundary Conditions & Saturation
+
+Controllers must enforce strict limits to ensure safe operation:
+
+---
+
+### 🔷 Required Behaviors
+
+* No overflow above maximum value
 * No underflow below zero
-* Stable behavior at boundaries
-* Recovery from extremes
+* Proper clamping at boundaries
+* Stable behavior when saturated
 
 ---
 
-## 11. Verification Strategy
+### 🔷 Edge Case Handling
 
-A **unified testbench** validates all controller types.
+* Recovery from `ctrl = 0` or `ctrl = MAX`
+* No wrap-around (prevents instability)
+* Consistent behavior under persistent `up` or `down`
 
-### 11.1 Philosophy
+---
 
-* Behavior-based validation
+## 10. Verification Strategy
+
+A **unified testbench** is used to validate all controller implementations under consistent conditions.
+
+---
+
+### 🔷 Philosophy
+
+* Behavior-based (not cycle-exact)
 * Architecture-independent
+* Focused on correctness and robustness
 
-### 11.2 Test Coverage
+---
 
-Key behaviors tested:
+### 🔷 Core Behaviors Verified
 
-* Reset correctness
-* Monotonic up/down behavior
-* Saturation limits
+* Reset initialization (`INIT_CTRL`)
+* Monotonic response:
+
+  * `up` → nondecreasing
+  * `down` → nonincreasing
+* Saturation at bounds
 * Stability under idle conditions
-* Recovery from boundaries
+* Recovery from extreme values
 * Alternating input robustness
 
-Example guarantees:
+---
 
-* No overflow/underflow
+### 🔷 Example Guarantees
+
+* No overflow or underflow
 * No runaway behavior
 * Correct response to persistent inputs
+* Stable operation across all controller types
 
-✔ Reusable across all designs 
-
----
-
-## 12. Timing & Implementation Considerations
-
-* Fully synchronous operation
-* Asynchronous reset support
-* One-cycle update latency
-* Synthesizable RTL
+✔ Reusable across all designs
 
 ---
 
-## 13. Integration with DCDL
-
-Controller output drives delay line:
-
-* Control word → delay mapping
-* Resolution must match DCDL granularity
-* Coarse/fine improves dynamic range
+## 11. Timing & Implementation Considerations
 
 ---
 
-## 14. Stability & Loop Behavior
+### 🔷 Clocking
 
-Observed behaviors:
-
-* Fast-lock controllers → potential overshoot
-* Fine-step controllers → reduced jitter
-* Trade-off defines loop bandwidth
+* Fully synchronous operation (`clk_in`)
+* Updates occur **once per clock cycle**
 
 ---
 
-## 15. Controller Selection Guide
+### 🔷 Reset Behavior
 
-| Use Case               | Recommended Controller |
-| ---------------------- | ---------------------- |
-| Simple system          | Saturating             |
-| Low jitter requirement | Filtered               |
-| Balanced design        | Acquire/Track          |
-| High resolution        | Coarse/Fine            |
-| Fastest lock possible  | Variable-Step          |
+* Asynchronous reset supported
+* Initializes controller to `INIT_CTRL`
 
 ---
 
-## 16. Industry Practices
+### 🔷 Latency
 
-Common real-world approaches:
+* One-cycle update latency:
 
-* **Acquire + Track** → standard in ASICs
-* **Coarse + Fine** → used in high-resolution DLLs
-* Hybrid designs → combine multiple strategies
-
-Rare:
-
-* Pure variable-step (research / optimization-heavy)
+  * phase error → control update → delay adjustment
 
 ---
 
-## 17. Limitations & Failure Modes
+### 🔷 Synthesizability
+
+* All designs are:
+
+  * RTL-compliant
+  * Fully synthesizable
+  * Scalable with parameterization
+
+---
+
+## 12. Integration with Delay Line (DCDL)
+
+The controller directly drives the delay line via `ctrl[N-1:0]`.
+
+---
+
+### 🔷 Key Considerations
+
+* **Control word → delay mapping**
+
+  * Each increment corresponds to a delay step
+
+* **Resolution matching**
+
+  * `CTRL_BITS` must align with DCDL granularity
+
+* **Dynamic range**
+
+  * Coarse/fine architectures improve range and precision
+
+---
+
+## 13. Stability & Loop Behavior in Practice
+
+---
+
+### 🔷 Observed Behaviors
+
+* High-gain (large step):
+
+  * Fast lock
+  * Overshoot and oscillation
+
+* Low-gain (small step):
+
+  * Slower lock
+  * Reduced jitter
+
+---
+
+### 🔷 Bandwidth Intuition
+
+* Step size effectively controls **loop bandwidth**
+* Trade-off:
+
+  * Fast response vs smooth steady-state
+
+---
+
+## 14. Controller Selection Guide
+
+| Use Case        | Recommended Controller |
+| --------------- | ---------------------- |
+| Simple system   | Saturating             |
+| Low jitter      | Filtered               |
+| Balanced design | Acquire/Track          |
+| High resolution | Coarse/Fine            |
+| Fastest lock    | Variable-Step          |
+
+---
+
+## 15. Industry Practices
+
+---
+
+### 🔷 Common Architectures
+
+* **Acquire + Track**
+
+  * Standard in ASIC designs
+  * Balances speed and stability
+
+* **Coarse + Fine**
+
+  * Used in high-resolution DLLs
+  * Improves precision and range
+
+---
+
+### 🔷 Hybrid Designs
+
+* Combine multiple techniques:
+
+  * e.g., coarse + fine + filtered
+
+---
+
+### 🔷 Less Common
+
+* Pure variable-step controllers
+
+  * Typically research-oriented
+  * Require careful tuning
+
+---
+
+## 16. Limitations & Failure Modes
+
+---
+
+### 🔷 Common Issues
 
 * Limit-cycle oscillation near lock
 * Slow convergence (filtered designs)
@@ -694,7 +887,9 @@ Rare:
 
 ---
 
-## 18. Future Extensions
+## 17. Future Extensions
+
+---
 
 * Hybrid controllers (filtered + adaptive)
 * Dynamic threshold tuning
@@ -702,18 +897,7 @@ Rare:
 
 ---
 
-## 19. References
 
-* Digital Delay Lock Techniques (textbook) 
-* Unified controller testbench 
-
----
-
-## ✅ Summary
-
-This controller suite explores the **full design spectrum of digital DLL control**, from simple baseline designs to advanced adaptive architectures, with a unified verification framework and strong grounding in both theory and practice.
-
----
 
 
 
