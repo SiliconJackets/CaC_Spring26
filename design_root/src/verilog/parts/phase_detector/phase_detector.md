@@ -465,8 +465,3 @@ It is critical for:
 * correct lock
 
 ---
-
-If you want next level polish, I can:
-
-* convert these into **clean SVG schematics (looks like textbook figures)**
-* or align them with your controller diagrams for a **perfect paired README set**
