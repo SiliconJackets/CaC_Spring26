@@ -1,10 +1,3 @@
-Absolutely — here is your **full drop-in README** with:
-
-* ✅ Same structure as your controller doc
-* ✅ Clean formatting
-* ✅ Simple **circuit-level markdown diagrams for EACH implementation**
-* ✅ Proper placement (right inside each subsection)
-* ✅ Copy-paste ready for GitHub
 
 ---
 
