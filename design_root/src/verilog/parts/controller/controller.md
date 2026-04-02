@@ -194,11 +194,6 @@ This project explores **5 controller types**:
 
 DLL controllers behave as **discrete-time integrators** driven by a bang-bang phase detector. It is essentially a counter that keeps adjusting until the clocks line up. The feedback loop helps with the self correcting behavior. The latency that it takes to converge depends heavily on the granularity and the features of the controller. The corrections are constantly accumulated until the error is small enough. 
 
-### Key Concepts 
-
-This is already strong — I just cleaned it up for **flow, clarity, and consistency**, and added **simple sketches where they actually help learning**.
-
----
 
 ### Key Concepts
 
@@ -319,11 +314,42 @@ RST ------>|                       |
            +-----------------------+
 ```
 
+
+### Conceptual Waveform
+
+```
+clk_in:   ─┐ ─┐ ─┐ ─┐ ─┐ ─┐ ─┐
+           └─┘ └─┘ └─┘ └─┘ └─┘
+
+up:        1   1   1   0   0
+down:      0   0   0   1   1
+
+ctrl:     32  33  34  34  33  32
+```
+
 ---
 
 ### 5.1 Saturating Up/Down Controller
 
 **Baseline implementation**
+
+
+```
+          +------------------+
+UP -----> |                  |
+DOWN ---> |  +1 / -1 Logic   |
+          |  (Adder/Sub)     |
+          +--------+---------+
+                   |
+                   v
+            +-------------+
+            | Saturation  |
+            |  Clamp      |
+            +------+------+ 
+                   |
+                   v
+                 ctrl
+```
 
 * ±1 step per cycle
 * Hard saturation at bounds
@@ -332,9 +358,33 @@ RST ------>|                       |
 ✔ Industry baseline
 ✖ Slow convergence near lock
 
+
+
+---
+
+** Saturation Behavior **
+
+```
+ctrl:   ... 60 61 62 63 63 63 63
+                 ↑  ↑
+              saturates at MAX
+```
+
+
 ---
 
 ### 5.2 Filtered Controller
+
+```
+UP -----> +-------------+         +------------------+
+          | UP Counter  |-------> |                  |
+          +-------------+         |                  |
+                                  |   Update Logic   | ---> ctrl
+DOWN ---> +-------------+         | (only on threshold)
+          | DOWN Counter|-------> |                  |
+          +-------------+         +------------------+
+```
+
 
 * Requires repeated requests before update
 * Reduces jitter and chatter
@@ -342,9 +392,40 @@ RST ------>|                       |
 ✔ Stable near lock
 ✖ Slower response
 
+** Filtered Controller Behavior **
+
+```
+up:        1 1 1 1    0
+counter:   1 2 3 4 -> trigger
+ctrl:     32      33
+```
+
+✔ Update only after threshold reached
+
+
 ---
 
 ### 5.3 Acquire / Track Controller
+
+```
+                +----------------------+
+UP/DOWN ------> |   Step Selection     |
+                | (Acquire / Track)    |
+                +----------+-----------+
+                           |
+                           v
+                     +-----------+
+                     | Adder     |
+                     | (+/- step)|
+                     +-----+-----+
+                           |
+                           v
+                         ctrl
+
+          +------------------------------+
+          | Quiet Counter (mode switch)  |
+          +------------------------------+
+```
 
 * Dual-mode operation:
 
@@ -354,9 +435,44 @@ RST ------>|                       |
 ✔ Widely used in industry
 ✔ Balanced performance
 
+
+Acquire → Track Transition
+
+```
+mode:     A   A   A   A   T   T   T
+step:     4   4   4   4   1   1   1
+
+ctrl:    32 36 40 44 45 46 47
+```
+
+✔ Large jumps → fine tuning
+
+
 ---
 
 ### 5.4 Coarse / Fine Controller
+
+
+```
+                 +-------------------+
+UP/DOWN -------> |   Mode Select     |
+                 | (Coarse / Fine)   |
+                 +----+---------+----+
+                      |         |
+                      v         v
+                +---------+  +---------+
+                | Coarse  |  |  Fine   |
+                | Counter |  | Counter |
+                +----+----+  +----+----+
+                     \          /
+                      \        /
+                       v      v
+                    {coarse, fine}
+                          |
+                          v
+                        ctrl
+```
+
 
 * Splits control word:
 
@@ -366,15 +482,58 @@ RST ------>|                       |
 ✔ High resolution
 ✔ Efficient hardware scaling
 
+
+** Coarse / Fine Behavior **
+
+```
+coarse:   3   4   5   5   5
+fine:     0   0   0   1   2
+
+ctrl:    24  32  40  41  42
+```
+
+✔ Two-stage resolution
+
 ---
 
 ### 5.5 Variable-Step Controller
+
+
+```
+UP/DOWN -----> +----------------------+
+               | Direction Tracker    |
+               +----------+-----------+
+                          |
+                          v
+               +----------------------+
+               | Step Size Generator  |
+               | (based on history)   |
+               +----------+-----------+
+                          |
+                          v
+                    +-----------+
+                    | Adder     |
+                    | (+/- step)|
+                    +-----+-----+
+                          |
+                          v
+                        ctrl
+```
 
 * Step size adapts based on persistence of error
 * Nonlinear control behavior
 
 ✔ Fast convergence
 ✖ Requires careful tuning
+
+```
+same_dir_count: 1 2 3 4 5 6
+step size:      1 1 2 2 4 4
+
+ctrl:          32 33 34 36 38 42
+```
+
+✔ Adaptive acceleration
 
 ---
 
@@ -556,218 +715,5 @@ This controller suite explores the **full design spectrum of digital DLL control
 
 ---
 
-
-
-
-
-
----
-
-# 🔷 3. Controller-Specific Block Diagrams
-
----
-
-## 3.1 Saturating Controller
-
-```
-          +------------------+
-UP -----> |                  |
-DOWN ---> |  +1 / -1 Logic   |
-          |  (Adder/Sub)     |
-          +--------+---------+
-                   |
-                   v
-            +-------------+
-            | Saturation  |
-            |  Clamp      |
-            +------+------+ 
-                   |
-                   v
-                 ctrl
-```
-
-✔ Simple accumulator + bounds checking
-
----
-
-## 3.2 Filtered Controller
-
-```
-UP -----> +-------------+         +------------------+
-          | UP Counter  |-------> |                  |
-          +-------------+         |                  |
-                                 |   Update Logic   | ---> ctrl
-DOWN ---> +-------------+         | (only on threshold)
-          | DOWN Counter|-------> |                  |
-          +-------------+         +------------------+
-```
-
-✔ Temporal filtering before applying control updates
-
----
-
-## 3.3 Acquire / Track Controller
-
-```
-                +----------------------+
-UP/DOWN ------> |   Step Selection     |
-                | (Acquire / Track)    |
-                +----------+-----------+
-                           |
-                           v
-                     +-----------+
-                     | Adder     |
-                     | (+/- step)|
-                     +-----+-----+
-                           |
-                           v
-                         ctrl
-
-          +------------------------------+
-          | Quiet Counter (mode switch)  |
-          +------------------------------+
-```
-
-✔ Mode-dependent step size
-
----
-
-## 3.4 Coarse / Fine Controller
-
-```
-                 +-------------------+
-UP/DOWN -------> |   Mode Select     |
-                 | (Coarse / Fine)   |
-                 +----+---------+----+
-                      |         |
-                      v         v
-                +---------+  +---------+
-                | Coarse  |  |  Fine   |
-                | Counter |  | Counter |
-                +----+----+  +----+----+
-                     \          /
-                      \        /
-                       v      v
-                    {coarse, fine}
-                          |
-                          v
-                        ctrl
-```
-
-✔ Bit-partitioned control word
-
----
-
-## 3.5 Variable-Step Controller
-
-```
-UP/DOWN -----> +----------------------+
-               | Direction Tracker    |
-               +----------+-----------+
-                          |
-                          v
-               +----------------------+
-               | Step Size Generator  |
-               | (based on history)   |
-               +----------+-----------+
-                          |
-                          v
-                    +-----------+
-                    | Adder     |
-                    | (+/- step)|
-                    +-----+-----+
-                          |
-                          v
-                        ctrl
-```
-
-✔ Nonlinear adaptive gain
-
-
-### Conceptual Waveform
-
-```
-clk_in:   ─┐ ─┐ ─┐ ─┐ ─┐ ─┐ ─┐
-           └─┘ └─┘ └─┘ └─┘ └─┘
-
-up:        1   1   1   0   0
-down:      0   0   0   1   1
-
-ctrl:     32  33  34  34  33  32
-```
-
----
-
-## 4.2 Saturation Behavior
-
-```
-ctrl:   ... 60 61 62 63 63 63 63
-                 ↑  ↑
-              saturates at MAX
-```
-
----
-
-## 4.3 Filtered Controller Behavior
-
-```
-up:        1 1 1 1    0
-counter:   1 2 3 4 -> trigger
-ctrl:     32      33
-```
-
-✔ Update only after threshold reached
-
----
-
-## 4.4 Acquire → Track Transition
-
-```
-mode:     A   A   A   A   T   T   T
-step:     4   4   4   4   1   1   1
-
-ctrl:    32 36 40 44 45 46 47
-```
-
-✔ Large jumps → fine tuning
-
----
-
-## 4.5 Coarse / Fine Behavior
-
-```
-coarse:   3   4   5   5   5
-fine:     0   0   0   1   2
-
-ctrl:    24  32  40  41  42
-```
-
-✔ Two-stage resolution
-
----
-
-## 4.6 Variable-Step Behavior
-
-```
-same_dir_count: 1 2 3 4 5 6
-step size:      1 1 2 2 4 4
-
-ctrl:          32 33 34 36 38 42
-```
-
-✔ Adaptive acceleration
-
----
-
-## 4.7 Alternating Inputs (Stability Check)
-
-```
-up:     1 0 1 0 1 0
-down:   0 1 0 1 0 1
-
-ctrl:  32 33 32 33 32 33
-```
-
-✔ No drift → stable loop
 
 
