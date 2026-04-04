@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+    <style>
+      text { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; fill: #333; }
+      rect.block { fill: #f0f4f8; stroke: #555; stroke-width: 1.5; rx: 6; }
+      .label { font-size: 12px; fill: #666; }
+      .sig { font-family: monospace; font-size: 11px; fill: #0066aa; }
+    </style>
+  </defs>
+
+  <!-- CLK_REF input -->
+  <text x="10" y="100" class="sig">CLK_REF</text>
+  <line x1="75" y1="96" x2="120" y2="96" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Phase Detector -->
+  <rect class="block" x="130" y="70" width="140" height="55"/>
+  <text x="155" y="103" font-weight="600">Phase Detector</text>
+
+  <!-- PD to Controller arrow -->
+  <line x1="270" y1="96" x2="340" y2="96" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="278" y="88" class="sig">up, down</text>
+
+  <!-- Controller -->
+  <rect class="block" x="350" y="70" width="130" height="55"/>
+  <text x="380" y="103" font-weight="600">Controller</text>
+
+  <!-- Controller to DCDL arrow -->
+  <line x1="480" y1="96" x2="480" y2="180" stroke="#333" stroke-width="1.5"/>
+  <line x1="480" y1="180" x2="480" y2="210" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="488" y="165" class="sig">ctrl[N-1:0]</text>
+
+  <!-- DCDL -->
+  <rect class="block" x="410" y="215" width="140" height="55"/>
+  <text x="460" y="248" font-weight="600" text-anchor="middle">DCDL</text>
+
+  <!-- DCDL output going left -->
+  <line x1="410" y1="242" x2="200" y2="242" stroke="#333" stroke-width="1.5"/>
+
+  <!-- Feedback going up to PD -->
+  <line x1="200" y1="242" x2="200" y2="125" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="140" y="235" class="sig">CLK_OUT</text>
+
+  <!-- CLK_OUT label at bottom -->
+  <line x1="200" y1="242" x2="80" y2="242" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="10" y="248" class="sig">CLK_OUT</text>
+</svg>

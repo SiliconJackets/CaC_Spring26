@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 200">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+    <style>
+      text { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; fill: #333; }
+      rect.block { fill: #f0f4f8; stroke: #555; stroke-width: 1.5; rx: 6; }
+      .sig { font-family: monospace; font-size: 11px; fill: #0066aa; }
+    </style>
+  </defs>
+
+  <!-- Inputs -->
+  <text x="10" y="65" class="sig">up</text>
+  <line x1="30" y1="61" x2="90" y2="61" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="10" y="110" class="sig">down</text>
+  <line x1="45" y1="106" x2="90" y2="106" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Add/Sub block -->
+  <rect class="block" x="100" y="40" width="120" height="90"/>
+  <text x="118" y="72" font-size="12">up → +1</text>
+  <text x="118" y="92" font-size="12">down → -1</text>
+  <text x="118" y="112" font-size="12">else → hold</text>
+
+  <!-- Arrow to saturation -->
+  <line x1="220" y1="85" x2="270" y2="85" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Saturation clamp -->
+  <rect class="block" x="280" y="55" width="110" height="60" style="fill:#fff8f0;"/>
+  <text x="294" y="80" font-size="12">Clamp to</text>
+  <text x="294" y="98" class="sig">[0, 2^N - 1]</text>
+
+  <!-- Arrow to output register -->
+  <line x1="390" y1="85" x2="420" y2="85" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Output -->
+  <rect class="block" x="430" y="65" width="70" height="40"/>
+  <text x="444" y="90" class="sig">ctrl</text>
+
+  <!-- clk_in -->
+  <text x="10" y="170" class="sig">clk_in</text>
+  <line x1="55" y1="166" x2="100" y2="166" stroke="#333" stroke-width="1"/>
+  <line x1="100" y1="166" x2="100" y2="132" stroke="#333" stroke-width="1" marker-end="url(#arrow)"/>
+</svg>

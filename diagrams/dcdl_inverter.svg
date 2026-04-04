@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 220">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+    <style>
+      text { font-family: 'Segoe UI', Arial, sans-serif; font-size: 12px; fill: #333; }
+      rect.block { fill: #f0f4f8; stroke: #555; stroke-width: 1.5; rx: 5; }
+      rect.inv { fill: #e8eef5; stroke: #555; stroke-width: 1; rx: 3; }
+      .sig { font-family: monospace; font-size: 11px; fill: #0066aa; }
+    </style>
+  </defs>
+
+  <!-- Input A -->
+  <text x="5" y="55" class="sig">A</text>
+  <line x1="20" y1="51" x2="38" y2="51" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Stage 0: inv pair -->
+  <rect class="inv" x="45" y="38" width="35" height="28"/>
+  <text x="51" y="56" font-size="10">inv0</text>
+  <line x1="80" y1="51" x2="90" y2="51" stroke="#333" stroke-width="1"/>
+  <rect class="inv" x="93" y="38" width="35" height="28"/>
+  <text x="99" y="56" font-size="10">inv1</text>
+  <line x1="128" y1="51" x2="140" y2="51" stroke="#333" stroke-width="1"/>
+  <text x="105" y="80" class="sig" font-size="10">tap0</text>
+  <circle cx="140" cy="51" r="3" fill="#0066aa"/>
+
+  <!-- Stage 1 -->
+  <rect class="inv" x="148" y="38" width="35" height="28"/>
+  <text x="154" y="56" font-size="10">inv2</text>
+  <line x1="183" y1="51" x2="193" y2="51" stroke="#333" stroke-width="1"/>
+  <rect class="inv" x="196" y="38" width="35" height="28"/>
+  <text x="202" y="56" font-size="10">inv3</text>
+  <line x1="231" y1="51" x2="243" y2="51" stroke="#333" stroke-width="1"/>
+  <text x="208" y="80" class="sig" font-size="10">tap1</text>
+  <circle cx="243" cy="51" r="3" fill="#0066aa"/>
+
+  <!-- Stage 2 -->
+  <rect class="inv" x="251" y="38" width="35" height="28"/>
+  <text x="257" y="56" font-size="10">inv4</text>
+  <line x1="286" y1="51" x2="296" y2="51" stroke="#333" stroke-width="1"/>
+  <rect class="inv" x="299" y="38" width="35" height="28"/>
+  <text x="305" y="56" font-size="10">inv5</text>
+  <line x1="334" y1="51" x2="346" y2="51" stroke="#333" stroke-width="1"/>
+  <text x="311" y="80" class="sig" font-size="10">tap2</text>
+  <circle cx="346" cy="51" r="3" fill="#0066aa"/>
+
+  <!-- Stage 3 -->
+  <rect class="inv" x="354" y="38" width="35" height="28"/>
+  <text x="360" y="56" font-size="10">inv6</text>
+  <line x1="389" y1="51" x2="399" y2="51" stroke="#333" stroke-width="1"/>
+  <rect class="inv" x="402" y="38" width="35" height="28"/>
+  <text x="408" y="56" font-size="10">inv7</text>
+  <line x1="437" y1="51" x2="449" y2="51" stroke="#333" stroke-width="1"/>
+  <text x="414" y="80" class="sig" font-size="10">tap3</text>
+  <circle cx="449" cy="51" r="3" fill="#0066aa"/>
+
+  <!-- Mux tree -->
+  <!-- tap lines down -->
+  <line x1="140" y1="51" x2="140" y2="130" stroke="#333" stroke-width="1"/>
+  <line x1="243" y1="51" x2="243" y2="130" stroke="#333" stroke-width="1"/>
+  <line x1="346" y1="51" x2="346" y2="130" stroke="#333" stroke-width="1"/>
+  <line x1="449" y1="51" x2="449" y2="130" stroke="#333" stroke-width="1"/>
+
+  <!-- Mux 0 -->
+  <rect class="block" x="160" y="130" width="60" height="35"/>
+  <text x="173" y="152" font-size="10">mux0</text>
+  <line x1="140" y1="140" x2="158" y2="140" stroke="#333" stroke-width="1" marker-end="url(#arrow)"/>
+  <line x1="243" y1="140" x2="222" y2="140" stroke="#333" stroke-width="1" marker-end="url(#arrow)"/>
+
+  <!-- Mux 1 -->
+  <rect class="block" x="365" y="130" width="60" height="35"/>
+  <text x="378" y="152" font-size="10">mux1</text>
+  <line x1="346" y1="140" x2="363" y2="140" stroke="#333" stroke-width="1" marker-end="url(#arrow)"/>
+  <line x1="449" y1="140" x2="427" y2="140" stroke="#333" stroke-width="1" marker-end="url(#arrow)"/>
+
+  <!-- Q[0] label -->
+  <text x="260" y="162" class="sig" font-size="10">Q[0]</text>
+  <line x1="282" y1="155" x2="220" y2="155" stroke="#0066aa" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="282" y1="155" x2="365" y2="155" stroke="#0066aa" stroke-width="1" stroke-dasharray="3,2"/>
+
+  <!-- Final mux -->
+  <rect class="block" x="270" y="185" width="60" height="35" style="fill:#fff8f0;"/>
+  <text x="278" y="207" font-size="10">mux2</text>
+  <line x1="190" y1="165" x2="190" y2="200" stroke="#333" stroke-width="1"/>
+  <line x1="190" y1="200" x2="268" y2="200" stroke="#333" stroke-width="1" marker-end="url(#arrow)"/>
+  <line x1="395" y1="165" x2="395" y2="200" stroke="#333" stroke-width="1"/>
+  <line x1="395" y1="200" x2="332" y2="200" stroke="#333" stroke-width="1" marker-end="url(#arrow)"/>
+
+  <!-- Q[1] label -->
+  <text x="340" y="210" class="sig" font-size="10">Q[1]</text>
+
+  <!-- Output Y -->
+  <line x1="330" y1="202" x2="380" y2="202" stroke="#333" stroke-width="1.5"/>
+  <line x1="380" y1="202" x2="460" y2="202" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="468" y="206" class="sig" font-weight="600">Y</text>
+</svg>

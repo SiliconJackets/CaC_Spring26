@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 220">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+    <style>
+      text { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; fill: #333; }
+      rect.block { fill: #f0f4f8; stroke: #555; stroke-width: 1.5; rx: 6; }
+      .sig { font-family: monospace; font-size: 11px; fill: #0066aa; }
+    </style>
+  </defs>
+
+  <!-- up input -->
+  <text x="10" y="55" class="sig">up</text>
+  <line x1="30" y1="51" x2="90" y2="51" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- up counter -->
+  <rect class="block" x="100" y="30" width="120" height="45"/>
+  <text x="115" y="48" font-size="12">UP Counter</text>
+  <text x="115" y="64" font-size="10" fill="#666">resets on dir change</text>
+
+  <!-- down input -->
+  <text x="10" y="155" class="sig">down</text>
+  <line x1="45" y1="151" x2="90" y2="151" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- down counter -->
+  <rect class="block" x="100" y="130" width="120" height="45"/>
+  <text x="110" y="148" font-size="12">DOWN Counter</text>
+  <text x="110" y="164" font-size="10" fill="#666">resets on dir change</text>
+
+  <!-- threshold comparators -->
+  <line x1="220" y1="52" x2="270" y2="52" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="220" y1="152" x2="270" y2="152" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect class="block" x="280" y="25" width="130" height="55" style="fill:#fff8f0;"/>
+  <text x="295" y="48" font-size="12">count ==</text>
+  <text x="295" y="66" class="sig">FILTER_LEN?</text>
+
+  <rect class="block" x="280" y="125" width="130" height="55" style="fill:#fff8f0;"/>
+  <text x="295" y="148" font-size="12">count ==</text>
+  <text x="295" y="166" class="sig">FILTER_LEN?</text>
+
+  <!-- to update logic -->
+  <line x1="410" y1="52" x2="440" y2="100" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="410" y1="152" x2="440" y2="100" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Update + register -->
+  <rect class="block" x="450" y="75" width="80" height="50"/>
+  <text x="460" y="96" font-size="12">+1 / -1</text>
+  <text x="465" y="114" font-size="12">→ ctrl</text>
+
+  <!-- output -->
+  <line x1="530" y1="100" x2="570" y2="100" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="573" y="104" class="sig">ctrl</text>
+</svg>
