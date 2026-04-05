@@ -1,10 +1,9 @@
-TOPLEVEL=syn_dll
+TOPLEVEL=zdb_top_with_ro
 
 TSMC_STD_CELL=$(PDKS)/tsmc/N65LP/digital/Front_End/verilog/tcbn65lp_200a/tcbn65lp.v
 
-SRC=./syn_dll.syn.v \
-	./delay_cell.sv \
-	./tb.v \
+SRC=./results/zdb_top_with_ro_2/zdb_top_with_ro.syn.v \
+	./tb_zdb_top_with_ro.sv  \
 	$(TSMC_STD_CELL)
 
 

@@ -1,0 +1,641 @@
+$date
+	Sat Apr  4 11:25:14 2026
+$end
+
+$version
+	Synopsys VCS version X-2025.06-SP2_Full64
+$end
+
+$timescale
+	1ps
+$end
+
+$comment Csum: 1 ba515c3098e9e138 $end
+
+
+$scope module tb_inv_dcdl_glitch_free $end
+$var reg 1 ! clk $end
+$var reg 1 " rst_n $end
+$var reg 1 # A $end
+$var reg 2 $ Q [1:0] $end
+$var reg 1 % Y $end
+
+$scope task apply_test $end
+$var reg 2 & q_val [1:0] $end
+$upscope $end
+
+
+$scope module dut $end
+$var reg 1 ' clk $end
+$var reg 1 ( rst_n $end
+$var reg 1 ) A $end
+$var reg 2 * Q [1:0] $end
+$var reg 1 + Y $end
+$var reg 1 , tap0 $end
+$var reg 1 - tap1 $end
+$var reg 1 . tap2 $end
+$var reg 1 / tap3 $end
+$var reg 4 0 sel [3:0] $end
+$var reg 4 1 sel_reg [3:0] $end
+$var reg 1 2 ntap0 $end
+$var reg 1 3 ntap1 $end
+$var reg 1 4 ntap2 $end
+$var reg 1 5 ntap3 $end
+$var reg 1 6 y0 $end
+$var reg 1 7 y1 $end
+$var reg 1 8 y2 $end
+$var reg 1 9 y3 $end
+$var reg 1 : n01 $end
+$var reg 1 ; n23 $end
+
+$scope module inv1 $end
+$var reg 1 < in $end
+$var reg 1 = out $end
+$upscope $end
+
+
+$scope module inv2 $end
+$var reg 1 > in $end
+$var reg 1 ? out $end
+$upscope $end
+
+
+$scope module inv3 $end
+$var reg 1 @ in $end
+$var reg 1 A out $end
+$upscope $end
+
+
+$scope module inv_t0 $end
+$var reg 1 B in $end
+$var reg 1 C out $end
+$upscope $end
+
+
+$scope module inv_t1 $end
+$var reg 1 D in $end
+$var reg 1 E out $end
+$upscope $end
+
+
+$scope module inv_t2 $end
+$var reg 1 F in $end
+$var reg 1 G out $end
+$upscope $end
+
+
+$scope module inv_t3 $end
+$var reg 1 H in $end
+$var reg 1 I out $end
+$upscope $end
+
+
+$scope module n0 $end
+$var reg 1 J a $end
+$var reg 1 K b $end
+$var reg 1 L out $end
+$upscope $end
+
+
+$scope module n1 $end
+$var reg 1 M a $end
+$var reg 1 N b $end
+$var reg 1 O out $end
+$upscope $end
+
+
+$scope module n2 $end
+$var reg 1 P a $end
+$var reg 1 Q b $end
+$var reg 1 R out $end
+$upscope $end
+
+
+$scope module n3 $end
+$var reg 1 S a $end
+$var reg 1 T b $end
+$var reg 1 U out $end
+$upscope $end
+
+
+$scope module n4 $end
+$var reg 1 V a $end
+$var reg 1 W b $end
+$var reg 1 X out $end
+$upscope $end
+
+
+$scope module n5 $end
+$var reg 1 Y a $end
+$var reg 1 Z b $end
+$var reg 1 [ out $end
+$upscope $end
+
+
+$scope module n6 $end
+$var reg 1 \ a $end
+$var reg 1 ] b $end
+$var reg 1 ^ out $end
+$upscope $end
+
+$upscope $end
+
+$upscope $end
+
+$enddefinitions $end
+
+#0
+$dumpvars
+0#
+1%
+0!
+0)
+1+
+0(
+0<
+1>
+0?
+0@
+1A
+0B
+1C
+1D
+0E
+0F
+1G
+1H
+0I
+1:
+0;
+0V
+1W
+1X
+1Y
+1Z
+0[
+1\
+0]
+1^
+1=
+0"
+0,
+1-
+0.
+1/
+xT
+x5
+xQ
+x4
+xN
+x3
+xK
+x2
+xU
+xR
+xO
+xL
+xS
+xP
+xM
+xJ
+x9
+x8
+x7
+x6
+b00 $
+bxx &
+b00 *
+b0001 0
+b0001 1
+0'
+$end
+0T
+0Q
+0N
+1K
+1U
+1R
+1O
+0L
+0S
+1P
+0M
+1J
+19
+18
+17
+06
+05
+14
+03
+12
+#5000
+1!
+1'
+#10000
+0!
+0'
+#15000
+1!
+1'
+1"
+1(
+#20000
+0!
+0'
+#25000
+1!
+1'
+b00 &
+#30000
+0!
+0'
+#35000
+1!
+1'
+1#
+1)
+1,
+1B
+0C
+02
+1<
+0=
+0-
+0D
+1E
+13
+0>
+1?
+1.
+1F
+0G
+04
+1@
+0A
+0/
+0H
+1I
+15
+1S
+0P
+1M
+0J
+1L
+16
+1V
+0X
+0:
+0\
+#40000
+0!
+0'
+#45000
+1!
+1'
+0#
+0)
+0,
+0B
+1C
+12
+0<
+1=
+1-
+1D
+0E
+03
+1>
+0?
+0.
+0F
+1G
+14
+0@
+1A
+1/
+1H
+0I
+05
+0S
+1P
+0M
+1J
+0L
+06
+0V
+1X
+1:
+1\
+#50000
+0!
+0'
+#55000
+1!
+1'
+b01 &
+b01 $
+b01 *
+b0010 0
+#60000
+0!
+0'
+#65000
+1!
+1'
+1#
+1)
+1,
+1B
+0C
+02
+1<
+0=
+0-
+0D
+1E
+13
+0>
+1?
+1.
+1F
+0G
+04
+1@
+0A
+0/
+0H
+1I
+15
+1S
+0P
+1M
+0J
+1L
+16
+1V
+0X
+0:
+0\
+b0010 1
+1N
+0K
+0O
+07
+0W
+1X
+1:
+1\
+#70000
+0!
+0'
+#75000
+1!
+1'
+0#
+0)
+0,
+0B
+1C
+12
+0<
+1=
+1-
+1D
+0E
+03
+1>
+0?
+0.
+0F
+1G
+14
+0@
+1A
+1/
+1H
+0I
+05
+0S
+1P
+0M
+1J
+1O
+17
+1W
+0X
+0:
+0\
+#80000
+0!
+0'
+#85000
+1!
+1'
+b10 &
+b10 $
+b10 *
+b0100 0
+#90000
+0!
+0'
+#95000
+1!
+1'
+1#
+1)
+1,
+1B
+0C
+02
+1<
+0=
+0-
+0D
+1E
+13
+0>
+1?
+1.
+1F
+0G
+04
+1@
+0A
+0/
+0H
+1I
+15
+1S
+0P
+1M
+0J
+0O
+07
+0W
+1X
+1:
+1\
+b0100 1
+1Q
+0N
+1O
+17
+1W
+0X
+0:
+0\
+#100000
+0!
+0'
+#105000
+1!
+1'
+0#
+0)
+0,
+0B
+1C
+12
+0<
+1=
+1-
+1D
+0E
+03
+1>
+0?
+0.
+0F
+1G
+14
+0@
+1A
+1/
+1H
+0I
+05
+0S
+1P
+0M
+1J
+0R
+08
+0Y
+1[
+1;
+1]
+#110000
+0!
+0'
+#115000
+1!
+1'
+b11 &
+b11 $
+b11 *
+b1000 0
+#120000
+0!
+0'
+#125000
+1!
+1'
+1#
+1)
+1,
+1B
+0C
+02
+1<
+0=
+0-
+0D
+1E
+13
+0>
+1?
+1.
+1F
+0G
+04
+1@
+0A
+0/
+0H
+1I
+15
+1S
+0P
+1M
+0J
+1R
+18
+1Y
+0[
+0;
+0]
+b1000 1
+1T
+0Q
+0U
+09
+0Z
+1[
+1;
+1]
+#130000
+0!
+0'
+#135000
+1!
+1'
+0#
+0)
+0,
+0B
+1C
+12
+0<
+1=
+1-
+1D
+0E
+03
+1>
+0?
+0.
+0F
+1G
+14
+0@
+1A
+1/
+1H
+0I
+05
+0S
+1P
+0M
+1J
+1U
+19
+1Z
+0[
+0;
+0]
+#140000
+0!
+0'
+#145000
+1!
+1'
+#150000
+0!
+0'
+#155000
+1!
+1'
+#160000
+0!
+0'

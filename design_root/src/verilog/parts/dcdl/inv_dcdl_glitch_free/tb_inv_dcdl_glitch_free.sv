@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module tb_inv_dcdl_simple;
+module tb_inv_dcdl_glitch_free;
 
     logic clk;
     logic rst_n;
@@ -8,8 +8,8 @@ module tb_inv_dcdl_simple;
     logic [1:0] Q;
     logic Y;
 
-    // DUT
-    inv_dcdl dut (
+    // DUT (FIXED NAME)
+    inv_dcdl_glitch_free dut (
         .clk(clk),
         .rst_n(rst_n),
         .A(A),
@@ -17,8 +17,25 @@ module tb_inv_dcdl_simple;
         .Y(Y)
     );
 
-    // Clock
+    // Clock: 10ns period
     always #5 clk = ~clk;
+
+    // Task to apply one test case (clean + reusable)
+    task apply_test(input [1:0] q_val);
+    begin
+        Q = q_val;
+
+        // wait for select to register
+        @(posedge clk);
+
+        // apply input toggle
+        A = 1;
+        @(posedge clk);
+
+        A = 0;
+        @(posedge clk);
+    end
+    endtask
 
     initial begin
         // Init
@@ -28,37 +45,27 @@ module tb_inv_dcdl_simple;
         Q     = 2'b00;
 
         // Reset
-        #10;
+        repeat (2) @(posedge clk);
         rst_n = 1;
 
-        // Case 1: small delay
-        Q = 2'b00;
-        #10 A = 1;
-        #20 A = 0;
+        // Wait one cycle after reset
+        @(posedge clk);
 
-        // Case 2: medium delay
-        Q = 2'b01;
-        #10 A = 1;
-        #20 A = 0;
+        // Run test cases
+        apply_test(2'b00); // smallest delay
+        apply_test(2'b01); // medium
+        apply_test(2'b10); // larger
+        apply_test(2'b11); // largest
 
-        // Case 3: larger delay
-        Q = 2'b10;
-        #10 A = 1;
-        #20 A = 0;
-
-        // Case 4: largest delay
-        Q = 2'b11;
-        #10 A = 1;
-        #20 A = 0;
-
-        #50;
+        // Finish
+        #20;
         $finish;
     end
 
-    // Dump waveform
+    // Waveform dump
     initial begin
         $dumpfile("dcdl_simple.vcd");
-        $dumpvars(0, tb_inv_dcdl_simple);
+        $dumpvars(0, tb_inv_dcdl_glitch_free);
     end
 
 endmodule

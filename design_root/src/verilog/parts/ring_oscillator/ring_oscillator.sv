@@ -5,11 +5,14 @@
 /* | */                                                                      
 /* | */                                                                      
 /* |======================================================================= */
-
+`ifndef RING_OSCILLATOR_V
+`define RING_OSCILLATOR_V
+(* dont_touch = "true" *)
 module ring_oscillator (
     input logic [1:0] sel, 
     output logic clk_out
 );
+(* dont_touch = "true", keep = "true" *)
 logic n0,n1,n2,n3,n4,n5,n6,n7,n8;
 inverter inv0 (.in(clk_out), .out(n0));
 inverter inv1 (.in(n0), .out(n1));
@@ -29,3 +32,4 @@ always_comb begin
     endcase
 end
 endmodule
+`endif
