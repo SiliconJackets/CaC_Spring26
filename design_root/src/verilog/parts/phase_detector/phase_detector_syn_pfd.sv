@@ -45,16 +45,20 @@ module phase_detector (
     assign clr = rst | (up_ff & down_ff);
 
     // Set UP on reference clock edge
-    always @(posedge clk_in or posedge clr) begin
-        if (clr)
+    always @(posedge clk_in or posedge rst) begin
+        if (rst)
+            up_ff <= 1'b0;
+        else if (clr)
             up_ff <= 1'b0;
         else
             up_ff <= 1'b1;
     end
 
     // Set DOWN on feedback clock edge
-    always @(posedge clk_out or posedge clr) begin
-        if (clr)
+    always @(posedge clk_out or posedge rst) begin
+        if (rst)
+            down_ff <= 1'b0;
+        else if (clr)
             down_ff <= 1'b0;
         else
             down_ff <= 1'b1;
