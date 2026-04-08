@@ -1,0 +1,20 @@
+{
+  "DESIGN_NAME": "inv_dcdl",
+  "VERILOG_FILES": [
+    "dir::sky130_wrapper.sv",
+    "dir::inv_dcdl.sv",
+    "dir::mux.sv"
+  ],
+  "CLOCK_PERIOD": 225,
+  "CLOCK_PORT": null,
+  "CLOCK_NET": null,
+  "FP_SIZING": "absolute",
+  "DIE_AREA": [0, 0, 120, 120],
+  "CORE_AREA": [10, 10, 110, 110],
+  "PL_TARGET_DENSITY": 0.45,
+  "RUN_POST_GPL_DESIGN_REPAIR": false,
+  "RUN_POST_CTS_RESIZER_TIMING": false,
+  "RUN_POST_GRT_DESIGN_REPAIR": false,
+  "RUN_POST_GRT_RESIZER_TIMING": false,
+  "MAGIC_EXT_USE_GDS": true
+}
