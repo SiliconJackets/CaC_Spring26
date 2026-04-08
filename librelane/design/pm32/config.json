@@ -2,5 +2,6 @@
   "DESIGN_NAME": "pm32",
   "VERILOG_FILES": ["dir::pm32.v", "dir::spm.v"],
   "CLOCK_PERIOD": 25,
-  "CLOCK_PORT": "clk"
+  "CLOCK_PORT": "clk",
+  "PDK": "sky130A"
 }
