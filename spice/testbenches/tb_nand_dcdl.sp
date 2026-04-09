@@ -3,10 +3,10 @@
 * ============================================================
 
 * --- Technology models ---
-.lib "/home/xtoml/.ciel/sky130A/libs.tech/ngspice/sky130.lib.spice" tt
+.lib "__PDK_ROOT__/sky130A/libs.tech/ngspice/sky130.lib.spice" tt
 
 * --- Post-layout extracted netlist ---
-.include "/home/xtoml/CaC_Spring26/spice/netlists/nand_dcdl.spice"
+.include "__NETLIST_PATH__"
 
 * ============================================================
 * Parameters & Supplies
