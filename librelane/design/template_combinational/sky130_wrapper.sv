@@ -17,7 +17,7 @@ module inverter (
     input   logic in,
     output  logic out
 );
-    (* dont_touch = "true" *) sky130_fd_sc_hd__inv_2 core_inv (
+    (* dont_touch = "true" *) sky130_fd_sc_hd__inv_1 core_inv (
         .A(in), .Y(out)
     );
 endmodule
@@ -30,5 +30,15 @@ module mux (
 );
     (* dont_touch = "true" *) sky130_fd_sc_hd__mux2_1 core_mux (
         .A0(x0), .A1(x1), .S(s), .X(Y)
+    );
+endmodule
+
+module xnor2 (
+    input   logic a,
+    input   logic b,
+    output  logic y   
+);
+    (* dont_touch = "true" *) sky130_fd_sc_hd__xnor2_1 core_xnor (
+        .A(a), .B(b), .Y(y)
     );
 endmodule
