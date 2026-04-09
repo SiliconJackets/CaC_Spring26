@@ -53,7 +53,6 @@ echo "----------------------------------------------"
 echo " DCDL CHARACTERIZATION RESULTS "
 echo "----------------------------------------------"
 print d1 d2 d3 d4
-plot v(A) (v(Y)+2)
 wrdata nand_dcdl_results.csv v(A) v(Y) v(Q0_node) v(Q1_node) v(Q2_node) v(Q3_node)
 .endc
 .end
