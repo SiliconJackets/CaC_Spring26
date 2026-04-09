@@ -1,9 +1,9 @@
 # Cac_Spring26
 
 ## Colab Flow Setup (Preferred)
-Setting up the flow online with Google Colab. This is the preferred flow as our final submission will be a Jupyter notebook that can be ran online. At the moment, we cannot open it using the "Open in Colab" button because the repository is on GT Enterprise Github and not public, so to use and modify it follow the following steps
+Setting up the flow online with Google Colab. This is the preferred flow as our final submission will be a Jupyter notebook that can be ran online. USe the following steps to commit updates to it
 1. Either download `DelayLockedLoop.ipynb` or clone the repository so that you have a local copy of it.
-2. Navigate to [Google Colab](https://colab.research.google.com/) and select "Upload" to upload `DelayLockedLoop.ipynb`.
+2. Navigate to [Google Colab notebook](https://colab.research.google.com/github/SiliconJackets/Cac_Spring26/blob/main/DelayLockedLoop.ipynb)
 3. Run as you normally would. The LibreLane setup only need to be ran once per session.
 4. If modifications are made, download the modified notebook as a `.ipynb` file and replace your local copy of `DelayLockedLoop.ipynb` with it, then add, commit, push if updates are intended to be kept.
 
