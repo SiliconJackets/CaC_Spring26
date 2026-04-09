@@ -19,5 +19,6 @@
   "FP_PDN_VOFFSET": 1,
   "FP_PDN_HOFFSET": 1,
 
-  "MAGIC_EXT_USE_GDS": true
+  "MAGIC_EXT_USE_GDS": true,
+  "PDK": "sky130A"
 }

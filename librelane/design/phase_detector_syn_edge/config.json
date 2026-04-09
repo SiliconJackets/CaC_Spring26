@@ -24,5 +24,6 @@
   "RUN_POST_GRT_DESIGN_REPAIR": false,
   "RUN_POST_GRT_RESIZER_TIMING": false,
 
-  "MAGIC_EXT_USE_GDS": true
+  "MAGIC_EXT_USE_GDS": true,
+  "PDK": "sky130A"
 }
