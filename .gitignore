@@ -3,6 +3,7 @@
 
 # Ignore the following directories
 spice/tmp
+*/__pycache__
 
 # Don't ignore the following
 !.gitignore
