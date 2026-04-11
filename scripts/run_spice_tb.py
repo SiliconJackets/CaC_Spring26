@@ -1,30 +1,33 @@
 # This script is for running the spice testbench locally
 import subprocess
-from pathlib import Path 
+from pathlib import Path
 
 # Control Parameters
-PROJECT_ROOT = Path("/home/xtoml/CaC_Spring26") # Modify to where your repository path is
+PROJECT_ROOT = Path(
+    "/home/xtoml/CaC_Spring26"
+)  # Modify to where your repository path is
 
-PDK_ROOT = "/home/xtoml/.ciel" # Modify to where your PDK root is
+PDK_ROOT = "/home/xtoml/.ciel"  # Modify to where your PDK root is
 SPICE_PATH = PROJECT_ROOT / "spice"
 
 TB_DIR = SPICE_PATH / "testbenches"
 TB_NAME = "tb_phase_detector.sp"
 
 NETLIST_DIR = SPICE_PATH / "netlists"
-NETLIST_NAME = "phase_detector_syn_ff1.spice"
+NETLIST_NAME = "phase_detector_syn_edge.spice"
 
 RESULTS_DIR = SPICE_PATH / "results"
-RESULT_NAME = "phase_detector_syn_ff1_results.csv"
+RESULT_NAME = "pd_syn_edge_clkout_lead_results.csv"
 
 # Only used for phase detector test benches
-CLK_IN_DELAY = "20n"
-CLK_OUT_DELAY = "22n"
+CLK_IN_DELAY = "22n"
+CLK_OUT_DELAY = "20n"
+
 
 def run_ngspice():
     """
     Resolve paths in a testbench template and run ngspice.
-    
+
     Reads   spice/testbenches/{testbench_name}
     Writes  /tmp/{testbench_name}  (with resolved paths)
     Output  spice/results/
@@ -32,8 +35,7 @@ def run_ngspice():
     tb_template = (TB_DIR / TB_NAME).read_text()
 
     tb_resolved = (
-        tb_template
-        .replace("__PDK_ROOT__", PDK_ROOT)
+        tb_template.replace("__PDK_ROOT__", PDK_ROOT)
         .replace("__NETLIST_PATH__", str(NETLIST_DIR / NETLIST_NAME))
         .replace("__RESULTS_DIR__", str(RESULTS_DIR))
         .replace("__RESULT_NAME__", str(RESULT_NAME))
