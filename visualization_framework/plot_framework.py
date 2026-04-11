@@ -1,5 +1,5 @@
 """
-Interactive Pretty Graph Goes BRR 
+Interactive Pretty Graph Goes BRR
 
 Usage in Jupyter Notebook:
     from bokeh.io import output_notebook
@@ -15,25 +15,37 @@ Usage in Jupyter Notebook:
     isweep_overlay(deep_nested_dict_with_trace_leaves, ...)    # N sliders + legend
 """
 
-
 import numpy as np
 from bokeh.plotting import figure, show
 from bokeh.models import (
-    ColumnDataSource, CustomJS, Slider,
-    HoverTool, CrosshairTool, Div,
+    ColumnDataSource,
+    CustomJS,
+    Slider,
+    HoverTool,
+    CrosshairTool,
+    Div,
+    Range1d
 )
-from bokeh.layouts import column
+from bokeh.layouts import column, gridplot
 
 
 COLORS = [
-    "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728",
-    "#9467bd", "#8c564b", "#e377c2", "#7f7f7f",
-    "#bcbd22", "#17becf",
+    "#1f77b4",
+    "#ff7f0e",
+    "#2ca02c",
+    "#d62728",
+    "#9467bd",
+    "#8c564b",
+    "#e377c2",
+    "#7f7f7f",
+    "#bcbd22",
+    "#17becf",
 ]
 
 
-def _make_figure(title, xlabel, ylabel, width, height,
-                 x_axis_type="linear", y_axis_type="linear"):
+def _make_figure(
+    title, xlabel, ylabel, width, height, x_axis_type="linear", y_axis_type="linear"
+):
     hover = HoverTool(tooltips=[("x", "$x{0.000}"), ("y", "$y{0.000}")])
     crosshair = CrosshairTool()
     p = figure(
@@ -58,50 +70,110 @@ def _make_figure(title, xlabel, ylabel, width, height,
 def _add_trace(p, source, kind, color, label, line_width=2, size=6):
     kind = kind.lower().strip()
     if kind == "line":
-        return [p.line("x", "y", source=source, color=color,
-                        line_width=line_width, legend_label=label)]
+        return [
+            p.line(
+                "x",
+                "y",
+                source=source,
+                color=color,
+                line_width=line_width,
+                legend_label=label,
+            )
+        ]
     elif kind == "scatter":
-        return [p.scatter("x", "y", source=source, color=color,
-                           size=size, legend_label=label)]
+        return [
+            p.scatter(
+                "x", "y", source=source, color=color, size=size, legend_label=label
+            )
+        ]
     elif kind == "line+scatter":
-        r1 = p.line("x", "y", source=source, color=color,
-                    line_width=line_width, legend_label=label)
+        r1 = p.line(
+            "x",
+            "y",
+            source=source,
+            color=color,
+            line_width=line_width,
+            legend_label=label,
+        )
         r2 = p.scatter("x", "y", source=source, color=color, size=size)
         return [r1, r2]
     elif kind == "step":
-        return [p.step("x", "y", source=source, color=color,
-                        line_width=line_width, mode="after",
-                        legend_label=label)]
+        return [
+            p.step(
+                "x",
+                "y",
+                source=source,
+                color=color,
+                line_width=line_width,
+                mode="after",
+                legend_label=label,
+            )
+        ]
     elif kind == "area":
-        r1 = p.line("x", "y", source=source, color=color,
-                    line_width=line_width, legend_label=label)
-        r2 = p.varea(x="x", y1=0, y2="y", source=source,
-                     color=color, alpha=0.2)
+        r1 = p.line(
+            "x",
+            "y",
+            source=source,
+            color=color,
+            line_width=line_width,
+            legend_label=label,
+        )
+        r2 = p.varea(x="x", y1=0, y2="y", source=source, color=color, alpha=0.2)
         return [r1, r2]
     elif kind == "bar":
-        return [p.vbar(x="x", top="y", source=source, color=color,
-                        width=0.7, alpha=0.7, legend_label=label)]
+        return [
+            p.vbar(
+                x="x",
+                top="y",
+                source=source,
+                color=color,
+                width=0.7,
+                alpha=0.7,
+                legend_label=label,
+            )
+        ]
     elif kind in ("histogram", "hist"):
         y_data = np.array(source.data["y"])
         counts, edges = np.histogram(y_data, bins="auto")
-        hist_source = ColumnDataSource(data=dict(
-            top=counts, left=edges[:-1], right=edges[1:],
-        ))
-        return [p.quad(top="top", bottom=0, left="left", right="right",
-                        source=hist_source, color=color, alpha=0.65,
-                        line_color="white", legend_label=label)]
+        hist_source = ColumnDataSource(
+            data=dict(
+                top=counts,
+                left=edges[:-1],
+                right=edges[1:],
+            )
+        )
+        return [
+            p.quad(
+                top="top",
+                bottom=0,
+                left="left",
+                right="right",
+                source=hist_source,
+                color=color,
+                alpha=0.65,
+                line_color="white",
+                legend_label=label,
+            )
+        ]
     elif kind in ("bell", "bell curve", "kde"):
         from scipy.stats import gaussian_kde
+
         y_data = np.array(source.data["y"])
         kde = gaussian_kde(y_data)
-        xs = np.linspace(y_data.min() - 3 * y_data.std(),
-                         y_data.max() + 3 * y_data.std(), 500)
+        xs = np.linspace(
+            y_data.min() - 3 * y_data.std(), y_data.max() + 3 * y_data.std(), 500
+        )
         ys = kde(xs)
         kde_source = ColumnDataSource(data=dict(x=xs, y=ys))
-        r1 = p.line("x", "y", source=kde_source, color=color,
-                    line_width=line_width, legend_label=label)
-        r2 = p.varea(x="x", y1=0, y2="y", source=kde_source,
-                     color=color, alpha=0.15)
+        r1 = p.line(
+            "x",
+            "y",
+            source=kde_source,
+            color=color,
+            line_width=line_width,
+            legend_label=label,
+        )
+        r2 = p.varea(x="x", y1=0, y2="y", source=kde_source, color=color, alpha=0.15)
         return [r1, r2]
     else:
         raise ValueError(
@@ -121,9 +193,7 @@ def _style_legend(p, location="top_right"):
 
 def _is_xy_tuple(v):
     """Check if v looks like an (x, y) data pair."""
-    return (isinstance(v, (tuple, list))
-            and len(v) == 2
-            and not isinstance(v[0], str))
+    return isinstance(v, (tuple, list)) and len(v) == 2 and not isinstance(v[0], str)
 
 
 def _parse_sweep_tree(tree):
@@ -193,22 +263,34 @@ def _flat_index(indices, dims):
     return idx
 
 
-'''
+"""
 PUBLIC FUNCTIONS TO USE
-'''
+"""
+
 
 def iplot(
-    x, y, *,
-    title="", xlabel="x", ylabel="y",
-    kind="line", color=None,
-    width=800, height=450,
-    x_log=False, y_log=False,
+    x,
+    y,
+    *,
+    title="",
+    xlabel="x",
+    ylabel="y",
+    kind="line",
+    color=None,
+    width=800,
+    height=450,
+    x_log=False,
+    y_log=False,
 ):
     """Plot a single dataset."""
     x, y = np.asarray(x, dtype=float), np.asarray(y, dtype=float)
     source = ColumnDataSource(data=dict(x=x, y=y))
     p = _make_figure(
-        title, xlabel, ylabel, width, height,
+        title,
+        xlabel,
+        ylabel,
+        width,
+        height,
         x_axis_type="log" if x_log else "linear",
         y_axis_type="log" if y_log else "linear",
     )
@@ -219,21 +301,30 @@ def iplot(
 
 
 def ioverlay(
-    datasets, *,
-    title="", xlabel="x", ylabel="y",
-    kind="line", width=800, height=450,
-    x_log=False, y_log=False,
+    datasets,
+    *,
+    title="",
+    xlabel="x",
+    ylabel="y",
+    kind="line",
+    width=800,
+    height=450,
+    x_log=False,
+    y_log=False,
 ):
     """Overlay multiple datasets. Click legend to hide/show."""
     p = _make_figure(
-        title, xlabel, ylabel, width, height,
+        title,
+        xlabel,
+        ylabel,
+        width,
+        height,
         x_axis_type="log" if x_log else "linear",
         y_axis_type="log" if y_log else "linear",
     )
     for i, (label, (x, y)) in enumerate(datasets.items()):
         source = ColumnDataSource(
-            data=dict(x=np.asarray(x, dtype=float),
-                      y=np.asarray(y, dtype=float))
+            data=dict(x=np.asarray(x, dtype=float), y=np.asarray(y, dtype=float))
         )
         _add_trace(p, source, kind, COLORS[i % len(COLORS)], label=label)
     _style_legend(p)
@@ -241,10 +332,16 @@ def ioverlay(
 
 
 def isweep(
-    datasets, *,
-    title="", xlabel="x", ylabel="y",
-    kind="line", width=800, height=450,
-    x_log=False, y_log=False,
+    datasets,
+    *,
+    title="",
+    xlabel="x",
+    ylabel="y",
+    kind="line",
+    width=800,
+    height=450,
+    x_log=False,
+    y_log=False,
 ):
     """
     N-dimensional sweep with one slider per nesting level.
@@ -272,12 +369,16 @@ def isweep(
     render_kind = kind
     if kind in ("bell", "kde"):
         from scipy.stats import gaussian_kde
+
         processed = []
         for _, y_raw in flat_data:
             samples = np.asarray(y_raw, dtype=float)
             kde = gaussian_kde(samples)
-            xs = np.linspace(samples.min() - 3 * samples.std(),
-                             samples.max() + 3 * samples.std(), 500)
+            xs = np.linspace(
+                samples.min() - 3 * samples.std(),
+                samples.max() + 3 * samples.std(),
+                500,
+            )
             ys = kde(xs)
             processed.append((xs, ys))
         flat_data = processed
@@ -296,25 +397,36 @@ def isweep(
     all_sources = []
     for xy in flat_data:
         x, y = xy
-        all_sources.append(ColumnDataSource(
-            data=dict(x=np.asarray(x, dtype=float),
-                      y=np.asarray(y, dtype=float))
-        ))
+        all_sources.append(
+            ColumnDataSource(
+                data=dict(x=np.asarray(x, dtype=float), y=np.asarray(y, dtype=float))
+            )
+        )
 
     # Active source
     first_x, first_y = flat_data[0]
     active_source = ColumnDataSource(
-        data=dict(x=np.asarray(first_x, dtype=float),
-                  y=np.asarray(first_y, dtype=float))
+        data=dict(
+            x=np.asarray(first_x, dtype=float), y=np.asarray(first_y, dtype=float)
+        )
     )
 
     p = _make_figure(
-        title, xlabel, ylabel, width, height,
+        title,
+        xlabel,
+        ylabel,
+        width,
+        height,
         x_axis_type="log" if x_log else "linear",
         y_axis_type="log" if y_log else "linear",
     )
-    _add_trace(p, active_source, render_kind, COLORS[0],
-               label=levels[0][0] if levels else "data")
+    _add_trace(
+        p,
+        active_source,
+        render_kind,
+        COLORS[0],
+        label=levels[0][0] if levels else "data",
+    )
     if p.legend:
         p.legend.visible = False
 
@@ -329,16 +441,21 @@ def isweep(
     # Build sliders
     sliders = []
     for d in range(n_dims):
-        s = Slider(start=0, end=dims[d] - 1, value=0, step=1,
-                   title="", show_value=False, width=width - 60)
+        s = Slider(
+            start=0,
+            end=dims[d] - 1,
+            value=0,
+            step=1,
+            title="",
+            show_value=False,
+            width=width - 60,
+        )
         sliders.append(s)
 
     # Single JS callback shared by all sliders
     # Each slider is passed as s0, s1, ... to avoid circular reference
     # (slider -> callback -> sliders list -> slider)
-    slider_idx_code = " ".join(
-        f"indices.push(s{d}.value);" for d in range(n_dims)
-    )
+    slider_idx_code = " ".join(f"indices.push(s{d}.value);" for d in range(n_dims))
     js_code = f"""
         const indices = [];
         {slider_idx_code}
@@ -384,10 +501,16 @@ def isweep(
 
 
 def isweep_overlay(
-    sweep_groups, *,
-    title="", xlabel="x", ylabel="y",
-    kind="line", width=800, height=450,
-    x_log=False, y_log=False,
+    sweep_groups,
+    *,
+    title="",
+    xlabel="x",
+    ylabel="y",
+    kind="line",
+    width=800,
+    height=450,
+    x_log=False,
+    y_log=False,
 ):
     """
     N-dimensional sweep + overlaid traces with legend hide/show.
@@ -425,10 +548,11 @@ def isweep_overlay(
     active_sources = []
     for tname in trace_names:
         x, y = first_cell[tname]
-        active_sources.append(ColumnDataSource(
-            data=dict(x=np.asarray(x, dtype=float),
-                      y=np.asarray(y, dtype=float))
-        ))
+        active_sources.append(
+            ColumnDataSource(
+                data=dict(x=np.asarray(x, dtype=float), y=np.asarray(y, dtype=float))
+            )
+        )
 
     # Master: flat list of lists-of-sources, one inner list per grid cell
     all_cells = []
@@ -436,21 +560,27 @@ def isweep_overlay(
         cell_srcs = []
         for tname in trace_names:
             x, y = cell_dict[tname]
-            cell_srcs.append(ColumnDataSource(
-                data=dict(x=np.asarray(x, dtype=float),
-                          y=np.asarray(y, dtype=float))
-            ))
+            cell_srcs.append(
+                ColumnDataSource(
+                    data=dict(
+                        x=np.asarray(x, dtype=float), y=np.asarray(y, dtype=float)
+                    )
+                )
+            )
         all_cells.append(cell_srcs)
 
     p = _make_figure(
-        title, xlabel, ylabel, width, height,
+        title,
+        xlabel,
+        ylabel,
+        width,
+        height,
         x_axis_type="log" if x_log else "linear",
         y_axis_type="log" if y_log else "linear",
     )
 
     for i, tname in enumerate(trace_names):
-        _add_trace(p, active_sources[i], kind,
-                   COLORS[i % len(COLORS)], label=tname)
+        _add_trace(p, active_sources[i], kind, COLORS[i % len(COLORS)], label=tname)
 
     _style_legend(p)
 
@@ -463,13 +593,18 @@ def isweep_overlay(
 
     sliders = []
     for d in range(n_dims):
-        s = Slider(start=0, end=dims[d] - 1, value=0, step=1,
-                   title="", show_value=False, width=width - 60)
+        s = Slider(
+            start=0,
+            end=dims[d] - 1,
+            value=0,
+            step=1,
+            title="",
+            show_value=False,
+            width=width - 60,
+        )
         sliders.append(s)
 
-    slider_idx_code = " ".join(
-        f"indices.push(s{d}.value);" for d in range(n_dims)
-    )
+    slider_idx_code = " ".join(f"indices.push(s{d}.value);" for d in range(n_dims))
     js_code = f"""
         const indices = [];
         {slider_idx_code}
@@ -504,3 +639,137 @@ def isweep_overlay(
 
     layout = column(p, label_div, *sliders, sizing_mode="fixed")
     show(layout)
+
+
+def istack(
+    layers: list[dict],
+    *,
+    title: str = "",
+    xlabel: str = "x",
+    ylabels: list[str] | None = None,
+    kind: str = "line",
+    width: int = 900,
+    layer_height: int = 180,
+    x_range: tuple[float, float] | None = None,
+    x_log: bool = False,
+    y_log: bool = False,
+    colors: list[str] | None = None,
+):
+    """
+    Vertically stacked subplots sharing one x-axis.
+
+    Parameters
+    ----------
+    layers : list of dicts
+        Each dict maps {label: (x, y)} — same format as ioverlay.
+        Layers are drawn top-to-bottom. Each layer becomes one
+        subplot. Multiple signals in one layer are overlaid with
+        legend toggle.
+
+    title       : title for the top subplot
+    xlabel      : x-axis label (shown only on the bottom subplot)
+    ylabels     : per-layer y-axis labels; if None, auto-generated
+                  from the signal names in each layer
+    kind        : trace type ("line", "scatter", "line+scatter", "step")
+    width       : figure width in pixels
+    layer_height: height per subplot in pixels
+    x_range     : optional (min, max) to lock the shared x-axis
+    x_log       : log scale on x-axis
+    y_log       : log scale on y-axis
+    colors      : custom color palette (defaults to framework COLORS)
+    """
+    if not layers:
+        raise ValueError("Need at least one layer")
+
+    palette = colors or COLORS
+    n_layers = len(layers)
+
+    # Auto-generate y-labels from signal names if not provided
+    if ylabels is None:
+        ylabels = [", ".join(layer.keys()) for layer in layers]
+    elif len(ylabels) < n_layers:
+        ylabels = list(ylabels) + [""] * (n_layers - len(ylabels))
+
+    # Compute shared x-range from all data if not given
+    if x_range is None:
+        x_min, x_max = np.inf, -np.inf
+        for layer in layers:
+            for x, _ in layer.values():
+                x_arr = np.asarray(x, dtype=float)
+                x_min = min(x_min, x_arr.min())
+                x_max = max(x_max, x_arr.max())
+        shared_x_range = Range1d(start=x_min, end=x_max)
+    else:
+        shared_x_range = Range1d(start=x_range[0], end=x_range[1])
+
+    figures = []
+    color_idx = 0  # Global color counter so colors don't repeat
+    # across layers unless the palette wraps
+
+    for i, layer in enumerate(layers):
+        is_top = i == 0
+        is_bottom = i == n_layers - 1
+
+        hover = HoverTool(tooltips=[("x", "$x{0.000}"), ("y", "$y{0.000}")])
+        crosshair = CrosshairTool()
+
+        p = figure(
+            title=title if is_top else None,
+            x_axis_label=xlabel if is_bottom else None,
+            y_axis_label=ylabels[i],
+            width=width,
+            height=layer_height + (30 if is_top else 0) + (30 if is_bottom else 0),
+            x_range=shared_x_range,
+            x_axis_type="log" if x_log else "linear",
+            y_axis_type="log" if y_log else "linear",
+            tools=[
+                hover,
+                crosshair,
+                "box_zoom",
+                "xpan",
+                "xwheel_zoom",
+                "reset",
+                "save",
+            ],
+            active_drag="xpan",
+            active_scroll="xwheel_zoom",
+        )
+
+        # Style
+        if is_top:
+            p.title.text_font_size = "14px"
+        p.yaxis.axis_label_text_font_size = "11px"
+        p.grid.grid_line_alpha = 0.3
+        p.min_border_top = 8 if not is_top else 20
+        p.min_border_bottom = 8 if not is_bottom else 40
+
+        # Hide x-axis ticks/labels on non-bottom plots
+        if not is_bottom:
+            p.xaxis.visible = False
+
+        # Plot traces in this layer
+        for label, (x, y) in layer.items():
+            source = ColumnDataSource(
+                data=dict(
+                    x=np.asarray(x, dtype=float),
+                    y=np.asarray(y, dtype=float),
+                )
+            )
+            c = palette[color_idx % len(palette)]
+            _add_trace(p, source, kind, c, label=label)
+            color_idx += 1
+
+        # Only show legend if the layer has multiple signals
+        if len(layer) > 1:
+            _style_legend(p, location="top_right")
+        elif p.legend:
+            p.legend.visible = False
+
+        figures.append(p)
+
+    grid = gridplot(
+        [[fig] for fig in figures],
+        merge_tools=True,
+        toolbar_location="right",
+    )
+    show(grid)

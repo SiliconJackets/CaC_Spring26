@@ -100,6 +100,7 @@ def load_sweep(
                 f"Signal '{signal}' not in labels {labels} for '{sweep_label}'"
             )
         result[sweep_label] = traces[signal]
+        print(traces[signal])
     return result
 
 
