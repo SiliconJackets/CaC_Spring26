@@ -183,12 +183,13 @@ def _add_trace(p, source, kind, color, label, line_width=2, size=6):
 
 
 def _style_legend(p, location="top_right"):
-    if p.legend:
-        p.legend.click_policy = "hide"
-        p.legend.location = location
-        p.legend.label_text_font_size = "10px"
-        p.legend.background_fill_alpha = 0.7
-        p.legend.border_line_alpha = 0.3
+    if p.legend and len(p.legend) > 0:
+        legend = p.legend[0]
+        legend.click_policy = "hide"
+        legend.location = location
+        legend.label_text_font_size = "10px"
+        legend.background_fill_alpha = 0.7
+        legend.border_line_alpha = 0.3
 
 
 def _is_xy_tuple(v):
@@ -295,7 +296,7 @@ def iplot(
         y_axis_type="log" if y_log else "linear",
     )
     _add_trace(p, source, kind, color or COLORS[0], label=title or "data")
-    if p.legend:
+    if p.legend and len(p.legend) > 0:
         p.legend.visible = False
     show(p)
 
@@ -762,7 +763,7 @@ def istack(
         # Only show legend if the layer has multiple signals
         if len(layer) > 1:
             _style_legend(p, location="top_right")
-        elif p.legend:
+        elif p.legend and len(p.legend) > 0:
             p.legend.visible = False
 
         figures.append(p)

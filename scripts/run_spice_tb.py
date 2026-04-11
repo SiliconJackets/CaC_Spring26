@@ -7,7 +7,7 @@ PROJECT_ROOT = Path(
     "/home/xtoml/CaC_Spring26"
 )  # Modify to where your repository path is
 
-PDK_ROOT = "/home/xtoml/.ciel"  # Modify to where your PDK root is
+PDK_ROOT = "~/.ciel"  # Modify to where your PDK root is
 SPICE_PATH = PROJECT_ROOT / "spice"
 
 TB_DIR = SPICE_PATH / "testbenches"
@@ -35,7 +35,7 @@ def run_ngspice():
     tb_template = (TB_DIR / TB_NAME).read_text()
 
     tb_resolved = (
-        tb_template.replace("__PDK_ROOT__", PDK_ROOT)
+        tb_template.replace("__PDK_ROOT__", str(PDK_ROOT))
         .replace("__NETLIST_PATH__", str(NETLIST_DIR / NETLIST_NAME))
         .replace("__RESULTS_DIR__", str(RESULTS_DIR))
         .replace("__RESULT_NAME__", str(RESULT_NAME))
