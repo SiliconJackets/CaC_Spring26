@@ -26,17 +26,19 @@ module tb_phase_detector;
     initial begin
         clk_in = 1'b0;
         #22000; // 22ns initial delay
+        clk_in = 1'b1;
         forever #5000 clk_in = ~clk_in;
     end
 
     initial begin
         clk_out = 1'b0;
         #20000; // 20ns initial delay
+        clk_in = 1'b1;
         forever #5000 clk_out = ~clk_out;
     end
 
     initial begin
-        $dumpfile("pd_tb.vcd");
+        $dumpfile("tb_phase_detector_syn_xor1.vcd");
         $dumpvars(0, tb_phase_detector);
 
         #100000; // 100ns total simulation time
