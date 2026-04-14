@@ -4,7 +4,7 @@
     "dir::controller_variable_step/controller_variable_step.sv"
   ],
   
-  "CLOCK_PERIOD": 225,
+  "CLOCK_PERIOD": 5,
   "CLOCK_NET": null,
   "CLOCK_PORT": "clk_in",
 
