@@ -48,3 +48,18 @@ class PhaseDetector:
         elif clk_out_edge < clk_in_edge:
             return 0, 1, latest_edge + self.down_prop_delay_ps
         return 0, 0, latest_edge
+
+
+class SingleFlipFlopPhaseDetector(PhaseDetector):
+    def __init__(self):
+        super().__init__(up_prop_delay_ps=348.78, down_prop_delay_ps=2348.25)
+
+
+class EdgeLevelPhaseDetector(PhaseDetector):
+    def __init__(self):
+        super().__init__(up_prop_delay_ps=242.81, down_prop_delay_ps=242.81)
+
+
+class PFDPhaseDetector(PhaseDetector):
+    def __init__(self):
+        super().__init__(up_prop_delay_ps=353.95, down_prop_delay_ps=352.99)
