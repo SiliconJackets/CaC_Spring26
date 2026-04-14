@@ -40,19 +40,6 @@ class DCDL:
 
 
 # ===================================================================
-# 1. Behavioral  (dcdl_behavioral.sv)
-#    ctrl = number of active cells (0 .. num_cells)
-# ===================================================================
-
-class BehavioralDCDL(DCDL):
-    """Simple linear model.  ctrl directly selects how many cells."""
-
-    def _delay(self, ctrl: int) -> float:
-        n = max(0, min(ctrl, self.num_cells))
-        return self._cells_delay(n)
-
-
-# ===================================================================
 # 2. Inverter DCDL  (inv_dcdl.sv)
 #    Binary mux tree selects tap.  ctrl in [0, num_cells-1].
 #    Tap k routes through k+1 cells then ceil(log2(N)) mux levels.
@@ -147,19 +134,13 @@ class InverterGlitchFreeDCDL(DCDL):
         return chain_delay + output_delay
 
 
-# ===================================================================
-# 5. NAND DCDL  (nand_dcdl.sv)
-#    One-hot Q via shift register.  Q[k]=1 means cell k selects
-#    input A; signal chains through cells k-1 .. 0.
-#    Cells traversed = position of set bit + 1.
-# ===================================================================
-
 class NandDCDL(DCDL):
-    """NAND mux-cell chain.  One-hot ctrl.
-
-    No extra overhead parameters — the cell delays from SPICE
-    include the NAND gates within each cell.
     """
+    NAND DCDL
+    """
+
+    def __init__(self, num_cells=64, first_cell_delay_ps=106.67, remaining_cell_delay_ps=72.68):
+        super().__init__(num_cells, first_cell_delay_ps, remaining_cell_delay_ps)
 
     def _delay(self, ctrl: int) -> float:
         pos = 0
@@ -168,46 +149,3 @@ class NandDCDL(DCDL):
                 pos = i
                 break
         return self._cells_delay(pos + 1)
-
-
-# ===================================================================
-# 6. Vernier crossover DCDL  (vernier_dcdl.sv)
-#    Two parallel paths: slow (buf_1) and fast (buf_4).
-#    First Q[k]=1 crosses signal from slow to fast.
-#    Slow cell delays use first_cell / remaining_cell.
-#    Fast cells and crossover mux have their own delays.
-# ===================================================================
-
-class VernierDCDL(DCDL):
-    """Vernier crossover architecture.
-
-    Extra parameters: fast_cell_delay_ps, mux_delay_ps.
-
-    Signal path for crossover at stage k:
-        k slow cells -> crossover mux -> (num_cells - k) fast cells
-    """
-
-    def __init__(self, num_cells: int,
-                 first_cell_delay_ps: float,
-                 remaining_cell_delay_ps: float,
-                 fast_cell_delay_ps: float,
-                 mux_delay_ps: float):
-        super().__init__(num_cells, first_cell_delay_ps,
-                         remaining_cell_delay_ps)
-        self.fast_cell_delay_ps = fast_cell_delay_ps
-        self.mux_delay_ps = mux_delay_ps
-
-    def _delay(self, ctrl: int) -> float:
-        crossover = -1
-        for i in range(self.num_cells):
-            if ctrl & (1 << i):
-                crossover = i
-                break
-        if crossover == -1:
-            return self._cells_delay(self.num_cells)
-
-        slow_delay = self._cells_delay(crossover)
-        fast_stages = self.num_cells - crossover
-        return (slow_delay
-                + self.mux_delay_ps
-                + fast_stages * self.fast_cell_delay_ps)
