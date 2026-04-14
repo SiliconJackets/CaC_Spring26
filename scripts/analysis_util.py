@@ -94,3 +94,13 @@ def apply_time_shift(
     t_shifted = t + time_shift
 
     return (t_shifted, v)
+
+
+def decode_ctrl(traces, vthresh=0.9):
+    """Convert 6 analog CTRL bit traces into a single integer waveform."""
+    time = traces["CTRL0"][0]
+    ctrl_int = np.zeros(len(time))
+    for i in range(6):
+        _, v = traces[f"CTRL{i}"]
+        ctrl_int += (v > vthresh).astype(float) * (1 << i)
+    return (time, ctrl_int)
