@@ -1,5 +1,5 @@
 * ============================================================
-* Testbench: Variable-Step Controller SPICE Characterization
+* Testbench: Coarse/Fine Controller SPICE Characterization
 * ============================================================
 
 * --- Technology models ---
@@ -39,68 +39,29 @@ Vrst rst_node VGND PWL(
 * ============================================================
 * Stimulus: UP/DOWN sequences (2ns clock, same cycle counts)
 * ============================================================
-* Variable-step controller behavior (default params):
-*   same_dir_count < 4  (MED_THRESH) => step = 1
-*   same_dir_count >= 4 (MED_THRESH) => step = 2
-*   same_dir_count >= 8 (BIG_THRESH) => step = 4
-*   Direction change resets same_dir_count to 1
-*
-* Phase 1 ( 4- 44ns):  UP=1   — 20 cycles sustained UP
-*   Expect: cycles 1-3 step=1, cycles 4-7 step=2, cycles 8+ step=4
-*   ctrl: 32->33->34->35->37->39->41->43->47->51->55->59->63(sat)
-*
-* Phase 2 (44- 64ns):  IDLE   — 10 cycles, resets same_dir_count
-*
-* Phase 3 (64-104ns):  DOWN=1 — 20 cycles sustained DOWN
-*   Expect same acceleration pattern downward from 63
-*
-* Phase 4 (104-114ns): IDLE   — 5 cycles, resets count
-*
-* Phase 5 (114-134ns): Alternating UP/DOWN every 3 cycles
-*   Tests direction-change reset — steps should stay at 1
-*
-* Phase 6 (134-174ns): UP=1   — 20 cycles sustained UP
-*   Confirm acceleration restarts from step=1
-*
-* Phase 7 (174-180ns): IDLE
+*   Phase 1  ( 4ns -  44ns):  UP=1, DOWN=0  — 20 cyc coarse acquisition
+*   Phase 2  (44ns -  84ns):  UP=0, DOWN=0  — 20 cyc idle (triggers mode switch)
+*   Phase 3  (84ns - 124ns):  UP=1, DOWN=0  — 20 cyc fine mode response
+*   Phase 4  (124ns- 164ns):  UP=0, DOWN=1  — 20 cyc fine mode reverse
+*   Phase 5  (164ns- 180ns):  UP=0, DOWN=0  — 8 cyc idle
 
 Vup   up_node   VGND PWL(
-+   0       0
-+   3.9n    0
-+   4n      vdd_val
-+   43.9n   vdd_val
-+   44n     0
-+   63.9n   0
-+   64n     0
-+   113.9n  0
-+   114n    vdd_val
-+   119.9n  vdd_val
-+   120n    0
-+   125.9n  0
-+   126n    vdd_val
-+   131.9n  vdd_val
-+   132n    0
-+   133.9n  0
-+   134n    vdd_val
-+   173.9n  vdd_val
-+   174n    0 )
++   0      0
++   3.9n   0
++   4n     vdd_val
++   43.9n  vdd_val
++   44n    0
++   83.9n  0
++   84n    vdd_val
++   123.9n vdd_val
++   124n   0 )
 
 Vdown down_node VGND PWL(
-+   0       0
-+   63.9n   0
-+   64n     vdd_val
-+   103.9n  vdd_val
-+   104n    0
-+   113.9n  0
-+   114n    0
-+   119.9n  0
-+   120n    vdd_val
-+   125.9n  vdd_val
-+   126n    0
-+   131.9n  0
-+   132n    vdd_val
-+   133.9n  vdd_val
-+   134n    0 )
++   0      0
++   123.9n 0
++   124n   vdd_val
++   163.9n vdd_val
++   164n   0 )
 
 * ============================================================
 * DUT Instantiation

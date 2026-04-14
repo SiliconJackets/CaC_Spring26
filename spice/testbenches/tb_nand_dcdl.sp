@@ -19,7 +19,6 @@ Vss  VGND 0 DC 0
 Va   A    VGND PULSE(0 vdd_val 1n 50p 50p 5n 10n)
 
 * ============================================================
-* One-Hot Control Sequence (The Fix)
 * 0-25n:  Q=0001 (1 stage)
 * 25-50n: Q=0010 (2 stages)
 * 50-75n: Q=0100 (3 stages)
@@ -37,23 +36,13 @@ Vq3  Q3_node  VGND PWL(0 0       74.9n 0       75n vdd_val)
 Xdut  A Q0_node Q1_node Q2_node Q3_node VGND VPWR Y nand_dcdl
 Cload Y VGND 5f
 
-.tran 1p 100n
-
-* ============================================================
-* Automated Measurements
-* ============================================================
-.meas tran d1 TRIG v(A) VAL=0.9 RISE=2  TARG v(Y) VAL=0.9 RISE=2
-.meas tran d2 TRIG v(A) VAL=0.9 RISE=5  TARG v(Y) VAL=0.9 RISE=5
-.meas tran d3 TRIG v(A) VAL=0.9 RISE=8  TARG v(Y) VAL=0.9 RISE=8
-.meas tran d4 TRIG v(A) VAL=0.9 RISE=10 TARG v(Y) VAL=0.9 RISE=10
+.tran 10p 100n
 
 .control
 run
-echo "----------------------------------------------"
-echo " DCDL CHARACTERIZATION RESULTS "
-echo "----------------------------------------------"
-print d1 d2 d3 d4
+
 wrdata __RESULTS_DIR__/nand_dcdl_results.csv v(A) v(Y) v(Q0_node) v(Q1_node) v(Q2_node) v(Q3_node)
+
 quit
 .endc
 .end
