@@ -2,8 +2,8 @@
 
 module tb_zdb_top;
 
-    parameter integer CTRL_BITS = 6;
-    parameter integer INIT_CTRL = 32;
+    parameter integer CTRL_BITS = 7;
+    parameter integer INIT_CTRL = 0;
     localparam integer MAX_CTRL = (1 << CTRL_BITS) - 1;
 
     // ---------------------------------------------

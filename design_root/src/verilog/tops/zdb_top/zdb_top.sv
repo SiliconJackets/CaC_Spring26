@@ -38,8 +38,8 @@
 */
 
 module zdb_top #(
-    parameter integer CTRL_BITS = 6,
-    parameter integer INIT_CTRL = 32
+    parameter integer CTRL_BITS = 7,
+    parameter integer INIT_CTRL = 0
 )(
     input  wire                 clk_in,
     input  wire                 rst,

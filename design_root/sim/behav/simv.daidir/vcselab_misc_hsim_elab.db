@@ -1,5 +1,5 @@
 psSimBaseName                      	simv
-psLogFileName                      	nand_dcdl.log
+psLogFileName                      	zdb_top.log
 psDaiDir                           	simv.daidir
 destPath                           	csrc/
 fSharedMasterElab                  	0

@@ -1,0 +1,189 @@
+vcs -f zdb_top.include +v2k -R +lint=all -sverilog -full64 \
+	-timescale=1ns/10ps -debug_access+all -debug_region+cell+encrypt \
+	-debug_access -l zdb_top.log +define++SIM=1 +testname=DEFAULT \
+	-lca -kdb
+                         Chronologic VCS (TM)
+       Version X-2025.06-SP2_Full64 -- Tue Apr 14 10:24:19 2026
+
+                    Copyright (c) 1991 - 2025 Synopsys, Inc.
+   This software and the associated documentation are proprietary to Synopsys,
+ Inc. This software may only be used in accordance with the terms and conditions
+ of a written license agreement with Synopsys, Inc. All other use, reproduction,
+   or distribution of this software is strictly prohibited.  Licensed Products
+     communicate with Synopsys servers for the purpose of providing software
+    updates, detecting software piracy and verifying that customers are using
+    Licensed Products in conformity with the applicable License Key for such
+  Licensed Products. Synopsys will use information gathered in connection with
+    this process to deliver software updates and pursue software pirates and
+                                   infringers.
+
+ Inclusivity & Diversity - Visit SolvNetPlus to read the "Synopsys Statement on
+            Inclusivity and Diversity" (Refer to article 000036315 at
+                        https://solvnetplus.synopsys.com)
+
+
+Warning-[LCA_FEATURES_ENABLED] Usage warning
+  LCA features enabled by '-lca' argument on the command line.  For more 
+  information regarding list of LCA features please refer to Chapter "LCA 
+  features" in the VCS Release Notes
+
+Parsing design file '../../src/verilog/tops/zdb_top/zdb_top.sv'
+Parsing design file '../../src/verilog/parts/phase_detector/phase_detector_syn_pfd.sv'
+Parsing design file '../../src/verilog/parts/controller/controller_saturate.sv'
+Parsing design file '../../src/verilog/parts/dcdl/gates/inverter.sv'
+Parsing design file '../../src/verilog/parts/dcdl/gates/nand2.sv'
+Parsing design file '../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl_cell.sv'
+Parsing design file '../../src/verilog/parts/dcdl/nand_dcdl/dll_shift_register.sv'
+Parsing design file '../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl.sv'
+
+Warning-[V2KKW] Reserved word used as identifier
+../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl.sv, 19
+  'cell' is a reserved word introduced in Verilog 2001 (IEEE standard 
+  1364-2001) and may not be used as an identifier.
+  To avoid possible compatibility issue(s) in the future, please rename the 
+  identifier.
+
+
+Warning-[V2KKW] Reserved word used as identifier
+../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl.sv, 27
+  'cell' is a reserved word introduced in Verilog 2001 (IEEE standard 
+  1364-2001) and may not be used as an identifier.
+  To avoid possible compatibility issue(s) in the future, please rename the 
+  identifier.
+
+Parsing design file '../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl_top.sv'
+Parsing design file '../../src/verilog/tops/zdb_top/tb_zdb_top_data.sv'
+
+Lint-[NS] Null statement
+../../src/verilog/tops/zdb_top/tb_zdb_top_data.sv, 73
+  Null statement is used in following verilog source.
+  Source info:         #100;
+
+
+Lint-[NS] Null statement
+../../src/verilog/tops/zdb_top/tb_zdb_top_data.sv, 105
+  Null statement is used in following verilog source.
+  Source info:         #5000;
+
+
+Lint-[NS] Null statement
+../../src/verilog/tops/zdb_top/tb_zdb_top_data.sv, 109
+  Null statement is used in following verilog source.
+  Source info:         #200000;
+
+Top Level Modules:
+       inverter
+       nand2
+       tb_zdb_top_data
+TimeScale is 1 ps / 1 ps
+
+Lint-[WMIA-L] Width mismatch in assignment
+../../src/verilog/tops/zdb_top/tb_zdb_top_data.sv, 101
+  Width mismatch between LHS and RHS is found in assignment:
+  The following 32-bit wide expression is assigned to a 64-bit LHS target:
+  Source info: phase_err = 0;
+  Expression: phase_err
+
+Starting vcs inline pass...
+4 modules and 0 UDP read.
+recompiling module inverter
+recompiling module nand2
+recompiling module nand_dcdl_cell
+recompiling module tb_zdb_top_data
+All of 4 modules done
+make[1]: Entering directory '/nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/sim/behav/csrc'
+make[1]: Leaving directory '/nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/sim/behav/csrc'
+make[1]: Entering directory '/nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/sim/behav/csrc'
+rm -f _cuarc*.so _csrc*.so pre_vcsobj_*.so share_vcsobj_*.so
+if [ -x ../simv ]; then chmod a-x ../simv; fi
+g++  -o ../simv      -rdynamic  -Wl,-rpath='$ORIGIN'/simv.daidir -Wl,-rpath=./simv.daidir -Wl,-rpath=/tools/software/synopsys/vcs/latest/linux64/lib -L/tools/software/synopsys/vcs/latest/linux64/lib  -Wl,-rpath-link=./   objs/amcQw_d.o   _698749_archive_1.so _prev_archive_1.so   SIM_l.o       rmapats_mop.o rmapats.o rmar.o rmar_nd.o  rmar_llvm_0_1.o rmar_llvm_0_0.o            -lnuma -lvirsim -lerrorinf -lsnpsmalloc -lvfs      -lvcsnew -ldistsimclient -lsimprofile -luclinative /tools/software/synopsys/vcs/latest/linux64/lib/vcs_tls.o   -Wl,-whole-archive  -lvcsucli    -Wl,-no-whole-archive        _vcs_pli_stub_.o   /tools/software/synopsys/vcs/latest/linux64/lib/vcs_save_restore_new.o /tools/software/synopsys/verdi/latest/share/PLI/VCS/LINUX64/pli.a -ldl  -lc -lm -lpthread -ldl 
+../simv up to date
+make[1]: Leaving directory '/nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/sim/behav/csrc'
+Info: [VCS_SAVE_RESTORE_INFO] ASLR (Address Space Layout Randomization) is detected on the machine. To enable $save functionality, ASLR will be switched off and simv re-executed.
+Please use '-no_save' simv switch to avoid re-execution or '-suppress=ASLR_DETECTED_INFO' to suppress this message.
+
+Warning-[LCA_FEATURES_ENABLED] Usage warning
+  LCA features enabled by '-lca' argument on the command line.  For more 
+  information regarding list of LCA features please refer to Chapter "LCA 
+  features" in the VCS Release Notes
+
+Chronologic VCS simulator copyright 1991-2025
+Contains Synopsys proprietary information.
+Compiler version X-2025.06-SP2_Full64; Runtime version X-2025.06-SP2_Full64;  Apr 14 10:24 2026
+t=1700 | ERR=200 ps | CTRL=32 | SL=0 SR=0
+t=4700 | ERR=200 ps | CTRL=32 | SL=0 SR=0
+t=7700 | ERR=200 ps | CTRL=32 | SL=0 SR=0
+t=10700 | ERR=200 ps | CTRL=32 | SL=0 SR=0
+t=13700 | ERR=200 ps | CTRL=31 | SL=0 SR=1
+t=19700 | ERR=200 ps | CTRL=33 | SL=1 SR=0
+t=22900 | ERR=400 ps | CTRL=33 | SL=0 SR=0
+t=25900 | ERR=400 ps | CTRL=32 | SL=0 SR=1
+t=28700 | ERR=200 ps | CTRL=33 | SL=1 SR=0
+t=31900 | ERR=400 ps | CTRL=33 | SL=0 SR=0
+t=34900 | ERR=400 ps | CTRL=32 | SL=0 SR=1
+t=37700 | ERR=200 ps | CTRL=33 | SL=1 SR=0
+t=40900 | ERR=400 ps | CTRL=33 | SL=0 SR=0
+t=43900 | ERR=400 ps | CTRL=32 | SL=0 SR=1
+t=46700 | ERR=200 ps | CTRL=33 | SL=1 SR=0
+t=49900 | ERR=400 ps | CTRL=33 | SL=0 SR=0
+t=52900 | ERR=400 ps | CTRL=32 | SL=0 SR=1
+t=55700 | ERR=200 ps | CTRL=33 | SL=1 SR=0
+t=58900 | ERR=400 ps | CTRL=33 | SL=0 SR=0
+t=61900 | ERR=400 ps | CTRL=32 | SL=0 SR=1
+t=64700 | ERR=200 ps | CTRL=33 | SL=1 SR=0
+t=67900 | ERR=400 ps | CTRL=33 | SL=0 SR=0
+t=70900 | ERR=400 ps | CTRL=32 | SL=0 SR=1
+t=73700 | ERR=200 ps | CTRL=33 | SL=1 SR=0
+t=76900 | ERR=400 ps | CTRL=33 | SL=0 SR=0
+t=79900 | ERR=400 ps | CTRL=32 | SL=0 SR=1
+t=82700 | ERR=200 ps | CTRL=33 | SL=1 SR=0
+t=85900 | ERR=400 ps | CTRL=33 | SL=0 SR=0
+t=88900 | ERR=400 ps | CTRL=32 | SL=0 SR=1
+t=91700 | ERR=200 ps | CTRL=33 | SL=1 SR=0
+t=94900 | ERR=400 ps | CTRL=33 | SL=0 SR=0
+t=97900 | ERR=400 ps | CTRL=32 | SL=0 SR=1
+t=100700 | ERR=200 ps | CTRL=33 | SL=1 SR=0
+t=103900 | ERR=400 ps | CTRL=33 | SL=0 SR=0
+t=106900 | ERR=400 ps | CTRL=32 | SL=0 SR=1
+t=109700 | ERR=200 ps | CTRL=33 | SL=1 SR=0
+t=112900 | ERR=400 ps | CTRL=33 | SL=0 SR=0
+t=115900 | ERR=400 ps | CTRL=32 | SL=0 SR=1
+t=118700 | ERR=200 ps | CTRL=33 | SL=1 SR=0
+t=121900 | ERR=400 ps | CTRL=33 | SL=0 SR=0
+t=124900 | ERR=400 ps | CTRL=32 | SL=0 SR=1
+t=127700 | ERR=200 ps | CTRL=33 | SL=1 SR=0
+t=130900 | ERR=400 ps | CTRL=33 | SL=0 SR=0
+t=133900 | ERR=400 ps | CTRL=32 | SL=0 SR=1
+t=136700 | ERR=200 ps | CTRL=33 | SL=1 SR=0
+t=139900 | ERR=400 ps | CTRL=33 | SL=0 SR=0
+t=142900 | ERR=400 ps | CTRL=32 | SL=0 SR=1
+t=145700 | ERR=200 ps | CTRL=33 | SL=1 SR=0
+t=148900 | ERR=400 ps | CTRL=33 | SL=0 SR=0
+t=151900 | ERR=400 ps | CTRL=32 | SL=0 SR=1
+t=154700 | ERR=200 ps | CTRL=33 | SL=1 SR=0
+t=157900 | ERR=400 ps | CTRL=33 | SL=0 SR=0
+t=160900 | ERR=400 ps | CTRL=32 | SL=0 SR=1
+t=163700 | ERR=200 ps | CTRL=33 | SL=1 SR=0
+t=166900 | ERR=400 ps | CTRL=33 | SL=0 SR=0
+t=169900 | ERR=400 ps | CTRL=32 | SL=0 SR=1
+t=172700 | ERR=200 ps | CTRL=33 | SL=1 SR=0
+t=175900 | ERR=400 ps | CTRL=33 | SL=0 SR=0
+t=178900 | ERR=400 ps | CTRL=32 | SL=0 SR=1
+t=181700 | ERR=200 ps | CTRL=33 | SL=1 SR=0
+t=184900 | ERR=400 ps | CTRL=33 | SL=0 SR=0
+t=187900 | ERR=400 ps | CTRL=32 | SL=0 SR=1
+t=190700 | ERR=200 ps | CTRL=33 | SL=1 SR=0
+t=193900 | ERR=400 ps | CTRL=33 | SL=0 SR=0
+t=196900 | ERR=400 ps | CTRL=32 | SL=0 SR=1
+t=199700 | ERR=200 ps | CTRL=33 | SL=1 SR=0
+t=202900 | ERR=400 ps | CTRL=33 | SL=0 SR=0
+Simulation complete. Data saved to dll_data.csv
+$finish called from file "../../src/verilog/tops/zdb_top/tb_zdb_top_data.sv", line 113.
+$finish at simulation time               205000
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 205000 ps
+CPU Time:      0.370 seconds;       Data structure size:   0.0Mb
+Tue Apr 14 10:24:21 2026
+CPU time: .734 seconds to compile + .452 seconds to elab + .453 seconds to link + .434 seconds in simulation
+Verdi KDB elaboration done and the database successfully generated
+# simv 

@@ -2,7 +2,7 @@ Command: vcs -f zdb_top.include +v2k -R +lint=all -sverilog -full64 -timescale=1
 -debug_access+all -debug_region+cell+encrypt -debug_access -l zdb_top.log +define++SIM=1 \
 +testname=DEFAULT -lca -kdb
                          Chronologic VCS (TM)
-       Version X-2025.06-SP2_Full64 -- Mon Apr 13 22:29:52 2026
+       Version X-2025.06-SP2_Full64 -- Tue Apr 14 15:13:19 2026
 
                     Copyright (c) 1991 - 2025 Synopsys, Inc.
    This software and the associated documentation are proprietary to Synopsys,
@@ -34,140 +34,77 @@ Parsing design file '../../src/verilog/parts/dcdl/gates/nand2.sv'
 Parsing design file '../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl_cell.sv'
 Parsing design file '../../src/verilog/parts/dcdl/nand_dcdl/dll_shift_register.sv'
 Parsing design file '../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl.sv'
+
+Warning-[V2KKW] Reserved word used as identifier
+../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl.sv, 19
+  'cell' is a reserved word introduced in Verilog 2001 (IEEE standard 
+  1364-2001) and may not be used as an identifier.
+  To avoid possible compatibility issue(s) in the future, please rename the 
+  identifier.
+
+
+Warning-[V2KKW] Reserved word used as identifier
+../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl.sv, 27
+  'cell' is a reserved word introduced in Verilog 2001 (IEEE standard 
+  1364-2001) and may not be used as an identifier.
+  To avoid possible compatibility issue(s) in the future, please rename the 
+  identifier.
+
 Parsing design file '../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl_top.sv'
-Parsing design file '../../src/verilog/tops/zdb_top/tb_zdb_top.sv'
+Parsing design file '../../src/verilog/tops/zdb_top/tb_zdb_top_data.sv'
 
 Lint-[NS] Null statement
-../../src/verilog/tops/zdb_top/tb_zdb_top.sv, 115
+../../src/verilog/tops/zdb_top/tb_zdb_top_data.sv, 132
   Null statement is used in following verilog source.
-  Source info:             @(posedge clk_in);
-
-
-Lint-[NS] Null statement
-../../src/verilog/tops/zdb_top/tb_zdb_top.sv, 116
-  Null statement is used in following verilog source.
-  Source info:             #1;
+  Source info:         #20000;
 
 
 Lint-[NS] Null statement
-../../src/verilog/tops/zdb_top/tb_zdb_top.sv, 163
+../../src/verilog/tops/zdb_top/tb_zdb_top_data.sv, 136
   Null statement is used in following verilog source.
-  Source info:         #10000;
-
-
-Lint-[NS] Null statement
-../../src/verilog/tops/zdb_top/tb_zdb_top.sv, 166
-  Null statement is used in following verilog source.
-  Source info:         @(posedge clk_in); #1;
-
-
-Lint-[NS] Null statement
-../../src/verilog/tops/zdb_top/tb_zdb_top.sv, 166
-  Null statement is used in following verilog source.
-  Source info:         @(posedge clk_in); #1;
-
-
-Lint-[NS] Null statement
-../../src/verilog/tops/zdb_top/tb_zdb_top.sv, 187
-  Null statement is used in following verilog source.
-  Source info:         #5000;
+  Source info:         #500000;
 
 Top Level Modules:
        inverter
        nand2
-       tb_zdb_top
+       tb_zdb_top_data
 TimeScale is 1 ps / 1 ps
 
 Lint-[WMIA-L] Width mismatch in assignment
-../../src/verilog/tops/zdb_top/tb_zdb_top.sv, 54
-  Width mismatch between LHS and RHS is found in assignment:
-  The following 32-bit wide expression is assigned to a 1-bit LHS target:
-  Source info: clk_in = 0;
-  Expression: clk_in
-
-
-Lint-[ULCO] Unequal length in comparison operator
-../../src/verilog/tops/zdb_top/tb_zdb_top.sv, 83
-tb_zdb_top, "(ctrl_dbg == last_ctrl)"
-  A left 6-bit expression is compared to a right 32-bit expression.
-  Comparing 'ctrl_dbg' of type wire [(CTRL_BITS - 1):0]
-  with 'last_ctrl' of type integer.
-
-
-Lint-[WMIA-L] Width mismatch in assignment
-../../src/verilog/tops/zdb_top/tb_zdb_top.sv, 88
-  Width mismatch between LHS and RHS is found in assignment:
-  The following 6-bit wide expression is assigned to a 32-bit LHS target:
-  Source info: last_ctrl = ctrl_dbg;
-  Expression: last_ctrl
-
-
-Lint-[WMIA-L] Width mismatch in assignment
-../../src/verilog/tops/zdb_top/tb_zdb_top.sv, 156
+../../src/verilog/tops/zdb_top/tb_zdb_top_data.sv, 126
   Width mismatch between LHS and RHS is found in assignment:
   The following 32-bit wide expression is assigned to a 64-bit LHS target:
-  Source info: prev_phase_error = 0;
-  Expression: prev_phase_error
+  Source info: phase_err = 0;
+  Expression: phase_err
 
 
 Lint-[WMIA-L] Width mismatch in assignment
-../../src/verilog/tops/zdb_top/tb_zdb_top.sv, 162
+../../src/verilog/tops/zdb_top/tb_zdb_top_data.sv, 127
   Width mismatch between LHS and RHS is found in assignment:
-  The following 32-bit wide expression is assigned to a 1-bit LHS target:
-  Source info: rst = 1;
-  Expression: rst
+  The following 32-bit wide expression is assigned to a 64-bit LHS target:
+  Source info: t_in_edge = 0;
+  Expression: t_in_edge
 
 
 Lint-[WMIA-L] Width mismatch in assignment
-../../src/verilog/tops/zdb_top/tb_zdb_top.sv, 164
+../../src/verilog/tops/zdb_top/tb_zdb_top_data.sv, 128
   Width mismatch between LHS and RHS is found in assignment:
-  The following 32-bit wide expression is assigned to a 1-bit LHS target:
-  Source info: rst = 0;
-  Expression: rst
-
-
-Lint-[ULCO] Unequal length in comparison operator
-../../src/verilog/tops/zdb_top/tb_zdb_top.sv, 167
-tb_zdb_top, "(ctrl_dbg !== INIT_CTRL)"
-  A left 6-bit expression is compared to a right 32-bit expression.
-  Comparing 'ctrl_dbg' of type wire [(CTRL_BITS - 1):0]
-  with 'INIT_CTRL' of type integer.
-
-
-Lint-[WMIA-L] Width mismatch in assignment
-../../src/verilog/tops/zdb_top/tb_zdb_top.sv, 186
-  Width mismatch between LHS and RHS is found in assignment:
-  The following 32-bit wide expression is assigned to a 1-bit LHS target:
-  Source info: rst = 1;
-  Expression: rst
-
-
-Lint-[WMIA-L] Width mismatch in assignment
-../../src/verilog/tops/zdb_top/tb_zdb_top.sv, 188
-  Width mismatch between LHS and RHS is found in assignment:
-  The following 32-bit wide expression is assigned to a 1-bit LHS target:
-  Source info: rst = 0;
-  Expression: rst
-
-
-Lint-[ULCO] Unequal length in comparison operator
-../../src/verilog/tops/zdb_top/tb_zdb_top.sv, 106
-tb_zdb_top, "(ctrl_dbg > MAX_CTRL)"
-  A left 6-bit expression is compared to a right 32-bit expression.
-  Comparing 'ctrl_dbg' of type wire [(CTRL_BITS - 1):0]
-  with 'MAX_CTRL' of type integer.
+  The following 32-bit wide expression is assigned to a 64-bit LHS target:
+  Source info: t_out_edge = 0;
+  Expression: t_out_edge
 
 Starting vcs inline pass...
-3 modules and 0 UDP read.
-	However, due to incremental compilation, no re-compilation is necessary.
+4 modules and 0 UDP read.
+recompiling module tb_zdb_top_data
+	However, due to incremental compilation, only 1 module needs to be compiled. 
 make[1]: Entering directory '/nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/sim/behav/csrc' \
 
 rm -f _cuarc*.so _csrc*.so pre_vcsobj_*.so share_vcsobj_*.so
 if [ -x ../simv ]; then chmod a-x ../simv; fi
 g++  -o ../simv      -rdynamic  -Wl,-rpath='$ORIGIN'/simv.daidir -Wl,-rpath=./simv.daidir \
 -Wl,-rpath=/tools/software/synopsys/vcs/latest/linux64/lib -L/tools/software/synopsys/vcs/latest/linux64/lib \
--Wl,-rpath-link=./   objs/amcQw_d.o   _2723562_archive_1.so _prev_archive_1.so   \
-SIM_l.o       rmapats_mop.o rmapats.o rmar.o rmar_nd.o  rmar_llvm_0_1.o rmar_llvm_0_0.o \
+-Wl,-rpath-link=./   objs/amcQw_d.o   _159553_archive_1.so _prev_archive_1.so   SIM_l.o \
+rmapats_mop.o rmapats.o rmar.o rmar_nd.o  rmar_llvm_0_1.o rmar_llvm_0_0.o        \
 -lnuma -lvirsim -lerrorinf -lsnpsmalloc -lvfs      -lvcsnew -ldistsimclient -lsimprofile \
 -luclinative /tools/software/synopsys/vcs/latest/linux64/lib/vcs_tls.o   -Wl,-whole-archive \
 -lvcsucli    -Wl,-no-whole-archive        _vcs_pli_stub_.o   /tools/software/synopsys/vcs/latest/linux64/lib/vcs_save_restore_new.o \
@@ -179,841 +116,112 @@ make[1]: Leaving directory '/nethome/araj92/final_codeachiprepo/CaC_Spring26/des
 Command: /nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/sim/behav/./simv +v2k +lint=all -a zdb_top.log +define++SIM=1 +testname=DEFAULT -lca
 Chronologic VCS simulator copyright 1991-2025
 Contains Synopsys proprietary information.
-Compiler version X-2025.06-SP2_Full64; Runtime version X-2025.06-SP2_Full64;  Apr 13 22:29 2026
-time   rst clk_in clk_out | ctrl
-     0  1    0      x    | 32
-   294  1    0      0    | 32
-  5000  1    1      0    | 32
-t=5200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=0
-  5200  1    1      1    | 32
- 10000  0    0      1    | 32
- 10200  0    0      0    | 32
- 15000  0    1      0    | 32
-
-=== RUNNING DLL LOOP ===
-t=15200 | PHASE_ERR=200 ps | ctrl=32 | UP=1 DOWN=0
- 15200  0    1      1    | 32
- 20000  0    0      1    | 32
- 20200  0    0      0    | 32
- 25000  0    1      0    | 32
-t=25200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
- 25200  0    1      1    | 32
- 30000  0    0      1    | 32
- 30200  0    0      0    | 32
- 35000  0    1      0    | 31
-t=35200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
- 35200  0    1      1    | 31
- 40000  0    0      1    | 31
- 40200  0    0      0    | 31
- 45000  0    1      0    | 32
-t=45800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
- 45800  0    1      1    | 32
- 50000  0    0      1    | 32
- 50800  0    0      0    | 32
- 55000  0    1      0    | 32
-t=55200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
- 55200  0    1      1    | 32
- 60000  0    0      1    | 32
- 60200  0    0      0    | 32
- 65000  0    1      0    | 31
-t=65200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
- 65200  0    1      1    | 31
- 70000  0    0      1    | 31
- 70200  0    0      0    | 31
- 75000  0    1      0    | 32
-t=75800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
- 75800  0    1      1    | 32
- 80000  0    0      1    | 32
- 80800  0    0      0    | 32
- 85000  0    1      0    | 32
-t=85200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
- 85200  0    1      1    | 32
- 90000  0    0      1    | 32
- 90200  0    0      0    | 32
- 95000  0    1      0    | 31
-t=95200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
- 95200  0    1      1    | 31
-100000  0    0      1    | 31
-100200  0    0      0    | 31
-105000  0    1      0    | 32
-t=105800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-105800  0    1      1    | 32
-110000  0    0      1    | 32
-110800  0    0      0    | 32
-115000  0    1      0    | 32
-t=115200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-115200  0    1      1    | 32
-120000  0    0      1    | 32
-120200  0    0      0    | 32
-125000  0    1      0    | 31
-t=125200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-125200  0    1      1    | 31
-130000  0    0      1    | 31
-130200  0    0      0    | 31
-135000  0    1      0    | 32
-t=135800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-135800  0    1      1    | 32
-140000  0    0      1    | 32
-140800  0    0      0    | 32
-145000  0    1      0    | 32
-t=145200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-145200  0    1      1    | 32
-150000  0    0      1    | 32
-150200  0    0      0    | 32
-155000  0    1      0    | 31
-t=155200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-155200  0    1      1    | 31
-160000  0    0      1    | 31
-160200  0    0      0    | 31
-165000  0    1      0    | 32
-t=165800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-165800  0    1      1    | 32
-170000  0    0      1    | 32
-170800  0    0      0    | 32
-175000  0    1      0    | 32
-t=175200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-175200  0    1      1    | 32
-180000  0    0      1    | 32
-180200  0    0      0    | 32
-185000  0    1      0    | 31
-t=185200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-185200  0    1      1    | 31
-190000  0    0      1    | 31
-190200  0    0      0    | 31
-195000  0    1      0    | 32
-t=195800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-195800  0    1      1    | 32
-200000  0    0      1    | 32
-200800  0    0      0    | 32
-205000  0    1      0    | 32
-t=205200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-205200  0    1      1    | 32
-210000  0    0      1    | 32
-210200  0    0      0    | 32
-215000  0    1      0    | 31
-t=215200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-215200  0    1      1    | 31
-220000  0    0      1    | 31
-220200  0    0      0    | 31
-225000  0    1      0    | 32
-t=225800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-225800  0    1      1    | 32
-230000  0    0      1    | 32
-230800  0    0      0    | 32
-235000  0    1      0    | 32
-t=235200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-235200  0    1      1    | 32
-240000  0    0      1    | 32
-240200  0    0      0    | 32
-245000  0    1      0    | 31
-t=245200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-245200  0    1      1    | 31
-250000  0    0      1    | 31
-250200  0    0      0    | 31
-255000  0    1      0    | 32
-t=255800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-255800  0    1      1    | 32
-260000  0    0      1    | 32
-260800  0    0      0    | 32
-265000  0    1      0    | 32
-t=265200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-265200  0    1      1    | 32
-270000  0    0      1    | 32
-270200  0    0      0    | 32
-275000  0    1      0    | 31
-t=275200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-275200  0    1      1    | 31
-280000  0    0      1    | 31
-280200  0    0      0    | 31
-285000  0    1      0    | 32
-t=285800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-285800  0    1      1    | 32
-290000  0    0      1    | 32
-290800  0    0      0    | 32
-295000  0    1      0    | 32
-t=295200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-295200  0    1      1    | 32
-300000  0    0      1    | 32
-300200  0    0      0    | 32
-305000  0    1      0    | 31
-t=305200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-305200  0    1      1    | 31
-310000  0    0      1    | 31
-310200  0    0      0    | 31
-315000  0    1      0    | 32
-t=315800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-315800  0    1      1    | 32
-320000  0    0      1    | 32
-320800  0    0      0    | 32
-325000  0    1      0    | 32
-t=325200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-325200  0    1      1    | 32
-330000  0    0      1    | 32
-330200  0    0      0    | 32
-335000  0    1      0    | 31
-t=335200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-335200  0    1      1    | 31
-340000  0    0      1    | 31
-340200  0    0      0    | 31
-345000  0    1      0    | 32
-t=345800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-345800  0    1      1    | 32
-350000  0    0      1    | 32
-350800  0    0      0    | 32
-355000  0    1      0    | 32
-t=355200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-355200  0    1      1    | 32
-360000  0    0      1    | 32
-360200  0    0      0    | 32
-365000  0    1      0    | 31
-t=365200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-365200  0    1      1    | 31
-370000  0    0      1    | 31
-370200  0    0      0    | 31
-375000  0    1      0    | 32
-t=375800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-375800  0    1      1    | 32
-380000  0    0      1    | 32
-380800  0    0      0    | 32
-385000  0    1      0    | 32
-t=385200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-385200  0    1      1    | 32
-390000  0    0      1    | 32
-390200  0    0      0    | 32
-395000  0    1      0    | 31
-t=395200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-395200  0    1      1    | 31
-400000  0    0      1    | 31
-400200  0    0      0    | 31
-405000  0    1      0    | 32
-t=405800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-405800  0    1      1    | 32
-410000  0    0      1    | 32
-410800  0    0      0    | 32
-415000  0    1      0    | 32
-t=415200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-415200  0    1      1    | 32
-420000  0    0      1    | 32
-420200  0    0      0    | 32
-425000  0    1      0    | 31
-t=425200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-425200  0    1      1    | 31
-430000  0    0      1    | 31
-430200  0    0      0    | 31
-435000  0    1      0    | 32
-t=435800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-435800  0    1      1    | 32
-440000  0    0      1    | 32
-440800  0    0      0    | 32
-445000  0    1      0    | 32
-t=445200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-445200  0    1      1    | 32
-450000  0    0      1    | 32
-450200  0    0      0    | 32
-455000  0    1      0    | 31
-t=455200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-455200  0    1      1    | 31
-460000  0    0      1    | 31
-460200  0    0      0    | 31
-465000  0    1      0    | 32
-t=465800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-465800  0    1      1    | 32
-470000  0    0      1    | 32
-470800  0    0      0    | 32
-475000  0    1      0    | 32
-t=475200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-475200  0    1      1    | 32
-480000  0    0      1    | 32
-480200  0    0      0    | 32
-485000  0    1      0    | 31
-t=485200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-485200  0    1      1    | 31
-490000  0    0      1    | 31
-490200  0    0      0    | 31
-495000  0    1      0    | 32
-t=495800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-495800  0    1      1    | 32
-500000  0    0      1    | 32
-500800  0    0      0    | 32
-505000  0    1      0    | 32
-t=505200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-505200  0    1      1    | 32
-510000  0    0      1    | 32
-510200  0    0      0    | 32
-515000  0    1      0    | 31
-t=515200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-515200  0    1      1    | 31
-520000  0    0      1    | 31
-520200  0    0      0    | 31
-525000  0    1      0    | 32
-t=525800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-525800  0    1      1    | 32
-530000  0    0      1    | 32
-530800  0    0      0    | 32
-535000  0    1      0    | 32
-t=535200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-535200  0    1      1    | 32
-540000  0    0      1    | 32
-540200  0    0      0    | 32
-545000  0    1      0    | 31
-t=545200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-545200  0    1      1    | 31
-550000  0    0      1    | 31
-550200  0    0      0    | 31
-555000  0    1      0    | 32
-t=555800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-555800  0    1      1    | 32
-560000  0    0      1    | 32
-560800  0    0      0    | 32
-565000  0    1      0    | 32
-t=565200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-565200  0    1      1    | 32
-570000  0    0      1    | 32
-570200  0    0      0    | 32
-575000  0    1      0    | 31
-t=575200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-575200  0    1      1    | 31
-580000  0    0      1    | 31
-580200  0    0      0    | 31
-585000  0    1      0    | 32
-t=585800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-585800  0    1      1    | 32
-590000  0    0      1    | 32
-590800  0    0      0    | 32
-595000  0    1      0    | 32
-t=595200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-595200  0    1      1    | 32
-600000  0    0      1    | 32
-600200  0    0      0    | 32
-605000  0    1      0    | 31
-t=605200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-605200  0    1      1    | 31
-610000  0    0      1    | 31
-610200  0    0      0    | 31
-615000  0    1      0    | 32
-t=615800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-615800  0    1      1    | 32
-620000  0    0      1    | 32
-620800  0    0      0    | 32
-625000  0    1      0    | 32
-t=625200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-625200  0    1      1    | 32
-630000  0    0      1    | 32
-630200  0    0      0    | 32
-635000  0    1      0    | 31
-t=635200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-635200  0    1      1    | 31
-640000  0    0      1    | 31
-640200  0    0      0    | 31
-645000  0    1      0    | 32
-t=645800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-645800  0    1      1    | 32
-650000  0    0      1    | 32
-650800  0    0      0    | 32
-655000  0    1      0    | 32
-t=655200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-655200  0    1      1    | 32
-660000  0    0      1    | 32
-660200  0    0      0    | 32
-665000  0    1      0    | 31
-t=665200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-665200  0    1      1    | 31
-670000  0    0      1    | 31
-670200  0    0      0    | 31
-675000  0    1      0    | 32
-t=675800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-675800  0    1      1    | 32
-680000  0    0      1    | 32
-680800  0    0      0    | 32
-685000  0    1      0    | 32
-t=685200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-685200  0    1      1    | 32
-690000  0    0      1    | 32
-690200  0    0      0    | 32
-695000  0    1      0    | 31
-t=695200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-695200  0    1      1    | 31
-700000  0    0      1    | 31
-700200  0    0      0    | 31
-705000  0    1      0    | 32
-t=705800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-705800  0    1      1    | 32
-710000  0    0      1    | 32
-710800  0    0      0    | 32
-715000  0    1      0    | 32
-t=715200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-715200  0    1      1    | 32
-720000  0    0      1    | 32
-720200  0    0      0    | 32
-725000  0    1      0    | 31
-t=725200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-725200  0    1      1    | 31
-730000  0    0      1    | 31
-730200  0    0      0    | 31
-735000  0    1      0    | 32
-t=735800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-735800  0    1      1    | 32
-740000  0    0      1    | 32
-740800  0    0      0    | 32
-745000  0    1      0    | 32
-t=745200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-745200  0    1      1    | 32
-750000  0    0      1    | 32
-750200  0    0      0    | 32
-755000  0    1      0    | 31
-t=755200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-755200  0    1      1    | 31
-760000  0    0      1    | 31
-760200  0    0      0    | 31
-765000  0    1      0    | 32
-t=765800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-765800  0    1      1    | 32
-770000  0    0      1    | 32
-770800  0    0      0    | 32
-775000  0    1      0    | 32
-t=775200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-775200  0    1      1    | 32
-780000  0    0      1    | 32
-780200  0    0      0    | 32
-785000  0    1      0    | 31
-t=785200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-785200  0    1      1    | 31
-790000  0    0      1    | 31
-790200  0    0      0    | 31
-795000  0    1      0    | 32
-t=795800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-795800  0    1      1    | 32
-800000  0    0      1    | 32
-800800  0    0      0    | 32
-805000  0    1      0    | 32
-t=805200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-805200  0    1      1    | 32
-810000  0    0      1    | 32
-810200  0    0      0    | 32
-815000  0    1      0    | 31
-t=815200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-815200  0    1      1    | 31
-820000  0    0      1    | 31
-820200  0    0      0    | 31
-825000  0    1      0    | 32
-t=825800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-825800  0    1      1    | 32
-830000  0    0      1    | 32
-830800  0    0      0    | 32
-835000  0    1      0    | 32
-t=835200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-835200  0    1      1    | 32
-840000  0    0      1    | 32
-840200  0    0      0    | 32
-845000  0    1      0    | 31
-t=845200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-845200  0    1      1    | 31
-850000  0    0      1    | 31
-850200  0    0      0    | 31
-855000  0    1      0    | 32
-t=855800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-855800  0    1      1    | 32
-860000  0    0      1    | 32
-860800  0    0      0    | 32
-865000  0    1      0    | 32
-t=865200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-865200  0    1      1    | 32
-870000  0    0      1    | 32
-870200  0    0      0    | 32
-875000  0    1      0    | 31
-t=875200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-875200  0    1      1    | 31
-880000  0    0      1    | 31
-880200  0    0      0    | 31
-885000  0    1      0    | 32
-t=885800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-885800  0    1      1    | 32
-890000  0    0      1    | 32
-890800  0    0      0    | 32
-895000  0    1      0    | 32
-t=895200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-895200  0    1      1    | 32
-900000  0    0      1    | 32
-900200  0    0      0    | 32
-905000  0    1      0    | 31
-t=905200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-905200  0    1      1    | 31
-910000  0    0      1    | 31
-910200  0    0      0    | 31
-915000  0    1      0    | 32
-t=915800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-915800  0    1      1    | 32
-920000  0    0      1    | 32
-920800  0    0      0    | 32
-925000  0    1      0    | 32
-t=925200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-925200  0    1      1    | 32
-930000  0    0      1    | 32
-930200  0    0      0    | 32
-935000  0    1      0    | 31
-t=935200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-935200  0    1      1    | 31
-940000  0    0      1    | 31
-940200  0    0      0    | 31
-945000  0    1      0    | 32
-t=945800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-945800  0    1      1    | 32
-950000  0    0      1    | 32
-950800  0    0      0    | 32
-955000  0    1      0    | 32
-t=955200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-955200  0    1      1    | 32
-960000  0    0      1    | 32
-960200  0    0      0    | 32
-965000  0    1      0    | 31
-t=965200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-965200  0    1      1    | 31
-970000  0    0      1    | 31
-970200  0    0      0    | 31
-975000  0    1      0    | 32
-t=975800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-975800  0    1      1    | 32
-980000  0    0      1    | 32
-980800  0    0      0    | 32
-985000  0    1      0    | 32
-t=985200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-985200  0    1      1    | 32
-990000  0    0      1    | 32
-990200  0    0      0    | 32
-995000  0    1      0    | 31
-t=995200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-995200  0    1      1    | 31
-1000000  0    0      1    | 31
-1000200  0    0      0    | 31
-1005000  0    1      0    | 32
-t=1005800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-1005800  0    1      1    | 32
-1010000  0    0      1    | 32
-1010800  0    0      0    | 32
-1015000  0    1      0    | 32
-
-⚠️ NO LOCK DETECTED
-Phase stable cycles = 0
-Ctrl stable cycles  = 0
-
-
-=== DISTURBANCE TEST ===
-1015001  1    1      0    | 32
-t=1015200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=0
-1015200  1    1      1    | 32
-1020000  1    0      1    | 32
-1020001  0    0      1    | 32
-1020200  0    0      0    | 32
-1025000  0    1      0    | 32
-t=1025200 | PHASE_ERR=200 ps | ctrl=32 | UP=1 DOWN=0
-1025200  0    1      1    | 32
-1030000  0    0      1    | 32
-1030200  0    0      0    | 32
-1035000  0    1      0    | 32
-t=1035200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-1035200  0    1      1    | 32
-1040000  0    0      1    | 32
-1040200  0    0      0    | 32
-1045000  0    1      0    | 31
-t=1045200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-1045200  0    1      1    | 31
-1050000  0    0      1    | 31
-1050200  0    0      0    | 31
-1055000  0    1      0    | 32
-t=1055800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-1055800  0    1      1    | 32
-1060000  0    0      1    | 32
-1060800  0    0      0    | 32
-1065000  0    1      0    | 32
-t=1065200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-1065200  0    1      1    | 32
-1070000  0    0      1    | 32
-1070200  0    0      0    | 32
-1075000  0    1      0    | 31
-t=1075200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-1075200  0    1      1    | 31
-1080000  0    0      1    | 31
-1080200  0    0      0    | 31
-1085000  0    1      0    | 32
-t=1085800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-1085800  0    1      1    | 32
-1090000  0    0      1    | 32
-1090800  0    0      0    | 32
-1095000  0    1      0    | 32
-t=1095200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-1095200  0    1      1    | 32
-1100000  0    0      1    | 32
-1100200  0    0      0    | 32
-1105000  0    1      0    | 31
-t=1105200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-1105200  0    1      1    | 31
-1110000  0    0      1    | 31
-1110200  0    0      0    | 31
-1115000  0    1      0    | 32
-t=1115800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-1115800  0    1      1    | 32
-1120000  0    0      1    | 32
-1120800  0    0      0    | 32
-1125000  0    1      0    | 32
-t=1125200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-1125200  0    1      1    | 32
-1130000  0    0      1    | 32
-1130200  0    0      0    | 32
-1135000  0    1      0    | 31
-t=1135200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-1135200  0    1      1    | 31
-1140000  0    0      1    | 31
-1140200  0    0      0    | 31
-1145000  0    1      0    | 32
-t=1145800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-1145800  0    1      1    | 32
-1150000  0    0      1    | 32
-1150800  0    0      0    | 32
-1155000  0    1      0    | 32
-t=1155200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-1155200  0    1      1    | 32
-1160000  0    0      1    | 32
-1160200  0    0      0    | 32
-1165000  0    1      0    | 31
-t=1165200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-1165200  0    1      1    | 31
-1170000  0    0      1    | 31
-1170200  0    0      0    | 31
-1175000  0    1      0    | 32
-t=1175800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-1175800  0    1      1    | 32
-1180000  0    0      1    | 32
-1180800  0    0      0    | 32
-1185000  0    1      0    | 32
-t=1185200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-1185200  0    1      1    | 32
-1190000  0    0      1    | 32
-1190200  0    0      0    | 32
-1195000  0    1      0    | 31
-t=1195200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-1195200  0    1      1    | 31
-1200000  0    0      1    | 31
-1200200  0    0      0    | 31
-1205000  0    1      0    | 32
-t=1205800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-1205800  0    1      1    | 32
-1210000  0    0      1    | 32
-1210800  0    0      0    | 32
-1215000  0    1      0    | 32
-t=1215200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-1215200  0    1      1    | 32
-1220000  0    0      1    | 32
-1220200  0    0      0    | 32
-1225000  0    1      0    | 31
-t=1225200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-1225200  0    1      1    | 31
-1230000  0    0      1    | 31
-1230200  0    0      0    | 31
-1235000  0    1      0    | 32
-t=1235800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-1235800  0    1      1    | 32
-1240000  0    0      1    | 32
-1240800  0    0      0    | 32
-1245000  0    1      0    | 32
-t=1245200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-1245200  0    1      1    | 32
-1250000  0    0      1    | 32
-1250200  0    0      0    | 32
-1255000  0    1      0    | 31
-t=1255200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-1255200  0    1      1    | 31
-1260000  0    0      1    | 31
-1260200  0    0      0    | 31
-1265000  0    1      0    | 32
-t=1265800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-1265800  0    1      1    | 32
-1270000  0    0      1    | 32
-1270800  0    0      0    | 32
-1275000  0    1      0    | 32
-t=1275200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-1275200  0    1      1    | 32
-1280000  0    0      1    | 32
-1280200  0    0      0    | 32
-1285000  0    1      0    | 31
-t=1285200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-1285200  0    1      1    | 31
-1290000  0    0      1    | 31
-1290200  0    0      0    | 31
-1295000  0    1      0    | 32
-t=1295800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-1295800  0    1      1    | 32
-1300000  0    0      1    | 32
-1300800  0    0      0    | 32
-1305000  0    1      0    | 32
-t=1305200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-1305200  0    1      1    | 32
-1310000  0    0      1    | 32
-1310200  0    0      0    | 32
-1315000  0    1      0    | 31
-t=1315200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-1315200  0    1      1    | 31
-1320000  0    0      1    | 31
-1320200  0    0      0    | 31
-1325000  0    1      0    | 32
-t=1325800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-1325800  0    1      1    | 32
-1330000  0    0      1    | 32
-1330800  0    0      0    | 32
-1335000  0    1      0    | 32
-t=1335200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-1335200  0    1      1    | 32
-1340000  0    0      1    | 32
-1340200  0    0      0    | 32
-1345000  0    1      0    | 31
-t=1345200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-1345200  0    1      1    | 31
-1350000  0    0      1    | 31
-1350200  0    0      0    | 31
-1355000  0    1      0    | 32
-t=1355800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-1355800  0    1      1    | 32
-1360000  0    0      1    | 32
-1360800  0    0      0    | 32
-1365000  0    1      0    | 32
-t=1365200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-1365200  0    1      1    | 32
-1370000  0    0      1    | 32
-1370200  0    0      0    | 32
-1375000  0    1      0    | 31
-t=1375200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-1375200  0    1      1    | 31
-1380000  0    0      1    | 31
-1380200  0    0      0    | 31
-1385000  0    1      0    | 32
-t=1385800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-1385800  0    1      1    | 32
-1390000  0    0      1    | 32
-1390800  0    0      0    | 32
-1395000  0    1      0    | 32
-t=1395200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-1395200  0    1      1    | 32
-1400000  0    0      1    | 32
-1400200  0    0      0    | 32
-1405000  0    1      0    | 31
-t=1405200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-1405200  0    1      1    | 31
-1410000  0    0      1    | 31
-1410200  0    0      0    | 31
-1415000  0    1      0    | 32
-t=1415800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-1415800  0    1      1    | 32
-1420000  0    0      1    | 32
-1420800  0    0      0    | 32
-1425000  0    1      0    | 32
-t=1425200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-1425200  0    1      1    | 32
-1430000  0    0      1    | 32
-1430200  0    0      0    | 32
-1435000  0    1      0    | 31
-t=1435200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-1435200  0    1      1    | 31
-1440000  0    0      1    | 31
-1440200  0    0      0    | 31
-1445000  0    1      0    | 32
-t=1445800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-1445800  0    1      1    | 32
-1450000  0    0      1    | 32
-1450800  0    0      0    | 32
-1455000  0    1      0    | 32
-t=1455200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-1455200  0    1      1    | 32
-1460000  0    0      1    | 32
-1460200  0    0      0    | 32
-1465000  0    1      0    | 31
-t=1465200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-1465200  0    1      1    | 31
-1470000  0    0      1    | 31
-1470200  0    0      0    | 31
-1475000  0    1      0    | 32
-t=1475800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-1475800  0    1      1    | 32
-1480000  0    0      1    | 32
-1480800  0    0      0    | 32
-1485000  0    1      0    | 32
-t=1485200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-1485200  0    1      1    | 32
-1490000  0    0      1    | 32
-1490200  0    0      0    | 32
-1495000  0    1      0    | 31
-t=1495200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-1495200  0    1      1    | 31
-1500000  0    0      1    | 31
-1500200  0    0      0    | 31
-1505000  0    1      0    | 32
-t=1505800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-1505800  0    1      1    | 32
-1510000  0    0      1    | 32
-1510800  0    0      0    | 32
-1515000  0    1      0    | 32
-t=1515200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-1515200  0    1      1    | 32
-1520000  0    0      1    | 32
-1520200  0    0      0    | 32
-1525000  0    1      0    | 31
-t=1525200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-1525200  0    1      1    | 31
-1530000  0    0      1    | 31
-1530200  0    0      0    | 31
-1535000  0    1      0    | 32
-t=1535800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-1535800  0    1      1    | 32
-1540000  0    0      1    | 32
-1540800  0    0      0    | 32
-1545000  0    1      0    | 32
-t=1545200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-1545200  0    1      1    | 32
-1550000  0    0      1    | 32
-1550200  0    0      0    | 32
-1555000  0    1      0    | 31
-t=1555200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-1555200  0    1      1    | 31
-1560000  0    0      1    | 31
-1560200  0    0      0    | 31
-1565000  0    1      0    | 32
-t=1565800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-1565800  0    1      1    | 32
-1570000  0    0      1    | 32
-1570800  0    0      0    | 32
-1575000  0    1      0    | 32
-t=1575200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-1575200  0    1      1    | 32
-1580000  0    0      1    | 32
-1580200  0    0      0    | 32
-1585000  0    1      0    | 31
-t=1585200 | PHASE_ERR=200 ps | ctrl=31 | UP=1 DOWN=1
-1585200  0    1      1    | 31
-1590000  0    0      1    | 31
-1590200  0    0      0    | 31
-1595000  0    1      0    | 32
-t=1595800 | PHASE_ERR=800 ps | ctrl=32 | UP=1 DOWN=0
-1595800  0    1      1    | 32
-1600000  0    0      1    | 32
-1600800  0    0      0    | 32
-1605000  0    1      0    | 32
-t=1605200 | PHASE_ERR=200 ps | ctrl=32 | UP=0 DOWN=1
-1605200  0    1      1    | 32
-1610000  0    0      1    | 32
-1610200  0    0      0    | 32
-1615000  0    1      0    | 31
-
-⚠️ NO LOCK DETECTED
-Phase stable cycles = 0
-Ctrl stable cycles  = 1
-
-
-==============================
-TEST PASSED
-==============================
-$finish called from file "../../src/verilog/tops/zdb_top/tb_zdb_top.sv", line 203.
-$finish at simulation time              1615001
+Compiler version X-2025.06-SP2_Full64; Runtime version X-2025.06-SP2_Full64;  Apr 14 15:13 2026
+CLK_IN  edge @ 25000
+CLK_OUT edge @ 30600 | ERR=5600 ps | CTRL=0 | SL=0 SR=0
+CLK_IN  edge @ 35000
+CLK_OUT edge @ 40600 | ERR=5600 ps | CTRL=0 | SL=0 SR=0
+CLK_IN  edge @ 45000
+CLK_OUT edge @ 50600 | ERR=5600 ps | CTRL=0 | SL=0 SR=0
+CLK_IN  edge @ 55000
+CLK_OUT edge @ 60600 | ERR=5600 ps | CTRL=1 | SL=1 SR=0
+CLK_IN  edge @ 65000
+CLK_OUT edge @ 70600 | ERR=5600 ps | CTRL=1 | SL=0 SR=0
+CLK_IN  edge @ 75000
+CLK_OUT edge @ 80600 | ERR=5600 ps | CTRL=0 | SL=0 SR=1
+CLK_IN  edge @ 85000
+CLK_OUT edge @ 90600 | ERR=5600 ps | CTRL=1 | SL=1 SR=0
+CLK_IN  edge @ 95000
+CLK_OUT edge @ 100600 | ERR=5600 ps | CTRL=1 | SL=0 SR=0
+CLK_IN  edge @ 105000
+CLK_OUT edge @ 110400 | ERR=5400 ps | CTRL=0 | SL=0 SR=1
+CLK_IN  edge @ 115000
+CLK_OUT edge @ 120600 | ERR=5600 ps | CTRL=1 | SL=1 SR=0
+CLK_IN  edge @ 125000
+CLK_OUT edge @ 130600 | ERR=5600 ps | CTRL=1 | SL=0 SR=0
+CLK_IN  edge @ 135000
+CLK_OUT edge @ 140400 | ERR=5400 ps | CTRL=0 | SL=0 SR=1
+CLK_IN  edge @ 145000
+CLK_OUT edge @ 150600 | ERR=5600 ps | CTRL=1 | SL=1 SR=0
+CLK_IN  edge @ 155000
+CLK_OUT edge @ 160600 | ERR=5600 ps | CTRL=1 | SL=0 SR=0
+CLK_IN  edge @ 165000
+CLK_OUT edge @ 170400 | ERR=5400 ps | CTRL=0 | SL=0 SR=1
+CLK_IN  edge @ 175000
+CLK_OUT edge @ 180600 | ERR=5600 ps | CTRL=1 | SL=1 SR=0
+CLK_IN  edge @ 185000
+CLK_OUT edge @ 190600 | ERR=5600 ps | CTRL=1 | SL=0 SR=0
+CLK_IN  edge @ 195000
+CLK_OUT edge @ 200400 | ERR=5400 ps | CTRL=0 | SL=0 SR=1
+CLK_IN  edge @ 205000
+CLK_OUT edge @ 210600 | ERR=5600 ps | CTRL=1 | SL=1 SR=0
+CLK_IN  edge @ 215000
+CLK_OUT edge @ 220600 | ERR=5600 ps | CTRL=1 | SL=0 SR=0
+CLK_IN  edge @ 225000
+CLK_OUT edge @ 230400 | ERR=5400 ps | CTRL=0 | SL=0 SR=1
+CLK_IN  edge @ 235000
+CLK_OUT edge @ 240600 | ERR=5600 ps | CTRL=1 | SL=1 SR=0
+CLK_IN  edge @ 245000
+CLK_OUT edge @ 250600 | ERR=5600 ps | CTRL=1 | SL=0 SR=0
+CLK_IN  edge @ 255000
+CLK_OUT edge @ 260400 | ERR=5400 ps | CTRL=0 | SL=0 SR=1
+CLK_IN  edge @ 265000
+CLK_OUT edge @ 270600 | ERR=5600 ps | CTRL=1 | SL=1 SR=0
+CLK_IN  edge @ 275000
+CLK_OUT edge @ 280600 | ERR=5600 ps | CTRL=1 | SL=0 SR=0
+CLK_IN  edge @ 285000
+CLK_OUT edge @ 290400 | ERR=5400 ps | CTRL=0 | SL=0 SR=1
+CLK_IN  edge @ 295000
+CLK_OUT edge @ 300600 | ERR=5600 ps | CTRL=1 | SL=1 SR=0
+CLK_IN  edge @ 305000
+CLK_OUT edge @ 310600 | ERR=5600 ps | CTRL=1 | SL=0 SR=0
+CLK_IN  edge @ 315000
+CLK_OUT edge @ 320400 | ERR=5400 ps | CTRL=0 | SL=0 SR=1
+CLK_IN  edge @ 325000
+CLK_OUT edge @ 330600 | ERR=5600 ps | CTRL=1 | SL=1 SR=0
+CLK_IN  edge @ 335000
+CLK_OUT edge @ 340600 | ERR=5600 ps | CTRL=1 | SL=0 SR=0
+CLK_IN  edge @ 345000
+CLK_OUT edge @ 350400 | ERR=5400 ps | CTRL=0 | SL=0 SR=1
+CLK_IN  edge @ 355000
+CLK_OUT edge @ 360600 | ERR=5600 ps | CTRL=1 | SL=1 SR=0
+CLK_IN  edge @ 365000
+CLK_OUT edge @ 370600 | ERR=5600 ps | CTRL=1 | SL=0 SR=0
+CLK_IN  edge @ 375000
+CLK_OUT edge @ 380400 | ERR=5400 ps | CTRL=0 | SL=0 SR=1
+CLK_IN  edge @ 385000
+CLK_OUT edge @ 390600 | ERR=5600 ps | CTRL=1 | SL=1 SR=0
+CLK_IN  edge @ 395000
+CLK_OUT edge @ 400600 | ERR=5600 ps | CTRL=1 | SL=0 SR=0
+CLK_IN  edge @ 405000
+CLK_OUT edge @ 410400 | ERR=5400 ps | CTRL=0 | SL=0 SR=1
+CLK_IN  edge @ 415000
+CLK_OUT edge @ 420600 | ERR=5600 ps | CTRL=1 | SL=1 SR=0
+CLK_IN  edge @ 425000
+CLK_OUT edge @ 430600 | ERR=5600 ps | CTRL=1 | SL=0 SR=0
+CLK_IN  edge @ 435000
+CLK_OUT edge @ 440400 | ERR=5400 ps | CTRL=0 | SL=0 SR=1
+CLK_IN  edge @ 445000
+CLK_OUT edge @ 450600 | ERR=5600 ps | CTRL=1 | SL=1 SR=0
+CLK_IN  edge @ 455000
+CLK_OUT edge @ 460600 | ERR=5600 ps | CTRL=1 | SL=0 SR=0
+CLK_IN  edge @ 465000
+CLK_OUT edge @ 470400 | ERR=5400 ps | CTRL=0 | SL=0 SR=1
+CLK_IN  edge @ 475000
+CLK_OUT edge @ 480600 | ERR=5600 ps | CTRL=1 | SL=1 SR=0
+CLK_IN  edge @ 485000
+CLK_OUT edge @ 490600 | ERR=5600 ps | CTRL=1 | SL=0 SR=0
+CLK_IN  edge @ 495000
+CLK_OUT edge @ 500400 | ERR=5400 ps | CTRL=0 | SL=0 SR=1
+CLK_IN  edge @ 505000
+CLK_OUT edge @ 510600 | ERR=5600 ps | CTRL=1 | SL=1 SR=0
+CLK_IN  edge @ 515000
+Simulation complete. Data saved to dll_data.csv
+$finish called from file "../../src/verilog/tops/zdb_top/tb_zdb_top_data.sv", line 140.
+$finish at simulation time               520000
            V C S   S i m u l a t i o n   R e p o r t 
-Time: 1615001 ps
-CPU Time:      0.350 seconds;       Data structure size:   0.0Mb
-Mon Apr 13 22:29:55 2026
-CPU time: .654 seconds to compile + .434 seconds to elab + .453 seconds to link + .409 seconds in simulation
+Time: 520000 ps
+CPU Time:      0.360 seconds;       Data structure size:   0.0Mb
+Tue Apr 14 15:13:22 2026
+CPU time: .805 seconds to compile + .488 seconds to elab + .448 seconds to link + .427 seconds in simulation
 Verdi KDB elaboration done and the database successfully generated

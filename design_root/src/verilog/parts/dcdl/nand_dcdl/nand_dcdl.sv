@@ -1,6 +1,6 @@
 (* dont_touch = "true" *)
 module nand_dcdl #(
-    parameter int N = 64
+    parameter int N = 128
 )(
     input  logic A,
     input  logic [N-1:0] Q,

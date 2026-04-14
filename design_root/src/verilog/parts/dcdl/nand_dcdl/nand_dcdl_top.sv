@@ -3,7 +3,7 @@
 // Description: Delay Line Top with the shift register generating Q
 //**************************************************************************
 module nand_dcdl_top #(
-    parameter int N = 64
+    parameter int N = 128
 )(
     input  logic clk,
     input  logic rst_n,
@@ -17,7 +17,9 @@ module nand_dcdl_top #(
 
     // Shift register
     dll_shift_register #(
-        .N(N)
+        .N(N), 
+        .INIT_TAP(N-1)
+
     ) sr (
         .clk(clk),
         .rst_n(rst_n),

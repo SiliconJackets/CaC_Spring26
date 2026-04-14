@@ -1,0 +1,242 @@
+vcs -f zdb_top.include +v2k -R +lint=all -sverilog -full64 \
+	-timescale=1ns/10ps -debug_access+all -debug_region+cell+encrypt \
+	-debug_access -l zdb_top.log +define++SIM=1 +testname=DEFAULT \
+	-lca -kdb
+                         Chronologic VCS (TM)
+       Version X-2025.06-SP2_Full64 -- Tue Apr 14 13:10:43 2026
+
+                    Copyright (c) 1991 - 2025 Synopsys, Inc.
+   This software and the associated documentation are proprietary to Synopsys,
+ Inc. This software may only be used in accordance with the terms and conditions
+ of a written license agreement with Synopsys, Inc. All other use, reproduction,
+   or distribution of this software is strictly prohibited.  Licensed Products
+     communicate with Synopsys servers for the purpose of providing software
+    updates, detecting software piracy and verifying that customers are using
+    Licensed Products in conformity with the applicable License Key for such
+  Licensed Products. Synopsys will use information gathered in connection with
+    this process to deliver software updates and pursue software pirates and
+                                   infringers.
+
+ Inclusivity & Diversity - Visit SolvNetPlus to read the "Synopsys Statement on
+            Inclusivity and Diversity" (Refer to article 000036315 at
+                        https://solvnetplus.synopsys.com)
+
+
+Warning-[LCA_FEATURES_ENABLED] Usage warning
+  LCA features enabled by '-lca' argument on the command line.  For more 
+  information regarding list of LCA features please refer to Chapter "LCA 
+  features" in the VCS Release Notes
+
+Parsing design file '../../src/verilog/tops/zdb_top/zdb_top.sv'
+Parsing design file '../../src/verilog/parts/phase_detector/phase_detector_syn_pfd.sv'
+Parsing design file '../../src/verilog/parts/controller/controller_saturate.sv'
+Parsing design file '../../src/verilog/parts/dcdl/gates/inverter.sv'
+Parsing design file '../../src/verilog/parts/dcdl/gates/nand2.sv'
+Parsing design file '../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl_cell.sv'
+Parsing design file '../../src/verilog/parts/dcdl/nand_dcdl/dll_shift_register.sv'
+Parsing design file '../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl.sv'
+
+Warning-[V2KKW] Reserved word used as identifier
+../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl.sv, 19
+  'cell' is a reserved word introduced in Verilog 2001 (IEEE standard 
+  1364-2001) and may not be used as an identifier.
+  To avoid possible compatibility issue(s) in the future, please rename the 
+  identifier.
+
+
+Warning-[V2KKW] Reserved word used as identifier
+../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl.sv, 27
+  'cell' is a reserved word introduced in Verilog 2001 (IEEE standard 
+  1364-2001) and may not be used as an identifier.
+  To avoid possible compatibility issue(s) in the future, please rename the 
+  identifier.
+
+Parsing design file '../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl_top.sv'
+Parsing design file '../../src/verilog/tops/zdb_top/tb_controller_dcdl_openloop.sv'
+
+Lint-[NS] Null statement
+../../src/verilog/tops/zdb_top/tb_controller_dcdl_openloop.sv, 80
+  Null statement is used in following verilog source.
+  Source info:         @(posedge clk_in);
+
+
+Lint-[NS] Null statement
+../../src/verilog/tops/zdb_top/tb_controller_dcdl_openloop.sv, 81
+  Null statement is used in following verilog source.
+  Source info:         @(negedge clk_in);
+
+
+Lint-[NS] Null statement
+../../src/verilog/tops/zdb_top/tb_controller_dcdl_openloop.sv, 87
+  Null statement is used in following verilog source.
+  Source info:         @(negedge clk_in);
+
+
+Lint-[NS] Null statement
+../../src/verilog/tops/zdb_top/tb_controller_dcdl_openloop.sv, 90
+  Null statement is used in following verilog source.
+  Source info:         @(posedge clk_in);
+
+
+Lint-[NS] Null statement
+../../src/verilog/tops/zdb_top/tb_controller_dcdl_openloop.sv, 91
+  Null statement is used in following verilog source.
+  Source info:         @(negedge clk_in);
+
+
+Lint-[NS] Null statement
+../../src/verilog/tops/zdb_top/tb_controller_dcdl_openloop.sv, 99
+  Null statement is used in following verilog source.
+  Source info:         @(negedge clk_in);
+
+
+Lint-[NS] Null statement
+../../src/verilog/tops/zdb_top/tb_controller_dcdl_openloop.sv, 102
+  Null statement is used in following verilog source.
+  Source info:         @(posedge clk_in);
+
+
+Lint-[NS] Null statement
+../../src/verilog/tops/zdb_top/tb_controller_dcdl_openloop.sv, 103
+  Null statement is used in following verilog source.
+  Source info:         @(negedge clk_in);
+
+
+Lint-[NS] Null statement
+../../src/verilog/tops/zdb_top/tb_controller_dcdl_openloop.sv, 112
+  Null statement is used in following verilog source.
+  Source info:         #(4*HALF_PERIOD);
+
+
+Lint-[NS] Null statement
+../../src/verilog/tops/zdb_top/tb_controller_dcdl_openloop.sv, 117
+  Null statement is used in following verilog source.
+  Source info:         @(posedge Y);
+
+
+Lint-[NS] Null statement
+../../src/verilog/tops/zdb_top/tb_controller_dcdl_openloop.sv, 124
+  Null statement is used in following verilog source.
+  Source info:         #(4*HALF_PERIOD);
+
+
+Lint-[NS] Null statement
+../../src/verilog/tops/zdb_top/tb_controller_dcdl_openloop.sv, 150
+  Null statement is used in following verilog source.
+  Source info:         #20000;
+
+
+Lint-[NS] Null statement
+../../src/verilog/tops/zdb_top/tb_controller_dcdl_openloop.sv, 153
+  Null statement is used in following verilog source.
+  Source info:         @(posedge clk_in);
+
+
+Lint-[NS] Null statement
+../../src/verilog/tops/zdb_top/tb_controller_dcdl_openloop.sv, 154
+  Null statement is used in following verilog source.
+  Source info:         @(negedge clk_in);
+
+
+Lint-[NS] Null statement
+../../src/verilog/tops/zdb_top/tb_controller_dcdl_openloop.sv, 224
+  Null statement is used in following verilog source.
+  Source info:         #10000;
+
+Top Level Modules:
+       zdb_top
+       inverter
+       nand2
+       tb_controller_dcdl_openloop
+TimeScale is 1 ps / 1 ps
+Starting vcs inline pass...
+7 modules and 0 UDP read.
+recompiling module tb_controller_dcdl_openloop
+	However, due to incremental compilation, only 1 module needs to be compiled. 
+make[1]: Entering directory '/nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/sim/behav/csrc'
+make[1]: Leaving directory '/nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/sim/behav/csrc'
+make[1]: Entering directory '/nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/sim/behav/csrc'
+rm -f _cuarc*.so _csrc*.so pre_vcsobj_*.so share_vcsobj_*.so
+if [ -x ../simv ]; then chmod a-x ../simv; fi
+g++  -o ../simv      -rdynamic  -Wl,-rpath='$ORIGIN'/simv.daidir -Wl,-rpath=./simv.daidir -Wl,-rpath=/tools/software/synopsys/vcs/latest/linux64/lib -L/tools/software/synopsys/vcs/latest/linux64/lib  -Wl,-rpath-link=./   objs/amcQw_d.o   _472307_archive_1.so _prev_archive_1.so   SIM_l.o       rmapats_mop.o rmapats.o rmar.o rmar_nd.o  rmar_llvm_0_1.o rmar_llvm_0_0.o            -lnuma -lvirsim -lerrorinf -lsnpsmalloc -lvfs      -lvcsnew -ldistsimclient -lsimprofile -luclinative /tools/software/synopsys/vcs/latest/linux64/lib/vcs_tls.o   -Wl,-whole-archive  -lvcsucli    -Wl,-no-whole-archive        _vcs_pli_stub_.o   /tools/software/synopsys/vcs/latest/linux64/lib/vcs_save_restore_new.o /tools/software/synopsys/verdi/latest/share/PLI/VCS/LINUX64/pli.a -ldl  -lc -lm -lpthread -ldl 
+../simv up to date
+make[1]: Leaving directory '/nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/sim/behav/csrc'
+Info: [VCS_SAVE_RESTORE_INFO] ASLR (Address Space Layout Randomization) is detected on the machine. To enable $save functionality, ASLR will be switched off and simv re-executed.
+Please use '-no_save' simv switch to avoid re-execution or '-suppress=ASLR_DETECTED_INFO' to suppress this message.
+
+Warning-[LCA_FEATURES_ENABLED] Usage warning
+  LCA features enabled by '-lca' argument on the command line.  For more 
+  information regarding list of LCA features please refer to Chapter "LCA 
+  features" in the VCS Release Notes
+
+Chronologic VCS simulator copyright 1991-2025
+Contains Synopsys proprietary information.
+Compiler version X-2025.06-SP2_Full64; Runtime version X-2025.06-SP2_Full64;  Apr 14 13:10 2026
+
+==============================
+ INITIAL
+==============================
+INIT | t=72800 | ctrl=32 | SL=0 SR=0 | Q=1000000000000000000000000000000000000000000000000000000000000000 | delay=12800 ps
+
+==============================
+ MOVE TO MIDRANGE
+==============================
+MID START | t=718800 | ctrl=12 | SL=0 SR=0 | Q=0000000000000000000010000000000000000000000000000000000000000000 | delay=8800 ps
+
+==============================
+ MIDRANGE 6x UP
+==============================
+MID UP | t=789000 | ctrl=13 | SL=0 SR=0 | Q=0000000000000000000100000000000000000000000000000000000000000000 | delay=9000 ps
+MID UP | t=859200 | ctrl=14 | SL=0 SR=0 | Q=0000000000000000001000000000000000000000000000000000000000000000 | delay=9200 ps
+MID UP | t=929400 | ctrl=15 | SL=0 SR=0 | Q=0000000000000000010000000000000000000000000000000000000000000000 | delay=9400 ps
+MID UP | t=999600 | ctrl=16 | SL=0 SR=0 | Q=0000000000000000100000000000000000000000000000000000000000000000 | delay=9600 ps
+MID UP | t=1069800 | ctrl=17 | SL=0 SR=0 | Q=0000000000000001000000000000000000000000000000000000000000000000 | delay=9800 ps
+MID UP | t=1140000 | ctrl=18 | SL=0 SR=0 | Q=0000000000000010000000000000000000000000000000000000000000000000 | delay=10000 ps
+
+==============================
+ MIDRANGE 6x DOWN
+==============================
+MID DOWN | t=1209800 | ctrl=17 | SL=0 SR=0 | Q=0000000000000001000000000000000000000000000000000000000000000000 | delay=9800 ps
+MID DOWN | t=1279600 | ctrl=16 | SL=0 SR=0 | Q=0000000000000000100000000000000000000000000000000000000000000000 | delay=9600 ps
+MID DOWN | t=1349400 | ctrl=15 | SL=0 SR=0 | Q=0000000000000000010000000000000000000000000000000000000000000000 | delay=9400 ps
+MID DOWN | t=1419200 | ctrl=14 | SL=0 SR=0 | Q=0000000000000000001000000000000000000000000000000000000000000000 | delay=9200 ps
+MID DOWN | t=1489000 | ctrl=13 | SL=0 SR=0 | Q=0000000000000000000100000000000000000000000000000000000000000000 | delay=9000 ps
+MID DOWN | t=1558800 | ctrl=12 | SL=0 SR=0 | Q=0000000000000000000010000000000000000000000000000000000000000000 | delay=8800 ps
+
+==============================
+ MIDRANGE ALTERNATING
+==============================
+ALT UP | t=1629000 | ctrl=13 | SL=0 SR=0 | Q=0000000000000000000100000000000000000000000000000000000000000000 | delay=9000 ps
+ALT DOWN | t=1698800 | ctrl=12 | SL=0 SR=0 | Q=0000000000000000000010000000000000000000000000000000000000000000 | delay=8800 ps
+ALT UP | t=1769000 | ctrl=13 | SL=0 SR=0 | Q=0000000000000000000100000000000000000000000000000000000000000000 | delay=9000 ps
+ALT DOWN | t=1838800 | ctrl=12 | SL=0 SR=0 | Q=0000000000000000000010000000000000000000000000000000000000000000 | delay=8800 ps
+ALT UP | t=1909000 | ctrl=13 | SL=0 SR=0 | Q=0000000000000000000100000000000000000000000000000000000000000000 | delay=9000 ps
+ALT DOWN | t=1978800 | ctrl=12 | SL=0 SR=0 | Q=0000000000000000000010000000000000000000000000000000000000000000 | delay=8800 ps
+ALT UP | t=2049000 | ctrl=13 | SL=0 SR=0 | Q=0000000000000000000100000000000000000000000000000000000000000000 | delay=9000 ps
+ALT DOWN | t=2118800 | ctrl=12 | SL=0 SR=0 | Q=0000000000000000000010000000000000000000000000000000000000000000 | delay=8800 ps
+ALT UP | t=2189000 | ctrl=13 | SL=0 SR=0 | Q=0000000000000000000100000000000000000000000000000000000000000000 | delay=9000 ps
+ALT DOWN | t=2258800 | ctrl=12 | SL=0 SR=0 | Q=0000000000000000000010000000000000000000000000000000000000000000 | delay=8800 ps
+ALT UP | t=2329000 | ctrl=13 | SL=0 SR=0 | Q=0000000000000000000100000000000000000000000000000000000000000000 | delay=9000 ps
+ALT DOWN | t=2398800 | ctrl=12 | SL=0 SR=0 | Q=0000000000000000000010000000000000000000000000000000000000000000 | delay=8800 ps
+
+==============================
+ BACK TO MAX
+==============================
+MAX AGAIN | t=3042800 | ctrl=32 | SL=0 SR=0 | Q=1000000000000000000000000000000000000000000000000000000000000000 | delay=12800 ps
+
+==============================
+ 4x UP AT MAX
+==============================
+SAT UP | t=3122800 | ctrl=33 | SL=0 SR=0 | Q=1000000000000000000000000000000000000000000000000000000000000000 | delay=12800 ps
+SAT UP | t=3202800 | ctrl=34 | SL=0 SR=0 | Q=1000000000000000000000000000000000000000000000000000000000000000 | delay=12800 ps
+SAT UP | t=3282800 | ctrl=35 | SL=0 SR=0 | Q=1000000000000000000000000000000000000000000000000000000000000000 | delay=12800 ps
+SAT UP | t=3362800 | ctrl=36 | SL=0 SR=0 | Q=1000000000000000000000000000000000000000000000000000000000000000 | delay=12800 ps
+$finish called from file "../../src/verilog/tops/zdb_top/tb_controller_dcdl_openloop.sv", line 225.
+$finish at simulation time              3392800
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 3392800 ps
+CPU Time:      0.360 seconds;       Data structure size:   0.1Mb
+Tue Apr 14 13:10:45 2026
+CPU time: .748 seconds to compile + .454 seconds to elab + .451 seconds to link + .412 seconds in simulation
+Verdi KDB elaboration done and the database successfully generated
+# simv 

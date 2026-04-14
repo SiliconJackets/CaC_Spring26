@@ -1,0 +1,1 @@
+../../src/verilog/tops/zdb_top/tb_controller_dcdl_openloop.sv

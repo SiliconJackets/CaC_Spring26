@@ -1,7 +1,10 @@
+/nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/src/verilog/parts/controller/controller_saturate.sv
 /nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/src/verilog/parts/dcdl/gates/inverter.sv
 /nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/src/verilog/parts/dcdl/gates/nand2.sv
 /nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/src/verilog/parts/dcdl/nand_dcdl/dll_shift_register.sv
 /nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/src/verilog/parts/dcdl/nand_dcdl/nand_dcdl.sv
 /nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/src/verilog/parts/dcdl/nand_dcdl/nand_dcdl_cell.sv
 /nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/src/verilog/parts/dcdl/nand_dcdl/nand_dcdl_top.sv
-/nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv
+/nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/src/verilog/parts/phase_detector/phase_detector_syn_pfd.sv
+/nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/src/verilog/tops/zdb_top/tb_zdb_top_data.sv
+/nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/src/verilog/tops/zdb_top/zdb_top.sv

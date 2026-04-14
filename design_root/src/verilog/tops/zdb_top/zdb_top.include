@@ -12,4 +12,4 @@
 ../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl.sv
 ../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl_top.sv
 
-../../src/verilog/tops/zdb_top/tb_zdb_top.sv
+../../src/verilog/tops/zdb_top/tb_zdb_top_data.sv
