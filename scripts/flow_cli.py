@@ -90,7 +90,9 @@ def run_ngspice(design_name, base_dir, pdk_root, clk_in_delay, clk_out_delay):
         "nand_dcdl",
         "controller_2mode",
         "controller_variable_step",
-        "controller_saturate"
+        "controller_saturate",
+        "controller_filtered",
+        "controller_locked"
     ]:
         # DCDLs have distinct spice testbenches
         TB_PATH = TB_DIR / f"tb_{design_name}.sp"
