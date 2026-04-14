@@ -1,0 +1,226 @@
+vcs -f nand_dcdl.include +v2k -R +lint=all -sverilog -full64 \
+	-timescale=1ns/10ps -debug_access+all -debug_region+cell+encrypt \
+	-debug_access -l nand_dcdl.log +define++SIM=1 +testname=DEFAULT \
+	-lca -kdb
+                         Chronologic VCS (TM)
+       Version X-2025.06-SP2_Full64 -- Tue Apr 14 09:52:33 2026
+
+                    Copyright (c) 1991 - 2025 Synopsys, Inc.
+   This software and the associated documentation are proprietary to Synopsys,
+ Inc. This software may only be used in accordance with the terms and conditions
+ of a written license agreement with Synopsys, Inc. All other use, reproduction,
+   or distribution of this software is strictly prohibited.  Licensed Products
+     communicate with Synopsys servers for the purpose of providing software
+    updates, detecting software piracy and verifying that customers are using
+    Licensed Products in conformity with the applicable License Key for such
+  Licensed Products. Synopsys will use information gathered in connection with
+    this process to deliver software updates and pursue software pirates and
+                                   infringers.
+
+ Inclusivity & Diversity - Visit SolvNetPlus to read the "Synopsys Statement on
+            Inclusivity and Diversity" (Refer to article 000036315 at
+                        https://solvnetplus.synopsys.com)
+
+
+Warning-[LCA_FEATURES_ENABLED] Usage warning
+  LCA features enabled by '-lca' argument on the command line.  For more 
+  information regarding list of LCA features please refer to Chapter "LCA 
+  features" in the VCS Release Notes
+
+Parsing design file '../../src/verilog/parts/dcdl/gates/nand2.sv'
+Parsing design file '../../src/verilog/parts/dcdl/gates/inverter.sv'
+Parsing design file '../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl_cell.sv'
+Parsing design file '../../src/verilog/parts/dcdl/nand_dcdl/dll_shift_register.sv'
+Parsing design file '../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl.sv'
+
+Warning-[V2KKW] Reserved word used as identifier
+../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl.sv, 19
+  'cell' is a reserved word introduced in Verilog 2001 (IEEE standard 
+  1364-2001) and may not be used as an identifier.
+  To avoid possible compatibility issue(s) in the future, please rename the 
+  identifier.
+
+
+Warning-[V2KKW] Reserved word used as identifier
+../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl.sv, 27
+  'cell' is a reserved word introduced in Verilog 2001 (IEEE standard 
+  1364-2001) and may not be used as an identifier.
+  To avoid possible compatibility issue(s) in the future, please rename the 
+  identifier.
+
+Parsing design file '../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl_top.sv'
+Parsing design file '../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv'
+
+Lint-[NS] Null statement
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 45
+  Null statement is used in following verilog source.
+  Source info:         @(negedge clk);
+
+
+Lint-[NS] Null statement
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 49
+  Null statement is used in following verilog source.
+  Source info:         @(posedge clk);
+
+
+Lint-[NS] Null statement
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 50
+  Null statement is used in following verilog source.
+  Source info:         @(negedge clk);
+
+
+Lint-[NS] Null statement
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 65
+  Null statement is used in following verilog source.
+  Source info:         #1000;
+
+
+Lint-[NS] Null statement
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 72
+  Null statement is used in following verilog source.
+  Source info:         @(posedge Y);
+
+
+Lint-[NS] Null statement
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 82
+  Null statement is used in following verilog source.
+  Source info:         #1000;
+
+
+Lint-[NS] Null statement
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 86
+  Null statement is used in following verilog source.
+  Source info:         #15000;
+
+
+Lint-[NS] Null statement
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 106
+  Null statement is used in following verilog source.
+  Source info:         #2000;
+
+
+Lint-[NS] Null statement
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 108
+  Null statement is used in following verilog source.
+  Source info:         @(posedge clk);
+
+
+Lint-[NS] Null statement
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 109
+  Null statement is used in following verilog source.
+  Source info:         @(negedge clk);
+
+
+Lint-[NS] Null statement
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 126
+  Null statement is used in following verilog source.
+  Source info:         #5000;
+
+Top Level Modules:
+       nand2
+       inverter
+       tb_dcdl_delay
+TimeScale is 1 ps / 1 ps
+Starting vcs inline pass...
+4 modules and 0 UDP read.
+recompiling module nand_dcdl_cell
+recompiling module tb_dcdl_delay
+Both modules done.
+	However, due to incremental compilation, only 2 modules need to be compiled. 
+make[1]: Entering directory '/nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/sim/behav/csrc'
+make[1]: Leaving directory '/nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/sim/behav/csrc'
+make[1]: Entering directory '/nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/sim/behav/csrc'
+rm -f _cuarc*.so _csrc*.so pre_vcsobj_*.so share_vcsobj_*.so
+if [ -x ../simv ]; then chmod a-x ../simv; fi
+g++  -o ../simv      -rdynamic  -Wl,-rpath='$ORIGIN'/simv.daidir -Wl,-rpath=./simv.daidir -Wl,-rpath=/tools/software/synopsys/vcs/latest/linux64/lib -L/tools/software/synopsys/vcs/latest/linux64/lib  -Wl,-rpath-link=./   objs/amcQw_d.o   _453926_archive_1.so _prev_archive_1.so   SIM_l.o       rmapats_mop.o rmapats.o rmar.o rmar_nd.o  rmar_llvm_0_1.o rmar_llvm_0_0.o            -lnuma -lvirsim -lerrorinf -lsnpsmalloc -lvfs      -lvcsnew -ldistsimclient -lsimprofile -luclinative /tools/software/synopsys/vcs/latest/linux64/lib/vcs_tls.o   -Wl,-whole-archive  -lvcsucli    -Wl,-no-whole-archive        _vcs_pli_stub_.o   /tools/software/synopsys/vcs/latest/linux64/lib/vcs_save_restore_new.o /tools/software/synopsys/verdi/latest/share/PLI/VCS/LINUX64/pli.a -ldl  -lc -lm -lpthread -ldl 
+../simv up to date
+make[1]: Leaving directory '/nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/sim/behav/csrc'
+Info: [VCS_SAVE_RESTORE_INFO] ASLR (Address Space Layout Randomization) is detected on the machine. To enable $save functionality, ASLR will be switched off and simv re-executed.
+Please use '-no_save' simv switch to avoid re-execution or '-suppress=ASLR_DETECTED_INFO' to suppress this message.
+
+Warning-[LCA_FEATURES_ENABLED] Usage warning
+  LCA features enabled by '-lca' argument on the command line.  For more 
+  information regarding list of LCA features please refer to Chapter "LCA 
+  features" in the VCS Release Notes
+
+Chronologic VCS simulator copyright 1991-2025
+Contains Synopsys proprietary information.
+Compiler version X-2025.06-SP2_Full64; Runtime version X-2025.06-SP2_Full64;  Apr 14 09:52 2026
+===== DCDL CHARACTERIZATION TEST =====
+Stage=0 | Q=0000000000000000000000000000000000000000000000000000000000000001 | Delay=200 ps
+Stage=1 | Q=0000000000000000000000000000000000000000000000000000000000000010 | Delay=400 ps
+Stage=2 | Q=0000000000000000000000000000000000000000000000000000000000000100 | Delay=600 ps
+Stage=3 | Q=0000000000000000000000000000000000000000000000000000000000001000 | Delay=800 ps
+Stage=4 | Q=0000000000000000000000000000000000000000000000000000000000010000 | Delay=1000 ps
+Stage=5 | Q=0000000000000000000000000000000000000000000000000000000000100000 | Delay=1200 ps
+Stage=6 | Q=0000000000000000000000000000000000000000000000000000000001000000 | Delay=1400 ps
+Stage=7 | Q=0000000000000000000000000000000000000000000000000000000010000000 | Delay=1600 ps
+Stage=8 | Q=0000000000000000000000000000000000000000000000000000000100000000 | Delay=1800 ps
+Stage=9 | Q=0000000000000000000000000000000000000000000000000000001000000000 | Delay=2000 ps
+Stage=10 | Q=0000000000000000000000000000000000000000000000000000010000000000 | Delay=2200 ps
+Stage=11 | Q=0000000000000000000000000000000000000000000000000000100000000000 | Delay=2400 ps
+Stage=12 | Q=0000000000000000000000000000000000000000000000000001000000000000 | Delay=2600 ps
+Stage=13 | Q=0000000000000000000000000000000000000000000000000010000000000000 | Delay=2800 ps
+Stage=14 | Q=0000000000000000000000000000000000000000000000000100000000000000 | Delay=3000 ps
+Stage=15 | Q=0000000000000000000000000000000000000000000000001000000000000000 | Delay=3200 ps
+Stage=16 | Q=0000000000000000000000000000000000000000000000010000000000000000 | Delay=3400 ps
+Stage=17 | Q=0000000000000000000000000000000000000000000000100000000000000000 | Delay=3600 ps
+Stage=18 | Q=0000000000000000000000000000000000000000000001000000000000000000 | Delay=3800 ps
+Stage=19 | Q=0000000000000000000000000000000000000000000010000000000000000000 | Delay=4000 ps
+Stage=20 | Q=0000000000000000000000000000000000000000000100000000000000000000 | Delay=4200 ps
+Stage=21 | Q=0000000000000000000000000000000000000000001000000000000000000000 | Delay=4400 ps
+Stage=22 | Q=0000000000000000000000000000000000000000010000000000000000000000 | Delay=4600 ps
+Stage=23 | Q=0000000000000000000000000000000000000000100000000000000000000000 | Delay=4800 ps
+Stage=24 | Q=0000000000000000000000000000000000000001000000000000000000000000 | Delay=5000 ps
+Stage=25 | Q=0000000000000000000000000000000000000010000000000000000000000000 | Delay=5200 ps
+Stage=26 | Q=0000000000000000000000000000000000000100000000000000000000000000 | Delay=5400 ps
+Stage=27 | Q=0000000000000000000000000000000000001000000000000000000000000000 | Delay=5600 ps
+Stage=28 | Q=0000000000000000000000000000000000010000000000000000000000000000 | Delay=5800 ps
+Stage=29 | Q=0000000000000000000000000000000000100000000000000000000000000000 | Delay=6000 ps
+Stage=30 | Q=0000000000000000000000000000000001000000000000000000000000000000 | Delay=6200 ps
+Stage=31 | Q=0000000000000000000000000000000010000000000000000000000000000000 | Delay=6400 ps
+Stage=32 | Q=0000000000000000000000000000000100000000000000000000000000000000 | Delay=6600 ps
+Stage=33 | Q=0000000000000000000000000000001000000000000000000000000000000000 | Delay=6800 ps
+Stage=34 | Q=0000000000000000000000000000010000000000000000000000000000000000 | Delay=7000 ps
+Stage=35 | Q=0000000000000000000000000000100000000000000000000000000000000000 | Delay=7200 ps
+Stage=36 | Q=0000000000000000000000000001000000000000000000000000000000000000 | Delay=7400 ps
+Stage=37 | Q=0000000000000000000000000010000000000000000000000000000000000000 | Delay=7600 ps
+Stage=38 | Q=0000000000000000000000000100000000000000000000000000000000000000 | Delay=7800 ps
+Stage=39 | Q=0000000000000000000000001000000000000000000000000000000000000000 | Delay=8000 ps
+Stage=40 | Q=0000000000000000000000010000000000000000000000000000000000000000 | Delay=8200 ps
+Stage=41 | Q=0000000000000000000000100000000000000000000000000000000000000000 | Delay=8400 ps
+Stage=42 | Q=0000000000000000000001000000000000000000000000000000000000000000 | Delay=8600 ps
+Stage=43 | Q=0000000000000000000010000000000000000000000000000000000000000000 | Delay=8800 ps
+Stage=44 | Q=0000000000000000000100000000000000000000000000000000000000000000 | Delay=9000 ps
+Stage=45 | Q=0000000000000000001000000000000000000000000000000000000000000000 | Delay=9200 ps
+Stage=46 | Q=0000000000000000010000000000000000000000000000000000000000000000 | Delay=9400 ps
+Stage=47 | Q=0000000000000000100000000000000000000000000000000000000000000000 | Delay=9600 ps
+Stage=48 | Q=0000000000000001000000000000000000000000000000000000000000000000 | Delay=9800 ps
+Stage=49 | Q=0000000000000010000000000000000000000000000000000000000000000000 | Delay=10000 ps
+Stage=50 | Q=0000000000000100000000000000000000000000000000000000000000000000 | Delay=10200 ps
+Stage=51 | Q=0000000000001000000000000000000000000000000000000000000000000000 | Delay=10400 ps
+Stage=52 | Q=0000000000010000000000000000000000000000000000000000000000000000 | Delay=10600 ps
+Stage=53 | Q=0000000000100000000000000000000000000000000000000000000000000000 | Delay=10800 ps
+Stage=54 | Q=0000000001000000000000000000000000000000000000000000000000000000 | Delay=11000 ps
+Stage=55 | Q=0000000010000000000000000000000000000000000000000000000000000000 | Delay=11200 ps
+Stage=56 | Q=0000000100000000000000000000000000000000000000000000000000000000 | Delay=11400 ps
+Stage=57 | Q=0000001000000000000000000000000000000000000000000000000000000000 | Delay=11600 ps
+Stage=58 | Q=0000010000000000000000000000000000000000000000000000000000000000 | Delay=11800 ps
+Stage=59 | Q=0000100000000000000000000000000000000000000000000000000000000000 | Delay=12000 ps
+Stage=60 | Q=0001000000000000000000000000000000000000000000000000000000000000 | Delay=12200 ps
+Stage=61 | Q=0010000000000000000000000000000000000000000000000000000000000000 | Delay=12400 ps
+Stage=62 | Q=0100000000000000000000000000000000000000000000000000000000000000 | Delay=12600 ps
+Stage=63 | Q=1000000000000000000000000000000000000000000000000000000000000000 | Delay=12800 ps
+-----------------------------------
+Characterization complete.
+CSV file: dcdl_delay.csv
+-----------------------------------
+$finish called from file "../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv", line 127.
+$finish at simulation time              2414800
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 2414800 ps
+CPU Time:      0.350 seconds;       Data structure size:   0.0Mb
+Tue Apr 14 09:52:36 2026
+CPU time: .724 seconds to compile + .437 seconds to elab + .446 seconds to link + .412 seconds in simulation
+Verdi KDB elaboration done and the database successfully generated
+# simv 

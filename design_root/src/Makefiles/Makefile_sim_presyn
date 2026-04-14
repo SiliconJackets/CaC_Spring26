@@ -1,6 +1,6 @@
 TOPLEVEL=nand_dcdl
 TESTNAME=default
-SRC_VERILOG=../../src/verilog/
+SRC_VERILOG=../../src/verilog/parts/nand_dcdl
 SRC_FOLDER= $(SRC_VERILOG)
 SIM=1
 SDF=0

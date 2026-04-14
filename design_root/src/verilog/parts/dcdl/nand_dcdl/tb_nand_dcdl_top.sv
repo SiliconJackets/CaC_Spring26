@@ -11,11 +11,15 @@ module tb_dcdl_delay;
     logic A;
     logic Y;
 
-    time t_in, t_out;
+    time t_in;
+    time delay_ps;
 
     int stage;
+    int fd;
 
+    // -------------------------
     // DUT
+    // -------------------------
     nand_dcdl_top #(
         .N(N)
     ) dut (
@@ -31,41 +35,66 @@ module tb_dcdl_delay;
     // Clock
     // -------------------------
     initial clk = 1'b0;
-    always #5000 clk = ~clk;
+    always #5000 clk = ~clk;   // 10ns period
 
     // -------------------------
-    // Timestamp capture
+    // Shift helper
     // -------------------------
-    always @(posedge A or negedge A)
-        t_in = $time;
+    task automatic do_shift_left;
+    begin
+        @(negedge clk);
+        shift_left  = 1'b1;
+        shift_right = 1'b0;
 
-    always @(posedge Y or negedge Y) begin
-        t_out = $time;
-        $display("Stage=%0d | Q=%b | Delay = %0t ps",
-                 stage, dut.Q, t_out - t_in);
+        @(posedge clk);
+        @(negedge clk);
+
+        shift_left = 1'b0;
     end
-
-    // -------------------------
-    // Shift helpers
-    // -------------------------
-    task do_shift_left;
-        begin
-            @(negedge clk);
-            shift_left  = 1'b1;
-            shift_right = 1'b0;
-
-            @(posedge clk);
-            @(negedge clk);
-
-            shift_left  = 1'b0;
-        end
     endtask
 
     // -------------------------
-    // Stimulus
+    // Measure one stage
+    // -------------------------
+    task automatic measure_stage(input int idx);
+    begin
+        stage = idx;
+
+        // force clean start
+        A = 1'b0;
+        #1000;
+
+        // launch edge
+        t_in = $time;
+        A = 1'b1;
+
+        // wait for propagated output edge
+        @(posedge Y);
+
+        delay_ps = $time - t_in;
+
+        $display("Stage=%0d | Q=%b | Delay=%0t ps",
+                 stage, dut.Q, delay_ps);
+
+        $fdisplay(fd, "%0d,%0t", stage, delay_ps);
+
+        // reset input for next measurement
+        #1000;
+        A = 1'b0;
+
+        // allow settle time
+        #15000;
+    end
+    endtask
+
+    // -------------------------
+    // Main stimulus
     // -------------------------
     initial begin
-        $display("===== DCDL DELAY TEST (N=%0d) =====", N);
+        fd = $fopen("dcdl_delay.csv", "w");
+        $fdisplay(fd, "stage,delay_ps");
+
+        $display("===== DCDL CHARACTERIZATION TEST =====");
 
         rst_n       = 1'b0;
         shift_left  = 1'b0;
@@ -77,36 +106,22 @@ module tb_dcdl_delay;
         #2000;
         rst_n = 1'b1;
         @(posedge clk);
+        @(negedge clk);
 
-        // -------------------------
-        // Sweep ALL stages
-        // -------------------------
-        $display("\n--- Measuring delay per stage ---");
-
+        // Sweep all stages
         for (int i = 0; i < N; i++) begin
-            stage = i;
+            measure_stage(i);
 
-            #1000;
-            A = 1'b1;
-            #2000;
-            A = 1'b0;
-
-            do_shift_left;
+            if (i != N-1)
+                do_shift_left();
         end
 
-        // -------------------------
-        // Stability check
-        // -------------------------
-        $display("\n--- Second sweep (stability check) ---");
+        $display("-----------------------------------");
+        $display("Characterization complete.");
+        $display("CSV file: dcdl_delay.csv");
+        $display("-----------------------------------");
 
-        repeat (8) begin
-            #1000;
-            A = ~A;
-            #2000;
-            A = ~A;
-
-            do_shift_left;
-        end
+        $fclose(fd);
 
         #5000;
         $finish;
