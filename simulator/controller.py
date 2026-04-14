@@ -86,16 +86,12 @@ class Controller:
         pass
 
 
-# ===================================================================
-# 1. Saturate  (controller_saturate.sv)
-# ===================================================================
-
 class SaturateController(Controller):
     """Simple +/-1 saturating controller."""
 
     def __init__(self, ctrl_bits = 6, init_ctrl = 32, prop_delay_ps = 2593):
         super().__init__(ctrl_bits, init_ctrl, prop_delay_ps)
-        
+
     def _step(self, up: int, down: int) -> None:
         if up and not down:
             if self._ctrl < self.max_ctrl:
@@ -105,15 +101,11 @@ class SaturateController(Controller):
                 self._ctrl -= 1
 
 
-# ===================================================================
-# 2. Filtered  (controller_filtered.sv)
-# ===================================================================
-
 class FilteredController(Controller):
     """Requires FILTER_LEN consecutive same-direction requests."""
 
     def __init__(self, ctrl_bits: int = 6, init_ctrl: int = 32,
-                 prop_delay_ps: float = 0.0, filter_len: int = 4):
+                 prop_delay_ps: float = 2786, filter_len: int = 4):
         super().__init__(ctrl_bits, init_ctrl, prop_delay_ps)
         self.filter_len = filter_len
         self._up_count = 0
@@ -146,15 +138,11 @@ class FilteredController(Controller):
             self._down_count = 0
 
 
-# ===================================================================
-# 3. Locked / acquire-track  (controller_locked.sv)
-# ===================================================================
-
 class LockedController(Controller):
     """Acquire/track — large steps then small steps after quiet period."""
 
     def __init__(self, ctrl_bits: int = 6, init_ctrl: int = 32,
-                 prop_delay_ps: float = 0.0,
+                 prop_delay_ps: float = 2578,
                  acquire_step: int = 4, track_step: int = 1,
                  quiet_cycles: int = 8):
         super().__init__(ctrl_bits, init_ctrl, prop_delay_ps)
@@ -183,71 +171,11 @@ class LockedController(Controller):
             self.mode = "track"
 
 
-# ===================================================================
-# 4. Two-mode / coarse-fine  (controller_2mode.sv)
-# ===================================================================
-
-class TwoModeController(Controller):
-    """Coarse/fine split — fast acquisition then precise adjustment."""
-
-    def __init__(self, ctrl_bits: int = 6, init_ctrl: int = 32,
-                 prop_delay_ps: float = 0.0,
-                 coarse_bits: int = 3, fine_bits: int = 3,
-                 switch_quiet: int = 8):
-        super().__init__(ctrl_bits, init_ctrl, prop_delay_ps)
-        self.coarse_bits = coarse_bits
-        self.fine_bits = fine_bits
-        self.switch_quiet = switch_quiet
-        self._max_coarse = (1 << coarse_bits) - 1
-        self._max_fine = (1 << fine_bits) - 1
-        self.coarse: int = (init_ctrl >> fine_bits) & self._max_coarse
-        self.fine: int = init_ctrl & self._max_fine
-        self._ctrl = (self.coarse << fine_bits) | self.fine
-        self.ctrl = self._ctrl
-        self.mode: str = "coarse"
-        self._quiet_count = 0
-
-    def _reset_state(self) -> None:
-        self.coarse = (self.init_ctrl >> self.fine_bits) & self._max_coarse
-        self.fine = self.init_ctrl & self._max_fine
-        self._ctrl = (self.coarse << self.fine_bits) | self.fine
-        self.mode = "coarse"
-        self._quiet_count = 0
-
-    def _step(self, up: int, down: int) -> None:
-        if up and not down:
-            self._quiet_count = 0
-            if self.mode == "coarse":
-                if self.coarse < self._max_coarse:
-                    self.coarse += 1
-            else:
-                if self.fine < self._max_fine:
-                    self.fine += 1
-        elif down and not up:
-            self._quiet_count = 0
-            if self.mode == "coarse":
-                if self.coarse > 0:
-                    self.coarse -= 1
-            else:
-                if self.fine > 0:
-                    self.fine -= 1
-        else:
-            if self._quiet_count < self.switch_quiet:
-                self._quiet_count += 1
-        if self._quiet_count == self.switch_quiet:
-            self.mode = "fine"
-        self._ctrl = (self.coarse << self.fine_bits) | self.fine
-
-
-# ===================================================================
-# 5. Variable-step  (controller_variable_step.sv)
-# ===================================================================
-
 class VariableStepController(Controller):
     """Adaptive step size based on direction persistence."""
 
     def __init__(self, ctrl_bits: int = 6, init_ctrl: int = 32,
-                 prop_delay_ps: float = 0.0,
+                 prop_delay_ps: float = 2652,
                  big_step: int = 4, med_step: int = 2,
                  big_thresh: int = 8, med_thresh: int = 4):
         super().__init__(ctrl_bits, init_ctrl, prop_delay_ps)
