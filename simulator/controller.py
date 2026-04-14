@@ -93,6 +93,9 @@ class Controller:
 class SaturateController(Controller):
     """Simple +/-1 saturating controller."""
 
+    def __init__(self, ctrl_bits = 6, init_ctrl = 32, prop_delay_ps = 2593):
+        super().__init__(ctrl_bits, init_ctrl, prop_delay_ps)
+        
     def _step(self, up: int, down: int) -> None:
         if up and not down:
             if self._ctrl < self.max_ctrl:

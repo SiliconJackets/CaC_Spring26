@@ -1,4 +1,9 @@
-from .phase_detector import PhaseDetector
+from .phase_detector import (
+    PhaseDetector,
+    SingleFlipFlopPhaseDetector,
+    EdgeLevelPhaseDetector,
+    PFDPhaseDetector,
+)
 from .controller import (
     Controller,
     SaturateController,
@@ -17,3 +22,6 @@ from .dcdl import (
     VernierDCDL,
 )
 from .dll import simulate
+from . import zdb
+from . import multiphase
+from . import tdc

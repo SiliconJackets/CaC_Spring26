@@ -1,14 +1,4 @@
-"""Phase detector for DLL simulation.
-
-All RTL variants (PFD, edge, FF1, XOR) share the same detection logic;
-they differ only in propagation delay (from SPICE).
-
-The up and down paths have different propagation delays because
-they go through different flip-flop/gate paths in the physical design.
-"""
-
 from __future__ import annotations
-
 
 class PhaseDetector:
     """Detects which edge arrives first.
