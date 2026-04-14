@@ -2,7 +2,7 @@
 // Author: Alfi Misha Antony Selvin Raj
 // Description: 4-NAND Delay line (DCDL)
 //**************************************************************************
-(* dont_touch = "true" *)
+(* dont_touch = "true", keep_hierarchy = "yes" *)
 module nand_dcdl(
     input logic A,
     input logic [3:0] Q, 

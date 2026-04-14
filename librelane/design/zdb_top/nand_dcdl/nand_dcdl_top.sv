@@ -2,6 +2,7 @@
 // Author: Alfi Misha Antony Selvin Raj
 // Description: Delay Line Top with the shift register generating Q
 //**************************************************************************
+(* dont_touch = "true", keep_hierarchy = "yes" *)
 module nand_dcdl_top (
     input logic clk,
     input logic rst_n,

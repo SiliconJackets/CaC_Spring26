@@ -3,7 +3,7 @@
 * Drive CLK_IN, observe CLK_OUT
 * ============================================================
 
-.lib "/Users/phevos/.ciel/ciel/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/libs.tech/ngspice/sky130.lib.spice" tt
+.lib "/home/ethanhuang03/.ciel/ciel/sky130/versions/8afc8346a57fe1ab7934ba5a6056ea8b43078e71/sky130A/libs.tech/ngspice/sky130.lib.spice" tt
 .include "../netlists/zdb_top.spice"
 
 * ============================================================
@@ -55,7 +55,7 @@ Xdut
 * ============================================================
 * Simulation
 * ============================================================
-.tran 10p 200n
+.tran 10p 50n
 
 .control
 run

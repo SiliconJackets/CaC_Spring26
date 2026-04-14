@@ -2,7 +2,7 @@
 // Author: Alfi Misha Antony Selvin Raj
 // Description: Single NAND based delay cell for 4 stage Nand Delay line
 //**************************************************************************
-(* dont_touch = "true" *) //telling synthesizer not to optimize this as nand gates can be changed to 2:1 MUX
+(* dont_touch = "true", keep_hierarchy = "yes" *) //telling synthesizer not to optimize this as nand gates can be changed to 2:1 MUX
 module nand_dcdl_cell(
     input logic in1,
     input logic in0, 
