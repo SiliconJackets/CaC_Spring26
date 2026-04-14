@@ -3,10 +3,11 @@
 * ============================================================
 
 * --- Technology models ---
-.lib "__PDK_ROOT__/sky130A/libs.tech/ngspice/sky130.lib.spice" tt
+.lib "/Users/phevos/.ciel/ciel/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/libs.tech/ngspice/sky130.lib.spice" tt
 
 * --- Post-layout extracted netlist ---
-.include "__NETLIST_PATH__"
+.include "../netlists/phase_detector_syn_pfd.spice"
+
 
 * ============================================================
 * Parameters & Supplies
@@ -39,8 +40,8 @@ Vrst RST VGND PWL(
 * Both clocks run at the same frequency; only the start time
 * (and thus phase relationship) differs per test.
 
-Vclk_in  CLK_IN  VGND PULSE(0 vdd_val __CLK_IN_DELAY__  rise_fall rise_fall half_period clk_period)
-Vclk_out CLK_OUT VGND PULSE(0 vdd_val __CLK_OUT_DELAY__ rise_fall rise_fall half_period clk_period)
+Vclk_in  CLK_IN  VGND PULSE(0 vdd_val 22n  rise_fall rise_fall half_period clk_period)
+Vclk_out CLK_OUT VGND PULSE(0 vdd_val 20n rise_fall rise_fall half_period clk_period)
 
 * ============================================================
 * DUT Instantiation
@@ -66,7 +67,7 @@ Cload_down DOWN VGND 5f
 .control
 run
 
-wrdata __RESULTS_DIR__/__RESULT_NAME__ v(CLK_IN) v(CLK_OUT) v(RST) v(UP) v(DOWN)
+wrdata ../results/phase_detector_syn_pfd_clkout_leads.csv v(CLK_IN) v(CLK_OUT) v(RST) v(UP) v(DOWN)
 
 quit
 .endc

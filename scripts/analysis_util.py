@@ -1,6 +1,52 @@
 import numpy as np
 
 
+def find_switching_times(
+    trace,
+    t_start,
+    t_end,
+    vdd=1.8,
+    edge="rising",
+):
+    """
+    Find all times at which a signal crosses 50% VDD within an interval.
+
+    Parameters
+    ----------
+    trace   : (x, y) tuple of numpy arrays (time, voltage)
+    t_start : start of search window (in ns)
+    t_end   : end of search window (in ns)
+    vdd     : supply voltage (threshold = vdd / 2)
+    edge    : "rising" or "falling"
+
+    Returns
+    -------
+    List of crossing times in ns.
+    """
+    t, v = np.asarray(trace[0], dtype=float), np.asarray(trace[1], dtype=float)
+    threshold = vdd / 2
+
+    mask = (t >= t_start) & (t <= t_end)
+    t_w = t[mask]
+    v_w = v[mask]
+
+    crossings = []
+    for i in range(len(t_w) - 1):
+        crossed = False
+        if edge == "rising" and v_w[i] < threshold <= v_w[i + 1]:
+            crossed = True
+        elif edge == "falling" and v_w[i] >= threshold > v_w[i + 1]:
+            crossed = True
+
+        if not crossed:
+            continue
+
+        frac = (threshold - v_w[i]) / (v_w[i + 1] - v_w[i])
+        crossings.append(t_w[i] + frac * (t_w[i + 1] - t_w[i]))
+
+    return crossings
+
+
 def find_switching_time(
     trace,
     t_start,
@@ -25,27 +71,18 @@ def find_switching_time(
     -------
     Crossing time in ns, or None if not found.
     """
-    t, v = np.asarray(trace[0], dtype=float), np.asarray(trace[1], dtype=float)
-    threshold = vdd / 2
-
-    mask = (t >= t_start) & (t <= t_end)
-    t_w = t[mask]
-    v_w = v[mask]
-
-    count = 0
-    for i in range(len(t_w) - 1):
-        if edge == "rising" and v_w[i] < threshold <= v_w[i + 1]:
-            count += 1
-        elif edge == "falling" and v_w[i] >= threshold > v_w[i + 1]:
-            count += 1
-        else:
-            continue
-
-        if count == occurrence:
-            frac = (threshold - v_w[i]) / (v_w[i + 1] - v_w[i])
-            return t_w[i] + frac * (t_w[i + 1] - t_w[i])
-
-    return None
+    crossings = find_switching_times(
+        trace,
+        t_start=t_start,
+        t_end=t_end,
+        vdd=vdd,
+        edge=edge,
+    )
+    if occurrence <= 0:
+        raise ValueError("occurrence must be >= 1")
+    if len(crossings) < occurrence:
+        return None
+    return crossings[occurrence - 1]
 
 
 def get_sample(
