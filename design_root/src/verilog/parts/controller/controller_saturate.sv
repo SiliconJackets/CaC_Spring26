@@ -32,8 +32,8 @@
 */
 
 module controller #(
-    parameter integer CTRL_BITS = 6,
-    parameter integer INIT_CTRL = 32
+    parameter integer CTRL_BITS = 4,
+    parameter integer INIT_CTRL = 1
 )(
     input  wire                 clk_in,
     input  wire                 rst,

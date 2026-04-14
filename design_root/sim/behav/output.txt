@@ -1,0 +1,266 @@
+vcs -f nand_dcdl.include +v2k -R +lint=all -sverilog -full64 \
+	-timescale=1ns/10ps -debug_access+all -debug_region+cell+encrypt \
+	-debug_access -l nand_dcdl.log +define++SIM=1 +testname=DEFAULT \
+	-lca -kdb
+                         Chronologic VCS (TM)
+       Version X-2025.06-SP2_Full64 -- Mon Apr 13 22:47:01 2026
+
+                    Copyright (c) 1991 - 2025 Synopsys, Inc.
+   This software and the associated documentation are proprietary to Synopsys,
+ Inc. This software may only be used in accordance with the terms and conditions
+ of a written license agreement with Synopsys, Inc. All other use, reproduction,
+   or distribution of this software is strictly prohibited.  Licensed Products
+     communicate with Synopsys servers for the purpose of providing software
+    updates, detecting software piracy and verifying that customers are using
+    Licensed Products in conformity with the applicable License Key for such
+  Licensed Products. Synopsys will use information gathered in connection with
+    this process to deliver software updates and pursue software pirates and
+                                   infringers.
+
+ Inclusivity & Diversity - Visit SolvNetPlus to read the "Synopsys Statement on
+            Inclusivity and Diversity" (Refer to article 000036315 at
+                        https://solvnetplus.synopsys.com)
+
+
+Warning-[LCA_FEATURES_ENABLED] Usage warning
+  LCA features enabled by '-lca' argument on the command line.  For more 
+  information regarding list of LCA features please refer to Chapter "LCA 
+  features" in the VCS Release Notes
+
+Parsing design file '../../src/verilog/parts/dcdl/gates/nand2.sv'
+Parsing design file '../../src/verilog/parts/dcdl/gates/inverter.sv'
+Parsing design file '../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl_cell.sv'
+Parsing design file '../../src/verilog/parts/dcdl/nand_dcdl/dll_shift_register.sv'
+Parsing design file '../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl.sv'
+
+Warning-[V2KKW] Reserved word used as identifier
+../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl.sv, 19
+  'cell' is a reserved word introduced in Verilog 2001 (IEEE standard 
+  1364-2001) and may not be used as an identifier.
+  To avoid possible compatibility issue(s) in the future, please rename the 
+  identifier.
+
+
+Warning-[V2KKW] Reserved word used as identifier
+../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl.sv, 27
+  'cell' is a reserved word introduced in Verilog 2001 (IEEE standard 
+  1364-2001) and may not be used as an identifier.
+  To avoid possible compatibility issue(s) in the future, please rename the 
+  identifier.
+
+Parsing design file '../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl_top.sv'
+Parsing design file '../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv'
+
+Lint-[NS] Null statement
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 47
+  Null statement is used in following verilog source.
+  Source info:             @(negedge clk);
+
+
+Lint-[NS] Null statement
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 50
+  Null statement is used in following verilog source.
+  Source info:             @(posedge clk);
+
+
+Lint-[NS] Null statement
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 51
+  Null statement is used in following verilog source.
+  Source info:             @(negedge clk);
+
+
+Lint-[NS] Null statement
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 68
+  Null statement is used in following verilog source.
+  Source info:         #2000;
+
+
+Lint-[NS] Null statement
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 70
+  Null statement is used in following verilog source.
+  Source info:         @(posedge clk);
+
+
+Lint-[NS] Null statement
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 77
+  Null statement is used in following verilog source.
+  Source info:             #1000;
+
+
+Lint-[NS] Null statement
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 79
+  Null statement is used in following verilog source.
+  Source info:             #2000;
+
+
+Lint-[NS] Null statement
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 90
+  Null statement is used in following verilog source.
+  Source info:             #1000;
+
+
+Lint-[NS] Null statement
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 92
+  Null statement is used in following verilog source.
+  Source info:             #2000;
+
+
+Lint-[NS] Null statement
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 98
+  Null statement is used in following verilog source.
+  Source info:         #5000;
+
+Top Level Modules:
+       nand2
+       inverter
+       tb_dcdl_delay
+
+Warning-[AOUP] Attempt to override undefined parameter
+../../src/verilog/parts/dcdl/nand_dcdl/nand_dcdl_top.sv, 21
+  Attempting to override undefined parameter "N", will ignore it.
+
+TimeScale is 1 ps / 1 ps
+
+Lint-[WMIA-L] Width mismatch in assignment
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 27
+  Width mismatch between LHS and RHS is found in assignment:
+  The following 32-bit wide expression is assigned to a 1-bit LHS target:
+  Source info: clk = 0;
+  Expression: clk
+
+
+Lint-[WMIA-L] Width mismatch in assignment
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 62
+  Width mismatch between LHS and RHS is found in assignment:
+  The following 32-bit wide expression is assigned to a 1-bit LHS target:
+  Source info: rst_n = 0;
+  Expression: rst_n
+
+
+Lint-[WMIA-L] Width mismatch in assignment
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 63
+  Width mismatch between LHS and RHS is found in assignment:
+  The following 32-bit wide expression is assigned to a 1-bit LHS target:
+  Source info: shift_left = 0;
+  Expression: shift_left
+
+
+Lint-[WMIA-L] Width mismatch in assignment
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 64
+  Width mismatch between LHS and RHS is found in assignment:
+  The following 32-bit wide expression is assigned to a 1-bit LHS target:
+  Source info: shift_right = 0;
+  Expression: shift_right
+
+
+Lint-[WMIA-L] Width mismatch in assignment
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 65
+  Width mismatch between LHS and RHS is found in assignment:
+  The following 32-bit wide expression is assigned to a 1-bit LHS target:
+  Source info: A = 0;
+  Expression: A
+
+
+Lint-[WMIA-L] Width mismatch in assignment
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 69
+  Width mismatch between LHS and RHS is found in assignment:
+  The following 32-bit wide expression is assigned to a 1-bit LHS target:
+  Source info: rst_n = 1;
+  Expression: rst_n
+
+
+Lint-[WMIA-L] Width mismatch in assignment
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 78
+  Width mismatch between LHS and RHS is found in assignment:
+  The following 32-bit wide expression is assigned to a 1-bit LHS target:
+  Source info: A = 1;
+  Expression: A
+
+
+Lint-[WMIA-L] Width mismatch in assignment
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 80
+  Width mismatch between LHS and RHS is found in assignment:
+  The following 32-bit wide expression is assigned to a 1-bit LHS target:
+  Source info: A = 0;
+  Expression: A
+
+
+Lint-[WMIA-L] Width mismatch in assignment
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 48
+  Width mismatch between LHS and RHS is found in assignment:
+  The following 32-bit wide expression is assigned to a 1-bit LHS target:
+  Source info: shift_left = 1;
+  Expression: shift_left
+
+
+Lint-[WMIA-L] Width mismatch in assignment
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 49
+  Width mismatch between LHS and RHS is found in assignment:
+  The following 32-bit wide expression is assigned to a 1-bit LHS target:
+  Source info: shift_right = 0;
+  Expression: shift_right
+
+
+Lint-[WMIA-L] Width mismatch in assignment
+../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv, 52
+  Width mismatch between LHS and RHS is found in assignment:
+  The following 32-bit wide expression is assigned to a 1-bit LHS target:
+  Source info: shift_left = 0;
+  Expression: shift_left
+
+Starting vcs inline pass...
+3 modules and 0 UDP read.
+recompiling module nand2
+recompiling module inverter
+recompiling module tb_dcdl_delay
+All of 3 modules done
+make[1]: Entering directory '/nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/sim/behav/csrc'
+make[1]: Leaving directory '/nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/sim/behav/csrc'
+make[1]: Entering directory '/nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/sim/behav/csrc'
+rm -f _cuarc*.so _csrc*.so pre_vcsobj_*.so share_vcsobj_*.so
+if [ -x ../simv ]; then chmod a-x ../simv; fi
+g++  -o ../simv      -rdynamic  -Wl,-rpath='$ORIGIN'/simv.daidir -Wl,-rpath=./simv.daidir -Wl,-rpath=/tools/software/synopsys/vcs/latest/linux64/lib -L/tools/software/synopsys/vcs/latest/linux64/lib  -Wl,-rpath-link=./   objs/amcQw_d.o   _3290196_archive_1.so _prev_archive_1.so   SIM_l.o       rmapats_mop.o rmapats.o rmar.o rmar_nd.o  rmar_llvm_0_1.o rmar_llvm_0_0.o            -lnuma -lvirsim -lerrorinf -lsnpsmalloc -lvfs      -lvcsnew -ldistsimclient -lsimprofile -luclinative /tools/software/synopsys/vcs/latest/linux64/lib/vcs_tls.o   -Wl,-whole-archive  -lvcsucli    -Wl,-no-whole-archive        _vcs_pli_stub_.o   /tools/software/synopsys/vcs/latest/linux64/lib/vcs_save_restore_new.o /tools/software/synopsys/verdi/latest/share/PLI/VCS/LINUX64/pli.a -ldl  -lc -lm -lpthread -ldl 
+../simv up to date
+make[1]: Leaving directory '/nethome/araj92/final_codeachiprepo/CaC_Spring26/design_root/sim/behav/csrc'
+Info: [VCS_SAVE_RESTORE_INFO] ASLR (Address Space Layout Randomization) is detected on the machine. To enable $save functionality, ASLR will be switched off and simv re-executed.
+Please use '-no_save' simv switch to avoid re-execution or '-suppress=ASLR_DETECTED_INFO' to suppress this message.
+
+Warning-[LCA_FEATURES_ENABLED] Usage warning
+  LCA features enabled by '-lca' argument on the command line.  For more 
+  information regarding list of LCA features please refer to Chapter "LCA 
+  features" in the VCS Release Notes
+
+Chronologic VCS simulator copyright 1991-2025
+Contains Synopsys proprietary information.
+Compiler version X-2025.06-SP2_Full64; Runtime version X-2025.06-SP2_Full64;  Apr 13 22:47 2026
+===== DCDL DELAY TEST =====
+Q=0001 | Delay = 294 ps
+
+--- Measuring delay per stage ---
+Q=0001 | Delay = 200 ps
+Q=0001 | Delay = 200 ps
+Q=0010 | Delay = 400 ps
+Q=0010 | Delay = 400 ps
+Q=0100 | Delay = 600 ps
+Q=0100 | Delay = 600 ps
+Q=1000 | Delay = 800 ps
+Q=1000 | Delay = 800 ps
+
+--- Second sweep (stability check) ---
+Q=0001 | Delay = 200 ps
+Q=0001 | Delay = 200 ps
+Q=0010 | Delay = 400 ps
+Q=0010 | Delay = 400 ps
+Q=0100 | Delay = 600 ps
+Q=0100 | Delay = 600 ps
+Q=1000 | Delay = 800 ps
+Q=1000 | Delay = 800 ps
+$finish called from file "../../src/verilog/parts/dcdl/nand_dcdl/tb_nand_dcdl_top.sv", line 99.
+$finish at simulation time               165000
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 165000 ps
+CPU Time:      0.350 seconds;       Data structure size:   0.0Mb
+Mon Apr 13 22:47:03 2026
+CPU time: .647 seconds to compile + .432 seconds to elab + .467 seconds to link + .407 seconds in simulation
+Verdi KDB elaboration done and the database successfully generated
+# simv 

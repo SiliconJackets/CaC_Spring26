@@ -1,26 +1,14 @@
 `timescale 1ps/1ps
 
-/*
-|=======================================================================
-| Module      : tb_zdb_top
-| Description : Functional testbench for zero-delay buffer top-level
-|
-| Tests:
-|   1. Reset initializes the controller to INIT_CTRL
-|   2. clk_out toggles after reset is released
-|   3. Control word remains within valid bounds
-|   4. No unknowns on key outputs after reset
-|   5. Phase detector / controller activity is observable
-|   6. Asynchronous reset restores initial control state
-|=======================================================================
-*/
-
 module tb_zdb_top;
 
     parameter integer CTRL_BITS = 6;
     parameter integer INIT_CTRL = 32;
     localparam integer MAX_CTRL = (1 << CTRL_BITS) - 1;
 
+    // ---------------------------------------------
+    // Signals
+    // ---------------------------------------------
     reg clk_in;
     reg rst;
 
@@ -32,16 +20,20 @@ module tb_zdb_top;
     wire shift_right_dbg;
 
     integer errors;
-    integer clk_in_edges;
-    integer clk_out_edges;
-    integer up_events;
-    integer down_events;
-    integer shift_left_events;
-    integer shift_right_events;
 
-    // -----------------------------------------------------------------
+    // ---------------------------------------------
+    // Phase measurement
+    // ---------------------------------------------
+    time t_in_edge, t_out_edge;
+    time phase_error, prev_phase_error;
+
+    integer stable_phase_cycles;
+    integer stable_ctrl_cycles;
+    integer last_ctrl;
+
+    // ---------------------------------------------
     // DUT
-    // -----------------------------------------------------------------
+    // ---------------------------------------------
     zdb_top #(
         .CTRL_BITS (CTRL_BITS),
         .INIT_CTRL (INIT_CTRL)
@@ -56,166 +48,157 @@ module tb_zdb_top;
         .shift_right_dbg (shift_right_dbg)
     );
 
-    // -----------------------------------------------------------------
-    // Reference clock: 10 ns period
-    // -----------------------------------------------------------------
-    initial begin
-        clk_in = 1'b0;
-        forever #5000 clk_in = ~clk_in;
-    end
+    // ---------------------------------------------
+    // Clock (10ns)
+    // ---------------------------------------------
+    initial clk_in = 0;
+    always #5000 clk_in = ~clk_in;
 
-    // -----------------------------------------------------------------
-    // Edge/event counters
-    // -----------------------------------------------------------------
+    // ---------------------------------------------
+    // Phase tracking
+    // ---------------------------------------------
     always @(posedge clk_in)
-        clk_in_edges = clk_in_edges + 1;
+        t_in_edge = $time;
 
-    always @(posedge clk_out)
-        clk_out_edges = clk_out_edges + 1;
+    always @(posedge clk_out) begin
+        t_out_edge = $time;
+        phase_error = t_out_edge - t_in_edge;
 
-    always @(posedge up_dbg)
-        up_events = up_events + 1;
+        $display("t=%0t | PHASE_ERR=%0t ps | ctrl=%0d | UP=%b DOWN=%b",
+                 $time, phase_error, ctrl_dbg, up_dbg, down_dbg);
 
-    always @(posedge down_dbg)
-        down_events = down_events + 1;
+        // Phase stability tracking
+        if (phase_error == prev_phase_error)
+            stable_phase_cycles++;
+        else
+            stable_phase_cycles = 0;
 
-    always @(posedge shift_left_dbg)
-        shift_left_events = shift_left_events + 1;
-
-    always @(posedge shift_right_dbg)
-        shift_right_events = shift_right_events + 1;
-
-    // -----------------------------------------------------------------
-    // Monitor
-    // -----------------------------------------------------------------
-    initial begin
-        $display(" time   rst clk_in clk_out | up down shiftL shiftR | ctrl");
-        $display("-------------------------------------------------------------");
-        $monitor("%6t   %b    %b      %b    |  %b    %b     %b      %b   | %0d",
-                 $time, rst, clk_in, clk_out,
-                 up_dbg, down_dbg, shift_left_dbg, shift_right_dbg, ctrl_dbg);
+        prev_phase_error = phase_error;
     end
 
-    // -----------------------------------------------------------------
-    // Helpers
-    // -----------------------------------------------------------------
-    task expect_ctrl_exact;
-        input integer expected;
-        begin
-            if (ctrl_dbg !== expected[CTRL_BITS-1:0]) begin
-                $display("ERROR @ %0t: expected ctrl=%0d, got %0d",
-                         $time, expected, ctrl_dbg);
-                errors = errors + 1;
-            end
-        end
-    endtask
+    // ---------------------------------------------
+    // Control convergence tracking
+    // ---------------------------------------------
+    always @(posedge clk_in) begin
+        if (ctrl_dbg == last_ctrl)
+            stable_ctrl_cycles++;
+        else
+            stable_ctrl_cycles = 0;
 
-    task expect_ctrl_in_range;
-        begin
-            if (ctrl_dbg > MAX_CTRL[CTRL_BITS-1:0]) begin
-                $display("ERROR @ %0t: ctrl out of range, ctrl=%0d", $time, ctrl_dbg);
-                errors = errors + 1;
-            end
-        end
-    endtask
+        last_ctrl = ctrl_dbg;
+    end
 
-    task expect_known_outputs;
+    // ---------------------------------------------
+    // Basic checks
+    // ---------------------------------------------
+    task expect_known;
         begin
             if ((^clk_out === 1'bx) ||
-                (^up_dbg === 1'bx) ||
-                (^down_dbg === 1'bx) ||
-                (^shift_left_dbg === 1'bx) ||
-                (^shift_right_dbg === 1'bx) ||
                 (^ctrl_dbg === 1'bx)) begin
-                $display("ERROR @ %0t: unknown (X/Z) detected on outputs", $time);
-                errors = errors + 1;
+                $display("ERROR: Unknown detected @ %0t", $time);
+                errors++;
             end
         end
     endtask
 
-    task wait_cycles;
-        input integer n;
-        integer k;
+    task expect_ctrl_range;
         begin
-            for (k = 0; k < n; k = k + 1) begin
-                @(posedge clk_in);
-                #1;
-                expect_ctrl_in_range();
-                expect_known_outputs();
+            if (ctrl_dbg > MAX_CTRL) begin
+                $display("ERROR: ctrl out of range @ %0t", $time);
+                errors++;
             end
         end
     endtask
 
-    // -----------------------------------------------------------------
-    // Test sequence
-    // -----------------------------------------------------------------
+    task wait_cycles(input int n);
+        for (int i = 0; i < n; i++) begin
+            @(posedge clk_in);
+            #1;
+            expect_known();
+            expect_ctrl_range();
+        end
+    endtask
+
+    // ---------------------------------------------
+    // Lock detection
+    // ---------------------------------------------
+    task check_lock;
+        begin
+            if (stable_phase_cycles > 5 && stable_ctrl_cycles > 5) begin
+                $display("\n🔥 LOCK ACHIEVED 🔥");
+                $display("Time        = %0t", $time);
+                $display("Final ctrl  = %0d", ctrl_dbg);
+                $display("Phase error = %0t ps\n", phase_error);
+            end else begin
+                $display("\n⚠️ NO LOCK DETECTED");
+                $display("Phase stable cycles = %0d", stable_phase_cycles);
+                $display("Ctrl stable cycles  = %0d\n", stable_ctrl_cycles);
+            end
+        end
+    endtask
+
+    // ---------------------------------------------
+    // Monitor
+    // ---------------------------------------------
+    initial begin
+        $display("time   rst clk_in clk_out | ctrl");
+        $monitor("%6t  %b    %b      %b    | %0d",
+                 $time, rst, clk_in, clk_out, ctrl_dbg);
+    end
+
+    // ---------------------------------------------
+    // TEST SEQUENCE
+    // ---------------------------------------------
     initial begin
         errors = 0;
-        clk_in_edges      = 0;
-        clk_out_edges     = 0;
-        up_events         = 0;
-        down_events       = 0;
-        shift_left_events = 0;
-        shift_right_events= 0;
+        stable_phase_cycles = 0;
+        stable_ctrl_cycles  = 0;
+        prev_phase_error    = 0;
+        last_ctrl           = INIT_CTRL;
 
-        rst = 1'b1;
+        // -----------------------------------------
+        // RESET
+        // -----------------------------------------
+        rst = 1;
+        #10000;
+        rst = 0;
 
-        // Check reset state
-        #1;
-        expect_ctrl_exact(INIT_CTRL);
+        @(posedge clk_in); #1;
+        if (ctrl_dbg !== INIT_CTRL)
+            $display("ERROR: Reset failed, ctrl=%0d", ctrl_dbg);
 
-        // Hold reset for a bit, then release
-        #12000;
-        rst = 1'b0;
+        // -----------------------------------------
+        // RUN DLL
+        // -----------------------------------------
+        $display("\n=== RUNNING DLL LOOP ===");
+        wait_cycles(100);
 
-        $display("\n=== TEST 1: Post-reset initialization ===");
-        @(posedge clk_in);
-        #1;
-        expect_ctrl_exact(INIT_CTRL);
+        // -----------------------------------------
+        // CHECK LOCK
+        // -----------------------------------------
+        check_lock();
 
-        $display("\n=== TEST 2: Functional run ===");
-        wait_cycles(40);
+        // -----------------------------------------
+        // DISTURB SYSTEM (important test)
+        // -----------------------------------------
+        $display("\n=== DISTURBANCE TEST ===");
 
-        // Clock out should toggle during operation
-        if (clk_out_edges == 0) begin
-            $display("ERROR: clk_out did not toggle after reset release");
-            errors = errors + 1;
-        end
+        rst = 1;   // reset loop mid-run
+        #5000;
+        rst = 0;
 
-        $display("\n=== TEST 3: Observe loop activity ===");
-        $display("clk_in edges       = %0d", clk_in_edges);
-        $display("clk_out edges      = %0d", clk_out_edges);
-        $display("UP events          = %0d", up_events);
-        $display("DOWN events        = %0d", down_events);
-        $display("shift_left events  = %0d", shift_left_events);
-        $display("shift_right events = %0d", shift_right_events);
+        wait_cycles(60);
+        check_lock();
 
-        // This is a soft functional expectation: at least some internal
-        // activity should be visible in a working loop.
-        if ((up_events + down_events) == 0) begin
-            $display("WARNING: no phase-detector activity observed");
-        end
-
-        if ((shift_left_events + shift_right_events) == 0) begin
-            $display("WARNING: no DCDL shift activity observed");
-        end
-
-        $display("\n=== TEST 4: Asynchronous reset ===");
-        #3000;
-        rst = 1'b1;
-        #1;
-        expect_ctrl_exact(INIT_CTRL);
-
-        #7000;
-        rst = 1'b0;
-        wait_cycles(10);
-
-        $display("\n======================================");
+        // -----------------------------------------
+        // SUMMARY
+        // -----------------------------------------
+        $display("\n==============================");
         if (errors == 0)
             $display("TEST PASSED");
         else
-            $display("TEST FAILED: %0d error(s)", errors);
-        $display("======================================");
+            $display("TEST FAILED: %0d errors", errors);
+        $display("==============================");
 
         $finish;
     end

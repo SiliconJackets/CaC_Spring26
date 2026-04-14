@@ -1,4 +1,4 @@
-TOPLEVEL=zdb_top_with_ro
+TOPLEVEL=nand_dcdl
 TESTNAME=default
 SRC_VERILOG=../../src/verilog/
 SRC_FOLDER= $(SRC_VERILOG)
