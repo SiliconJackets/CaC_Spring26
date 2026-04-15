@@ -160,7 +160,7 @@ DCDLS = {
     },
 }
 
-FIXED_INIT_CTRL = 0
+FIXED_INIT_CTRL = 32
 DISPLAY_COLUMNS = ["cycle", "clk_in", "clk_out", "up", "down", "phase_error_ps"]
 
 
