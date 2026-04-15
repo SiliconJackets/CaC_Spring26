@@ -85,6 +85,21 @@ class BinaryTapDCDLAdapter:
         return self.inner.delay(self.ctrl_word(ctrl_index))
 
 
+class StageCountDCDLAdapter:
+    """Treat controller output as enabled-stage count with cumulative cell delay."""
+
+    def __init__(self, inner):
+        self.inner = inner
+        self.num_cells = inner.num_cells
+
+    def ctrl_word(self, ctrl_index: int) -> int:
+        return max(0, min(ctrl_index, self.num_cells))
+
+    def delay(self, ctrl_index: int) -> float:
+        active_stages = self.ctrl_word(ctrl_index)
+        return self.inner._cells_delay(active_stages)
+
+
 PHASE_DETECTORS = {
     "FF1": SingleFlipFlopPhaseDetector,
     "EdgeLevel": EdgeLevelPhaseDetector,
@@ -124,7 +139,7 @@ DCDLS = {
         "default_clk_period_ps": 3013.87,
     },
     "InverterDCDL": {
-        "factory": lambda: BinaryTapDCDLAdapter(
+        "factory": lambda: StageCountDCDLAdapter(
             InverterDCDL(
                 num_cells=64,
                 first_cell_delay_ps=549.12,
@@ -137,7 +152,7 @@ DCDLS = {
         "default_clk_period_ps": 3013.87,
     },
     "InverterGlitchFreeDCDL": {
-        "factory": lambda: BinaryTapDCDLAdapter(
+        "factory": lambda: StageCountDCDLAdapter(
             InverterGlitchFreeDCDL(
                 num_cells=64,
                 first_cell_delay_ps=383.69,
