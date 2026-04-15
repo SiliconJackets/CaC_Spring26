@@ -1,35 +1,10 @@
 `timescale 1ps/1ps
 
-/*
-|=======================================================================
-| Module      : controller
-| Author      : Mythri Muralikannan
-| Description : Saturating up/down DLL controller
-|
-| Function:
-|   Updates the delay-control word based on the phase detector outputs.
-|
-| Inputs:
-|   clk_in : Reference/control clock
-|   rst    : Asynchronous active-high reset
-|   up     : Increment control request
-|   down   : Decrement control request
-|
-| Output:
-|   ctrl   : Delay control word
-|
-| Operation:
-|   - On reset, ctrl is initialized to INIT_CTRL, clamped to the valid
-|     range [0, 2^CTRL_BITS - 1]
-|   - up=1, down=0   -> increment ctrl by 1, saturating at MAX_CTRL
-|   - up=0, down=1   -> decrement ctrl by 1, saturating at 0
-|   - up=down        -> hold current ctrl value
-|
-| Notes:
-|   - Fully synthesizable
-|   - Baseline digital controller for DLL / ZDB applications
-|=======================================================================
-*/
+//**************************************************************************
+// Module      : controller
+// Author      : Mythri Muralikannan
+// Description : Saturating up/down DLL controller
+//**************************************************************************
 
 module controller #(
     parameter integer CTRL_BITS = 6,
