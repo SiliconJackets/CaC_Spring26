@@ -27,8 +27,8 @@ if __package__ in (None, ""):
     from simulator.gui_common import (
         DCDLS,
         CONTROLLERS,
-        FIXED_INIT_CTRL,
         PHASE_DETECTORS,
+        default_init_ctrl_for_dcdl,
         run_closed_loop_simulation,
         trace_rows,
         trace_summary_lines,
@@ -37,8 +37,8 @@ else:
     from .gui_common import (
         DCDLS,
         CONTROLLERS,
-        FIXED_INIT_CTRL,
         PHASE_DETECTORS,
+        default_init_ctrl_for_dcdl,
         run_closed_loop_simulation,
         trace_rows,
         trace_summary_lines,
@@ -189,7 +189,7 @@ def display_dll_simulator():
             controller_name=controller.value,
             dcdl_name=dcdl.value,
             clk_period_ps=float(clk_period_ps.value),
-            init_ctrl=FIXED_INIT_CTRL,
+            init_ctrl=default_init_ctrl_for_dcdl(dcdl.value),
             num_cycles=int(num_cycles.value),
             clk_in_start=float(clk_in_start.value),
             clk_out_start=None if auto_clk_out_start.value else float(clk_out_start.value),

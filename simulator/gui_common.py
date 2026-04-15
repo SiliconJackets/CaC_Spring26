@@ -160,7 +160,6 @@ DCDLS = {
     },
 }
 
-FIXED_INIT_CTRL = 0
 DISPLAY_COLUMNS = ["cycle", "clk_in", "clk_out", "up", "down", "phase_error_ps"]
 
 
@@ -233,6 +232,11 @@ def run_closed_loop_simulation(
 def trace_rows(trace: list[TraceEntry]) -> list[dict]:
     """Return the reduced table view used by the GUIs."""
     return [{key: asdict(entry)[key] for key in DISPLAY_COLUMNS} for entry in trace]
+
+
+def default_init_ctrl_for_dcdl(dcdl_name: str) -> int:
+    """Return the GUI/testbench default init code for a DCDL choice."""
+    return int(DCDLS[dcdl_name]["default_init_ctrl"])
 
 
 def trace_summary_lines(trace: list[TraceEntry]) -> tuple[str, str]:
