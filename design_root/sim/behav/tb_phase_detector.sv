@@ -1,0 +1,1 @@
+../../src/verilog/parts/phase_detector/tb_phase_detector.sv

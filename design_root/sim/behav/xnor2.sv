@@ -1,0 +1,1 @@
+../../src/verilog/parts/dcdl/gates/xnor2.sv

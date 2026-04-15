@@ -1,0 +1,1 @@
+../../src/verilog/parts/controller/controller_2mode.sv

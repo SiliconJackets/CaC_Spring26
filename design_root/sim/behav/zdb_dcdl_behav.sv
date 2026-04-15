@@ -1,0 +1,1 @@
+../../src/verilog/zdb_behav_test /zdb_dcdl_behav.sv

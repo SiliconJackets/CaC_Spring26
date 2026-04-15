@@ -1,0 +1,1 @@
+../../src/verilog/parts/ring_oscillator/inverter.sv

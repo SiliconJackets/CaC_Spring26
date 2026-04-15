@@ -1,0 +1,3 @@
+Command Line: /tools/software/synopsys/verdi/latest/platform/LINUXAMD64/bin/vfast -silent -del . -o /nethome/mmuralikannan3/CaC_ALL/CaC_Spring26/design_root/sim/behav/zdb.vcd.fsdb -ft verilog /nethome/mmuralikannan3/CaC_ALL/CaC_Spring26/design_root/sim/behav/zdb.vcd
+uname(Linux sathe-srv1.ece.gatech.edu 4.18.0-553.111.1.el8_10.x86_64 #1 SMP Sat Feb 28 00:49:56 EST 2026 x86_64)
+au time 0.367091 0.004078 0.004095 delta 27840512 27840512 total 221851648 221851648

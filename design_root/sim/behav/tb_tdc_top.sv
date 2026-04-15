@@ -1,0 +1,1 @@
+../../src/verilog/tops/tdc_top/tb_tdc_top.sv

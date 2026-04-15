@@ -1,0 +1,1 @@
+../../src/verilog/tops/zdb_top_with_ro/tb_zdb_top_with_ro.sv
