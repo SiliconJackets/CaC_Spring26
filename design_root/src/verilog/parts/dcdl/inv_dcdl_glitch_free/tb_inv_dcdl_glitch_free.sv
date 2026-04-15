@@ -21,18 +21,14 @@ module tb_inv_dcdl_glitch_free;
     initial clk = 0;
     always #5 clk = ~clk;
 
-    // ----------------------------
     // Print signal changes only
-    // ----------------------------
     always @(A)
         $display("[%0t] A changed to %b | Q=%b", $time, A, Q);
 
     always @(Y)
         $display("[%0t] Y changed to %b | Q=%b", $time, Y, Q);
 
-    // ----------------------------
     // Apply one test case
-    // ----------------------------
     task run_case(input [1:0] q_val);
     begin
         $display("\n=======================");
@@ -54,9 +50,7 @@ module tb_inv_dcdl_glitch_free;
     end
     endtask
 
-    // ----------------------------
     // Main stimulus
-    // ----------------------------
     initial begin
         rst_n = 0;
         A     = 0;
