@@ -113,7 +113,13 @@ CONTROLLERS = {
 
 DCDLS = {
     "NandDCDL": {
-        "factory": lambda: IndexedNandDCDL(NandDCDL()),
+        "factory": lambda: IndexedNandDCDL(
+            NandDCDL(
+                num_cells=64,
+                first_cell_delay_ps=106.67,
+                remaining_cell_delay_ps=73.76,
+                mux_delay_ps=0,
+        )),
         "ctrl_bits": 6,
         "default_init_ctrl": 50,
         "default_clk_period_ps": 3013.87,
@@ -121,42 +127,28 @@ DCDLS = {
     "InverterDCDL": {
         "factory": lambda: BinaryTapDCDLAdapter(
             InverterDCDL(
-                num_cells=8,
-                first_cell_delay_ps=200.0,
-                remaining_cell_delay_ps=150.0,
-                mux_delay_ps=50.0,
+                num_cells=64,
+                first_cell_delay_ps=549.12,
+                remaining_cell_delay_ps=69.67,
+                mux_delay_ps=0,
             )
         ),
-        "ctrl_bits": 3,
-        "default_init_ctrl": 6,
-        "default_clk_period_ps": 950.0,
-    },
-    "InverterCondDCDL": {
-        "factory": lambda: BinaryTapDCDLAdapter(
-            InverterCondDCDL(
-                num_cells=8,
-                first_cell_delay_ps=200.0,
-                remaining_cell_delay_ps=150.0,
-                mux_delay_ps=50.0,
-                xnor_delay_ps=30.0,
-            )
-        ),
-        "ctrl_bits": 3,
-        "default_init_ctrl": 6,
-        "default_clk_period_ps": 980.0,
+        "ctrl_bits": 6,
+        "default_init_ctrl": 50,
+        "default_clk_period_ps": 3013,
     },
     "InverterGlitchFreeDCDL": {
         "factory": lambda: BinaryTapDCDLAdapter(
             InverterGlitchFreeDCDL(
-                num_cells=8,
-                first_cell_delay_ps=50.0,
-                remaining_cell_delay_ps=40.0,
-                nand_delay_ps=20.0,
+                num_cells=64,
+                first_cell_delay_ps=383.69,
+                remaining_cell_delay_ps=75.6,
+                nand_delay_ps=0,
             )
         ),
         "ctrl_bits": 3,
         "default_init_ctrl": 6,
-        "default_clk_period_ps": 290.0,
+        "default_clk_period_ps": 3013,
     },
 }
 
