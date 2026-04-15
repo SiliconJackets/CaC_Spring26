@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 from dataclasses import asdict
+from io import BytesIO
 import sys
 from pathlib import Path
 
-from IPython.display import HTML, display
+from IPython.display import HTML, Image, display
 import matplotlib.pyplot as plt
 
 try:
@@ -54,7 +55,6 @@ def _render_clk_plot(trace) -> None:
     cycles = [entry.cycle for entry in trace]
     clk_in_values = [entry.clk_in for entry in trace]
     clk_out_values = [entry.clk_out for entry in trace]
-    plt.close("all")
     fig, ax = plt.subplots(figsize=(10, 4))
     ax.plot(cycles, clk_in_values, marker="o", linewidth=2, label="clk_in")
     ax.plot(cycles, clk_out_values, marker="o", linewidth=2, label="clk_out")
@@ -64,7 +64,10 @@ def _render_clk_plot(trace) -> None:
     ax.grid(True, alpha=0.3)
     ax.legend()
     fig.tight_layout()
-    display(fig)
+    buffer = BytesIO()
+    fig.savefig(buffer, format="png", dpi=150, bbox_inches="tight")
+    buffer.seek(0)
+    display(Image(data=buffer.getvalue()))
     plt.close(fig)
 
 
