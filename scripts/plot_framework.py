@@ -5,7 +5,13 @@ Usage in Jupyter Notebook:
     from bokeh.io import output_notebook
     output_notebook()
 
-    from plot_framework import iplot, isweep, ioverlay, isweep_overlay
+    from bokeh.io import output_notebook
+    output_notebook()
+
+    from plot_framework import (
+        iplot, isweep, ioverlay, isweep_overlay,
+        ianimate, ianimate_overlay, ianimate_stack, istack,
+    )
 
     iplot(x, y, ...)
     isweep({label: (x, y)}, ...)                              # 1 slider
@@ -13,6 +19,9 @@ Usage in Jupyter Notebook:
     ioverlay({label: (x, y)}, ...)                             # legend toggle
     isweep_overlay({label: {trace: (x, y)}}, ...)              # 1 slider + legend
     isweep_overlay(deep_nested_dict_with_trace_leaves, ...)    # N sliders + legend
+    ianimate(x, y, ...)                                        # progressive draw + play/pause
+    ianimate_overlay({label: (x, y)}, ...)                     # multi-trace progressive draw
+    ianimate_stack([{label: (x,y)}, ...], ...)                 # animated stacked subplots
 """
 
 import numpy as np
@@ -642,6 +651,245 @@ def isweep_overlay(
     show(layout)
 
 
+def ianimate(
+    x,
+    y,
+    *,
+    title="",
+    xlabel="x",
+    ylabel="y",
+    kind="line",
+    color=None,
+    width=800,
+    height=450,
+    x_log=False,
+    y_log=False,
+    interval_ms=50,
+    step_size=1,
+):
+    """
+    Progressively draw a single trace over time with play/pause + scrub slider.
+
+    The slider controls how many data points are visible. Pressing Play
+    auto-advances the slider from its current position to the end.
+
+    Parameters
+    ----------
+    x, y        : array-like data (same length)
+    interval_ms : milliseconds between animation frames
+    step_size   : how many points to reveal per frame
+    (all other params match iplot)
+
+    Usage
+    -----
+        ianimate(time, voltage, title="Transient", xlabel="t (ns)", ylabel="V")
+    """
+    from bokeh.models import Button
+
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+    n = len(x)
+
+    # Full data lives in a hidden source; active source gets sliced
+    full_source = ColumnDataSource(data=dict(x=x, y=y))
+    active_source = ColumnDataSource(data=dict(x=x[:1], y=y[:1]))
+
+    p = _make_figure(
+        title, xlabel, ylabel, width, height,
+        x_axis_type="log" if x_log else "linear",
+        y_axis_type="log" if y_log else "linear",
+    )
+    # Lock axis ranges to the full data extent so the view doesn't jump
+    x_pad = (x.max() - x.min()) * 0.02 or 1.0
+    y_pad = (y.max() - y.min()) * 0.05 or 1.0
+    p.x_range = Range1d(start=x.min() - x_pad, end=x.max() + x_pad)
+    p.y_range = Range1d(start=y.min() - y_pad, end=y.max() + y_pad)
+
+    _add_trace(p, active_source, kind, color or COLORS[0], label=title or "data")
+    if p.legend and len(p.legend) > 0:
+        p.legend.visible = False
+
+    slider = Slider(
+        start=1, end=n, value=1, step=step_size,
+        title=f"Samples shown (1 – {n})",
+        width=width - 60,
+    )
+
+    btn_play = Button(label="Play", button_type="success", width=80)
+    btn_pause = Button(label="Pause", button_type="warning", width=80)
+
+    # Slider → slice the full source
+    slider_cb = CustomJS(
+        args=dict(active=active_source, full=full_source, slider=slider),
+        code="""
+            const k = slider.value;
+            active.data = {
+                x: full.data.x.slice(0, k),
+                y: full.data.y.slice(0, k),
+            };
+            active.change.emit();
+        """,
+    )
+    slider.js_on_change("value", slider_cb)
+
+    # Play → start a JS interval that increments the slider
+    play_cb = CustomJS(
+        args=dict(slider=slider, btn_play=btn_play),
+        code=f"""
+            // Store interval ID on the button model so Pause can find it
+            if (btn_play._interval_id) return;          // already playing
+            btn_play._interval_id = setInterval(() => {{
+                if (slider.value >= slider.end) {{
+                    clearInterval(btn_play._interval_id);
+                    btn_play._interval_id = null;
+                    return;
+                }}
+                slider.value = Math.min(slider.value + {step_size}, slider.end);
+            }}, {interval_ms});
+        """,
+    )
+    btn_play.js_on_click(play_cb)
+
+    # Pause → clear the interval
+    pause_cb = CustomJS(
+        args=dict(btn_play=btn_play),
+        code="""
+            if (btn_play._interval_id) {
+                clearInterval(btn_play._interval_id);
+                btn_play._interval_id = null;
+            }
+        """,
+    )
+    btn_pause.js_on_click(pause_cb)
+
+    from bokeh.layouts import row as bk_row
+    controls = bk_row(btn_play, btn_pause)
+    layout = column(p, slider, controls, sizing_mode="fixed")
+    show(layout)
+
+
+def ianimate_overlay(
+    datasets,
+    *,
+    title="",
+    xlabel="x",
+    ylabel="y",
+    kind="line",
+    width=800,
+    height=450,
+    x_log=False,
+    y_log=False,
+    interval_ms=50,
+    step_size=1,
+):
+    """
+    Progressively draw multiple overlaid traces in sync with play/pause + scrub.
+
+    Parameters
+    ----------
+    datasets : dict  {label: (x, y), ...}
+        Same format as ioverlay. All traces are scrubbed together by the
+        same slider (they must share the same x-axis length, or each is
+        clipped to its own length).
+
+    Usage
+    -----
+        ianimate_overlay({
+            "ch1": (t, v1),
+            "ch2": (t, v2),
+        }, title="Multi-channel capture", interval_ms=30)
+    """
+    from bokeh.models import Button
+
+    # Build full + active sources for every trace
+    entries = list(datasets.items())
+    max_n = 0
+    full_sources = []
+    active_sources = []
+    for label, (x, y) in entries:
+        xa = np.asarray(x, dtype=float)
+        ya = np.asarray(y, dtype=float)
+        max_n = max(max_n, len(xa))
+        full_sources.append(ColumnDataSource(data=dict(x=xa, y=ya)))
+        active_sources.append(ColumnDataSource(data=dict(x=xa[:1], y=ya[:1])))
+
+    p = _make_figure(
+        title, xlabel, ylabel, width, height,
+        x_axis_type="log" if x_log else "linear",
+        y_axis_type="log" if y_log else "linear",
+    )
+
+    # Lock axes to full data extent
+    all_x = np.concatenate([s.data["x"] for s in full_sources])
+    all_y = np.concatenate([s.data["y"] for s in full_sources])
+    x_pad = (all_x.max() - all_x.min()) * 0.02 or 1.0
+    y_pad = (all_y.max() - all_y.min()) * 0.05 or 1.0
+    p.x_range = Range1d(start=all_x.min() - x_pad, end=all_x.max() + x_pad)
+    p.y_range = Range1d(start=all_y.min() - y_pad, end=all_y.max() + y_pad)
+
+    for i, (label, _) in enumerate(entries):
+        _add_trace(p, active_sources[i], kind, COLORS[i % len(COLORS)], label=label)
+    _style_legend(p)
+
+    slider = Slider(
+        start=1, end=max_n, value=1, step=step_size,
+        title=f"Samples shown (1 – {max_n})",
+        width=width - 60,
+    )
+
+    btn_play = Button(label="Play", button_type="success", width=80)
+    btn_pause = Button(label="Pause", button_type="warning", width=80)
+
+    slider_cb = CustomJS(
+        args=dict(active_sources=active_sources, full_sources=full_sources, slider=slider),
+        code="""
+            const k = slider.value;
+            for (let i = 0; i < active_sources.length; i++) {
+                const f = full_sources[i].data;
+                const slice_end = Math.min(k, f.x.length);
+                active_sources[i].data = {
+                    x: f.x.slice(0, slice_end),
+                    y: f.y.slice(0, slice_end),
+                };
+                active_sources[i].change.emit();
+            }
+        """,
+    )
+    slider.js_on_change("value", slider_cb)
+
+    play_cb = CustomJS(
+        args=dict(slider=slider, btn_play=btn_play),
+        code=f"""
+            if (btn_play._interval_id) return;
+            btn_play._interval_id = setInterval(() => {{
+                if (slider.value >= slider.end) {{
+                    clearInterval(btn_play._interval_id);
+                    btn_play._interval_id = null;
+                    return;
+                }}
+                slider.value = Math.min(slider.value + {step_size}, slider.end);
+            }}, {interval_ms});
+        """,
+    )
+    btn_play.js_on_click(play_cb)
+
+    pause_cb = CustomJS(
+        args=dict(btn_play=btn_play),
+        code="""
+            if (btn_play._interval_id) {
+                clearInterval(btn_play._interval_id);
+                btn_play._interval_id = null;
+            }
+        """,
+    )
+    btn_pause.js_on_click(pause_cb)
+
+    from bokeh.layouts import row as bk_row
+    controls = bk_row(btn_play, btn_pause)
+    layout = column(p, slider, controls, sizing_mode="fixed")
+    show(layout)
+
+
 def istack(
     layers: list[dict],
     *,
@@ -774,3 +1022,229 @@ def istack(
         toolbar_location="right",
     )
     show(grid)
+
+
+def ianimate_stack(
+    layers: list[dict],
+    *,
+    title: str = "",
+    xlabel: str = "x",
+    ylabels: list[str] | None = None,
+    kind: str = "line",
+    width: int = 900,
+    layer_height: int = 180,
+    x_range: tuple[float, float] | None = None,
+    x_log: bool = False,
+    y_log: bool = False,
+    colors: list[str] | None = None,
+    interval_ms: int = 50,
+    step_size: int = 1,
+):
+    """
+    Animated vertically stacked subplots — progressive draw with
+    play/pause and a shared scrub slider.
+
+    All traces across all layers are revealed in sync by one slider.
+
+    Parameters
+    ----------
+    layers : list of dicts
+        Each dict maps {label: (x, y)} — same format as istack / ioverlay.
+        Each layer becomes one subplot; multiple signals in a layer are
+        overlaid with legend toggle.
+
+    title        : title for the top subplot
+    xlabel       : x-axis label (bottom subplot only)
+    ylabels      : per-layer y-axis labels; None → auto from signal names
+    kind         : trace type ("line", "scatter", "line+scatter", "step")
+    width        : figure width in pixels
+    layer_height : height per subplot in pixels
+    x_range      : optional (min, max) to lock the shared x-axis
+    x_log        : log scale on x-axis
+    y_log        : log scale on y-axis
+    colors       : custom color palette (defaults to framework COLORS)
+    interval_ms  : milliseconds between animation frames
+    step_size    : how many points to reveal per frame
+
+    Usage
+    -----
+        t = np.linspace(0, 10, 2000)
+        ianimate_stack([
+            {"Voltage": (t, np.sin(2*t))},
+            {"Current": (t, np.cos(2*t) * 0.5)},
+            {"Power":   (t, np.sin(2*t) * np.cos(2*t) * 0.5)},
+        ], title="Circuit Waveforms", xlabel="t (ns)",
+           ylabels=["V", "I", "P"], interval_ms=20, step_size=5)
+    """
+    from bokeh.models import Button
+    from bokeh.layouts import row as bk_row
+
+    if not layers:
+        raise ValueError("Need at least one layer")
+
+    palette = colors or COLORS
+    n_layers = len(layers)
+
+    if ylabels is None:
+        ylabels = [", ".join(layer.keys()) for layer in layers]
+    elif len(ylabels) < n_layers:
+        ylabels = list(ylabels) + [""] * (n_layers - len(ylabels))
+
+    # ── Collect full/active source pairs across ALL layers ──
+    # We need flat lists so the JS callback can iterate once.
+    all_full_sources = []
+    all_active_sources = []
+    # Also track which sources belong to which layer for plotting
+    layer_source_ranges = []   # list of (start_idx, count)
+
+    max_n = 0
+    x_min_global, x_max_global = np.inf, -np.inf
+    y_extremes_per_layer = []  # [(ymin, ymax), ...]
+
+    for layer in layers:
+        start = len(all_full_sources)
+        y_lo, y_hi = np.inf, -np.inf
+        for label, (x, y) in layer.items():
+            xa = np.asarray(x, dtype=float)
+            ya = np.asarray(y, dtype=float)
+            max_n = max(max_n, len(xa))
+            x_min_global = min(x_min_global, xa.min())
+            x_max_global = max(x_max_global, xa.max())
+            y_lo = min(y_lo, ya.min())
+            y_hi = max(y_hi, ya.max())
+            all_full_sources.append(ColumnDataSource(data=dict(x=xa, y=ya)))
+            all_active_sources.append(ColumnDataSource(data=dict(x=xa[:1], y=ya[:1])))
+        y_extremes_per_layer.append((y_lo, y_hi))
+        layer_source_ranges.append((start, len(all_full_sources) - start))
+
+    # Shared x-range
+    if x_range is None:
+        shared_x_range = Range1d(start=x_min_global, end=x_max_global)
+    else:
+        shared_x_range = Range1d(start=x_range[0], end=x_range[1])
+
+    # ── Build subplot figures ──
+    figures = []
+    color_idx = 0
+
+    for i, layer in enumerate(layers):
+        is_top = i == 0
+        is_bottom = i == n_layers - 1
+
+        hover = HoverTool(tooltips=[("x", "$x{0.000}"), ("y", "$y{0.000}")])
+        crosshair = CrosshairTool()
+
+        p = figure(
+            title=title if is_top else None,
+            x_axis_label=xlabel if is_bottom else None,
+            y_axis_label=ylabels[i],
+            width=width,
+            height=layer_height + (30 if is_top else 0) + (30 if is_bottom else 0),
+            x_range=shared_x_range,
+            x_axis_type="log" if x_log else "linear",
+            y_axis_type="log" if y_log else "linear",
+            tools=[
+                hover, crosshair,
+                "box_zoom", "xpan", "xwheel_zoom", "reset", "save",
+            ],
+            active_drag="xpan",
+            active_scroll="xwheel_zoom",
+        )
+
+        # Lock y-range so subplots don't auto-rescale during animation
+        y_lo, y_hi = y_extremes_per_layer[i]
+        y_pad = (y_hi - y_lo) * 0.05 or 1.0
+        p.y_range = Range1d(start=y_lo - y_pad, end=y_hi + y_pad)
+
+        if is_top:
+            p.title.text_font_size = "14px"
+        p.yaxis.axis_label_text_font_size = "11px"
+        p.grid.grid_line_alpha = 0.3
+        p.min_border_top = 8 if not is_top else 20
+        p.min_border_bottom = 8 if not is_bottom else 40
+
+        if not is_bottom:
+            p.xaxis.visible = False
+
+        # Plot traces using the active sources
+        src_start, src_count = layer_source_ranges[i]
+        for j, (label, _) in enumerate(layer.items()):
+            active_src = all_active_sources[src_start + j]
+            c = palette[color_idx % len(palette)]
+            _add_trace(p, active_src, kind, c, label=label)
+            color_idx += 1
+
+        if len(layer) > 1:
+            _style_legend(p, location="top_right")
+        elif p.legend and len(p.legend) > 0:
+            p.legend.visible = False
+
+        figures.append(p)
+
+    # ── Slider + Play/Pause ──
+    slider = Slider(
+        start=1, end=max_n, value=1, step=step_size,
+        title=f"Samples shown (1 – {max_n})",
+        width=width - 60,
+    )
+
+    btn_play = Button(label="Play", button_type="success", width=80)
+    btn_pause = Button(label="Pause", button_type="warning", width=80)
+
+    slider_cb = CustomJS(
+        args=dict(
+            active_sources=all_active_sources,
+            full_sources=all_full_sources,
+            slider=slider,
+        ),
+        code="""
+            const k = slider.value;
+            for (let i = 0; i < active_sources.length; i++) {
+                const f = full_sources[i].data;
+                const slice_end = Math.min(k, f.x.length);
+                active_sources[i].data = {
+                    x: f.x.slice(0, slice_end),
+                    y: f.y.slice(0, slice_end),
+                };
+                active_sources[i].change.emit();
+            }
+        """,
+    )
+    slider.js_on_change("value", slider_cb)
+
+    play_cb = CustomJS(
+        args=dict(slider=slider, btn_play=btn_play),
+        code=f"""
+            if (btn_play._interval_id) return;
+            btn_play._interval_id = setInterval(() => {{
+                if (slider.value >= slider.end) {{
+                    clearInterval(btn_play._interval_id);
+                    btn_play._interval_id = null;
+                    return;
+                }}
+                slider.value = Math.min(slider.value + {step_size}, slider.end);
+            }}, {interval_ms});
+        """,
+    )
+    btn_play.js_on_click(play_cb)
+
+    pause_cb = CustomJS(
+        args=dict(btn_play=btn_play),
+        code="""
+            if (btn_play._interval_id) {
+                clearInterval(btn_play._interval_id);
+                btn_play._interval_id = null;
+            }
+        """,
+    )
+    btn_pause.js_on_click(pause_cb)
+
+    # ── Layout: grid on top, controls below ──
+    grid = gridplot(
+        [[fig] for fig in figures],
+        merge_tools=True,
+        toolbar_location="right",
+    )
+    controls = bk_row(btn_play, btn_pause)
+    layout = column(grid, slider, controls, sizing_mode="fixed")
+    show(layout)
