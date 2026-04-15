@@ -2,7 +2,7 @@ Command: vcs -f zdb_top_behav.include +v2k -R +lint=all -sverilog -full64 -times
 -debug_access+all -debug_region+cell+encrypt -debug_access -l zdb_top_behav.log +define+ccdSIM \
 +testname=default -lca -kdb
                          Chronologic VCS (TM)
-       Version X-2025.06-SP2_Full64 -- Tue Apr 14 22:46:49 2026
+       Version X-2025.06-SP2_Full64 -- Tue Apr 14 23:12:15 2026
 
                     Copyright (c) 1991 - 2025 Synopsys, Inc.
    This software and the associated documentation are proprietary to Synopsys,
@@ -26,30 +26,30 @@ Warning-[LCA_FEATURES_ENABLED] Usage warning
   information regarding list of LCA features please refer to Chapter "LCA 
   features" in the VCS Release Notes
 
-Parsing design file './tb_zdb_top_behav_python.sv'
+Parsing design file './tb_zdb_top_behav.sv'
 
 Lint-[NS] Null statement
-./tb_zdb_top_behav_python.sv, 94
+./tb_zdb_top_behav.sv, 37
   Null statement is used in following verilog source.
   Source info:         #1.3;
 
 
 Lint-[NS] Null statement
-./tb_zdb_top_behav_python.sv, 103
+./tb_zdb_top_behav.sv, 43
   Null statement is used in following verilog source.
   Source info:         #50;
 
 
 Lint-[NS] Null statement
-./tb_zdb_top_behav_python.sv, 172
+./tb_zdb_top_behav.sv, 101
   Null statement is used in following verilog source.
   Source info:             #20;
 
 
 Lint-[NS] Null statement
-./tb_zdb_top_behav_python.sv, 185
+./tb_zdb_top_behav.sv, 107
   Null statement is used in following verilog source.
-  Source info:         #(`SIM_TIMEOUT);
+  Source info:         #100000;
 
 Parsing design file './zdb_top_behav.sv'
 Parsing design file './zdb_phase_detector_behav.sv'
@@ -66,7 +66,7 @@ Top Level Modules:
 TimeScale is 1 ns / 1 ps
 
 Lint-[WMIA-L] Width mismatch in assignment
-./tb_zdb_top_behav_python.sv, 93
+./tb_zdb_top_behav.sv, 36
   Width mismatch between LHS and RHS is found in assignment:
   The following 32-bit wide expression is assigned to a 1-bit LHS target:
   Source info: clk_in = 0;
@@ -74,7 +74,7 @@ Lint-[WMIA-L] Width mismatch in assignment
 
 
 Lint-[WMIA-L] Width mismatch in assignment
-./tb_zdb_top_behav_python.sv, 102
+./tb_zdb_top_behav.sv, 42
   Width mismatch between LHS and RHS is found in assignment:
   The following 32-bit wide expression is assigned to a 1-bit LHS target:
   Source info: rst = 1;
@@ -82,7 +82,7 @@ Lint-[WMIA-L] Width mismatch in assignment
 
 
 Lint-[WMIA-L] Width mismatch in assignment
-./tb_zdb_top_behav_python.sv, 104
+./tb_zdb_top_behav.sv, 44
   Width mismatch between LHS and RHS is found in assignment:
   The following 32-bit wide expression is assigned to a 1-bit LHS target:
   Source info: rst = 0;
@@ -90,7 +90,7 @@ Lint-[WMIA-L] Width mismatch in assignment
 
 
 Lint-[WMIA-L] Width mismatch in assignment
-./tb_zdb_top_behav_python.sv, 136
+./tb_zdb_top_behav.sv, 69
   Width mismatch between LHS and RHS is found in assignment:
   The following 32-bit wide expression is assigned to a 64-bit LHS target:
   Source info: phase_error -= CLK_PERIOD;
@@ -98,7 +98,7 @@ Lint-[WMIA-L] Width mismatch in assignment
 
 
 Lint-[WMIA-L] Width mismatch in assignment
-./tb_zdb_top_behav_python.sv, 139
+./tb_zdb_top_behav.sv, 72
   Width mismatch between LHS and RHS is found in assignment:
   The following 32-bit wide expression is assigned to a 64-bit LHS target:
   Source info: phase_error += CLK_PERIOD;
@@ -185,7 +185,7 @@ rm -f _cuarc*.so _csrc*.so pre_vcsobj_*.so share_vcsobj_*.so
 if [ -x ../simv ]; then chmod a-x ../simv; fi
 g++  -o ../simv      -rdynamic  -Wl,-rpath='$ORIGIN'/simv.daidir -Wl,-rpath=./simv.daidir \
 -Wl,-rpath=/tools/software/synopsys/vcs/latest/linux64/lib -L/tools/software/synopsys/vcs/latest/linux64/lib \
--Wl,-rpath-link=./   objs/amcQw_d.o   _1318698_archive_1.so _prev_archive_1.so   \
+-Wl,-rpath-link=./   objs/amcQw_d.o   _1451374_archive_1.so _prev_archive_1.so   \
 SIM_l.o       rmapats_mop.o rmapats.o rmar.o rmar_nd.o  rmar_llvm_0_1.o rmar_llvm_0_0.o \
 -lnuma -lvirsim -lerrorinf -lsnpsmalloc -lvfs      -lvcsnew -ldistsimclient -lsimprofile \
 -luclinative /tools/software/synopsys/vcs/latest/linux64/lib/vcs_tls.o   -Wl,-whole-archive \
@@ -198,7 +198,7 @@ make[1]: Leaving directory '/nethome/mmuralikannan3/CaC_ALL/CaC_Spring26/design_
 Command: /nethome/mmuralikannan3/CaC_ALL/CaC_Spring26/design_root/sim/behav/./simv +v2k +lint=all -a zdb_top_behav.log +define+ccdSIM +testname=default -lca
 Chronologic VCS simulator copyright 1991-2025
 Contains Synopsys proprietary information.
-Compiler version X-2025.06-SP2_Full64; Runtime version X-2025.06-SP2_Full64;  Apr 14 22:46 2026
+Compiler version X-2025.06-SP2_Full64; Runtime version X-2025.06-SP2_Full64;  Apr 14 23:12 2026
 t=39000 ctrl=32 phase_err=-1.600
 t=79000 ctrl=33 phase_err=-0.900
 t=119000 ctrl=34 phase_err=-0.900
@@ -209,22 +209,11 @@ LOCK ACHIEVED at t=235000
 Final phase error = 0.500 ns
 Final ctrl = 35
 ====================================
-SIMULATION CONFIGURATION
-CLK_PERIOD        = 4
-CTRL_BITS         = 6
-INIT_CTRL         = 32
-DELAY_PS          = 700
-UPDATE_DIV_BITS   = 2
-RESET_DELAY_PS    = 20
-LOCK_COUNT_MAX    = 32
-SIM_TIMEOUT       = default
-====================================
-====================================
-$finish called from file "./tb_zdb_top_behav_python.sv", line 173.
+$finish called from file "./tb_zdb_top_behav.sv", line 102.
 $finish at simulation time               255300
            V C S   S i m u l a t i o n   R e p o r t 
 Time: 255300 ps
-CPU Time:      0.170 seconds;       Data structure size:   0.0Mb
-Tue Apr 14 22:46:51 2026
-CPU time: .365 seconds to compile + .243 seconds to elab + .277 seconds to link + .198 seconds in simulation
+CPU Time:      0.160 seconds;       Data structure size:   0.0Mb
+Tue Apr 14 23:12:17 2026
+CPU time: .355 seconds to compile + .240 seconds to elab + .268 seconds to link + .195 seconds in simulation
 Verdi KDB elaboration done and the database successfully generated
