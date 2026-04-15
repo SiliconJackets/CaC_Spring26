@@ -1,381 +1,296 @@
-"""Comprehensive tests for the DLL simulator."""
+"""Configuration-aware testbench for the DLL simulator.
+
+This testbench is driven by the controller and DCDL configurations that
+exist under ``librelane/design``. It only runs closed-loop simulations
+for combinations the Python simulator actually models.
+"""
+
+from __future__ import annotations
+
+import json
 import sys
-from simulator import (
-    PhaseDetector,
-    SingleFlipFlopPhaseDetector,
-    EdgeLevelPhaseDetector,
-    PFDPhaseDetector,
-    SaturateController, FilteredController, LockedController,
-    TwoModeController, VariableStepController,
-    BehavioralDCDL, InverterDCDL, InverterCondDCDL,
-    InverterGlitchFreeDCDL, NandDCDL, VernierDCDL,
-    simulate,
-)
+import unittest
+from dataclasses import dataclass
+from pathlib import Path
 
-fails = []
-
-def check(name, cond, msg=""):
-    if not cond:
-        fails.append(f"FAIL: {name} -- {msg}")
-        print(f"  FAIL: {name} -- {msg}")
-    else:
-        print(f"  ok: {name}")
-
-
-def first_zero(r):
-    return next((i for i, e in enumerate(r["phase_error"]) if e == 0.0), None)
-
-
-# =====================================================================
-# PART 1: PhaseDetector
-# =====================================================================
-print("--- PhaseDetector ---")
-pd_t = PhaseDetector(up_prop_delay_ps=80.0, down_prop_delay_ps=120.0)
-u, d, vt = pd_t.detect(0, 500)
-check("PD: clk_in leads -> up", u == 1 and d == 0)
-check("PD: up uses up_delay", vt == 500.0 + 80.0)
-
-u, d, vt = pd_t.detect(500, 0)
-check("PD: clk_out leads -> down", u == 0 and d == 1)
-check("PD: down uses down_delay", vt == 500.0 + 120.0)
-
-u, d, vt = pd_t.detect(100, 100)
-check("PD: aligned", u == 0 and d == 0)
-check("PD: aligned valid_time (no path delay)", vt == 100.0)
-
-check("PD: prop_delay_ps = max", pd_t.prop_delay_ps == 120.0)
-
-pd0 = PhaseDetector()
-u, d, vt = pd0.detect(0, 1)
-check("PD: zero prop delay", vt == 1.0)
-
-print("\n--- Concrete PD variants ---")
-ff1 = SingleFlipFlopPhaseDetector()
-check("FF1: up_delay", ff1.up_prop_delay_ps == 348.78)
-check("FF1: down_delay", ff1.down_prop_delay_ps == 2348.25)
-check("FF1: prop_delay = max(up,down)", ff1.prop_delay_ps == 2348.25)
-u, d, vt = ff1.detect(0, 100)
-check("FF1: up path uses up_delay", vt == 100.0 + 348.78)
-u, d, vt = ff1.detect(100, 0)
-check("FF1: down path uses down_delay", vt == 100.0 + 2348.25)
-
-el = EdgeLevelPhaseDetector()
-check("Edge: symmetric delays", el.up_prop_delay_ps == el.down_prop_delay_ps == 242.81)
-
-pfd = PFDPhaseDetector()
-check("PFD: up_delay", pfd.up_prop_delay_ps == 353.95)
-check("PFD: down_delay", pfd.down_prop_delay_ps == 352.99)
-check("PFD: near-symmetric", abs(pfd.up_prop_delay_ps - pfd.down_prop_delay_ps) < 1.0)
-
-# =====================================================================
-# PART 2: Controllers standalone
-# =====================================================================
-print("\n--- SaturateController ---")
-c = SaturateController(ctrl_bits=4, init_ctrl=8)
-check("Sat: init", c.ctrl == 8)
-c.update(1, 0); check("Sat: up", c.ctrl == 9)
-c.update(0, 1); check("Sat: down", c.ctrl == 8)
-c.update(1, 1); check("Sat: both=hold", c.ctrl == 8)
-c.update(0, 0); check("Sat: neither=hold", c.ctrl == 8)
-c2 = SaturateController(ctrl_bits=3, init_ctrl=7)
-c2.update(1, 0); check("Sat: max clamp", c2.ctrl == 7)
-c3 = SaturateController(ctrl_bits=3, init_ctrl=0)
-c3.update(0, 1); check("Sat: min clamp", c3.ctrl == 0)
-c.reset(); check("Sat: reset", c.ctrl == 8)
-
-print("\n--- FilteredController ---")
-fc = FilteredController(ctrl_bits=6, init_ctrl=32, filter_len=3)
-for _ in range(2):
-    fc.update(1, 0)
-check("Filt: 2 ups < threshold", fc.ctrl == 32)
-fc.update(1, 0)
-check("Filt: 3 ups = threshold", fc.ctrl == 33)
-fc.update(0, 1)  # direction change resets
-fc.update(1, 0)
-fc.update(1, 0)
-check("Filt: dir change resets count", fc.ctrl == 33)
-fc.update(1, 0)
-check("Filt: completes after reset", fc.ctrl == 34)
-# Idle resets counters
-fc2 = FilteredController(ctrl_bits=6, init_ctrl=32, filter_len=2)
-fc2.update(1, 0)
-fc2.update(0, 0)  # idle
-fc2.update(1, 0)
-check("Filt: idle resets count", fc2.ctrl == 32)
-fc2.update(1, 0)
-check("Filt: fresh streak works", fc2.ctrl == 33)
-fc2.reset(); check("Filt: reset", fc2.ctrl == 32)
-
-print("\n--- LockedController ---")
-lc = LockedController(ctrl_bits=6, init_ctrl=10, acquire_step=5,
-                      track_step=1, quiet_cycles=3)
-check("Lock: init mode", lc.mode == "acquire")
-lc.update(1, 0); check("Lock: acquire +5", lc.ctrl == 15)
-lc.update(0, 1); check("Lock: acquire -5", lc.ctrl == 10)
-for _ in range(3):
-    lc.update(0, 0)
-check("Lock: track mode", lc.mode == "track")
-lc.update(1, 0); check("Lock: track +1", lc.ctrl == 11)
-lc.update(0, 1); check("Lock: track -1", lc.ctrl == 10)
-# Saturate
-lc2 = LockedController(ctrl_bits=3, init_ctrl=6, acquire_step=4)
-lc2.update(1, 0); check("Lock: acquire clamp max", lc2.ctrl == 7)
-lc.reset()
-check("Lock: reset mode", lc.mode == "acquire")
-check("Lock: reset ctrl", lc.ctrl == 10)
-
-print("\n--- TwoModeController ---")
-tc = TwoModeController(ctrl_bits=6, init_ctrl=0, coarse_bits=3,
-                       fine_bits=3, switch_quiet=2)
-check("2Mode: init", tc.coarse == 0 and tc.fine == 0)
-tc.update(1, 0)
-check("2Mode: coarse +1", tc.coarse == 1 and tc.ctrl == 8)
-tc.update(0, 1)
-check("2Mode: coarse -1", tc.coarse == 0 and tc.ctrl == 0)
-tc.update(1, 0)  # coarse=1
-for _ in range(2):
-    tc.update(0, 0)
-check("2Mode: switch to fine", tc.mode == "fine")
-tc.update(1, 0)
-check("2Mode: fine +1", tc.fine == 1 and tc.coarse == 1)
-check("2Mode: fine ctrl value", tc.ctrl == (1 << 3) | 1)
-# Coarse saturation
-tc2 = TwoModeController(ctrl_bits=6, init_ctrl=0b111000,
-                        coarse_bits=3, fine_bits=3)
-tc2.update(1, 0)
-check("2Mode: coarse max clamp", tc2.coarse == 7)
-tc.reset()
-check("2Mode: reset", tc.mode == "coarse" and tc.ctrl == 0)
-
-print("\n--- VariableStepController ---")
-vc = VariableStepController(ctrl_bits=6, init_ctrl=32, big_step=4,
-                            med_step=2, big_thresh=4, med_thresh=2)
-vc.update(1, 0); check("VStep: count=1 step=1", vc.ctrl == 33)
-vc.update(1, 0); check("VStep: count=2 step=2", vc.ctrl == 35)
-vc.update(1, 0); check("VStep: count=3 step=2", vc.ctrl == 37)
-vc.update(1, 0); check("VStep: count=4 step=4", vc.ctrl == 41)
-vc.update(0, 1); check("VStep: dir change", vc.ctrl == 40)
-vc.update(0, 0)  # idle resets
-vc.update(0, 1); check("VStep: fresh down step=1", vc.ctrl == 39)
-vc.reset(); check("VStep: reset", vc.ctrl == 32)
-
-# =====================================================================
-# PART 3: DCDLs
-# =====================================================================
-print("\n--- BehavioralDCDL ---")
-bd = BehavioralDCDL(num_cells=10, first_cell_delay_ps=200,
-                    remaining_cell_delay_ps=150)
-check("Behav: ctrl=0", bd.delay(0) == 0.0)
-check("Behav: ctrl=1", bd.delay(1) == 200.0)
-check("Behav: ctrl=2", bd.delay(2) == 350.0)
-check("Behav: ctrl=10", bd.delay(10) == 200 + 9 * 150)
-check("Behav: ctrl>max clamped", bd.delay(20) == bd.delay(10))
-
-print("\n--- InverterDCDL ---")
-id4 = InverterDCDL(4, 50, 40, mux_delay_ps=25)
-check("Inv4: mux_levels=2", id4.mux_levels == 2)
-check("Inv4: tap0", id4.delay(0) == 50 + 50)
-check("Inv4: tap3", id4.delay(3) == (50 + 3 * 40) + 50)
-id6 = InverterDCDL(6, 50, 40, mux_delay_ps=25)
-check("Inv6: mux_levels=3", id6.mux_levels == 3)
-id1 = InverterDCDL(1, 50, 40, mux_delay_ps=25)
-check("Inv1: mux_levels=0", id1.mux_levels == 0)
-check("Inv1: tap0", id1.delay(0) == 50)
-id8 = InverterDCDL(8, 50, 40, mux_delay_ps=25)
-check("Inv8: mux_levels=3", id8.mux_levels == 3)
-check("Inv8: monotonic", all(id8.delay(k) < id8.delay(k + 1) for k in range(7)))
-
-print("\n--- InverterCondDCDL ---")
-ic = InverterCondDCDL(4, 50, 40, mux_delay_ps=25, xnor_delay_ps=15)
-check("InvCond: tap0", ic.delay(0) == 50 + 50 + 15)
-check("InvCond: tap3", ic.delay(3) == 170 + 50 + 15)
-
-print("\n--- InverterGlitchFreeDCDL ---")
-gf = InverterGlitchFreeDCDL(4, 50, 40, nand_delay_ps=20)
-check("GF: nand_tree_depth=2", gf.nand_tree_depth == 2)
-check("GF: tap0", gf.delay(0) == 0 + 40 + 3 * 20)      # 100
-check("GF: tap1", gf.delay(1) == 50 + 40 + 60)          # 150
-check("GF: tap3", gf.delay(3) == (50 + 2 * 40) + 40 + 60)  # 230
-gf8 = InverterGlitchFreeDCDL(8, 50, 40, nand_delay_ps=20)
-check("GF8: nand_tree_depth=3", gf8.nand_tree_depth == 3)
-check("GF8: tap0", gf8.delay(0) == 40 + 4 * 20)         # 120
-
-print("\n--- NandDCDL ---")
-nd = NandDCDL(4, 60, 45)
-check("NAND: Q=0001", nd.delay(0b0001) == 60.0)
-check("NAND: Q=0010", nd.delay(0b0010) == 60 + 45)
-check("NAND: Q=0100", nd.delay(0b0100) == 60 + 2 * 45)
-check("NAND: Q=1000", nd.delay(0b1000) == 60 + 3 * 45)
-nd8 = NandDCDL(8, 70, 50)
-check("NAND8: Q=bit7", nd8.delay(1 << 7) == 70 + 7 * 50)
-
-print("\n--- VernierDCDL ---")
-vd = VernierDCDL(4, 50, 40, fast_cell_delay_ps=15, mux_delay_ps=10)
-check("Vern: cross@0", vd.delay(0b0001) == 0 + 10 + 4 * 15)
-check("Vern: cross@1", vd.delay(0b0010) == 50 + 10 + 3 * 15)
-check("Vern: cross@3", vd.delay(0b1000) == (50 + 2 * 40) + 10 + 1 * 15)
-check("Vern: no cross", vd.delay(0b0000) == 50 + 3 * 40)
-check("Vern: multi-bit uses lowest", vd.delay(0b1010) == vd.delay(0b0010))
-
-# =====================================================================
-# PART 4: DLL simulate — all controllers x Behavioral DCDL
-# =====================================================================
-T = 5000.0
-dcdl_b = BehavioralDCDL(63, 100, 100)  # ctrl=50 -> 5000ps
-
-print("\n--- DLL: PFD + Saturate x Behavioral ---")
-r = simulate(PFDPhaseDetector(), SaturateController(6, 0), dcdl_b, T, 70)
-check("PFD+Sat+Behav: locks", r["phase_error"][-1] == 0.0)
-check("PFD+Sat+Behav: ctrl=50", r["ctrl"][-1] == 50)
-fz_sat = first_zero(r)
-
-print("\n--- DLL: EdgeLevel + Saturate x Behavioral (from above) ---")
-r2 = simulate(EdgeLevelPhaseDetector(), SaturateController(6, 63), dcdl_b, T, 70)
-check("Edge+Sat above: locks", r2["phase_error"][-1] == 0.0)
-check("Edge+Sat above: ctrl=50", r2["ctrl"][-1] == 50)
-
-print("\n--- DLL: FF1 + Filtered x Behavioral ---")
-r3 = simulate(SingleFlipFlopPhaseDetector(), FilteredController(6, 0, filter_len=3),
-              dcdl_b, T, 200)
-check("FF1+Filt+Behav: locks", r3["phase_error"][-1] == 0.0)
-check("FF1+Filt+Behav: ctrl=50", r3["ctrl"][-1] == 50)
-fz_filt = first_zero(r3)
-check("Filt slower than Sat", fz_filt > fz_sat)
-print(f"  FF1+Filtered locks at cycle {fz_filt}")
-
-print("\n--- DLL: PFD + Locked x Behavioral ---")
-# init=2, step=4 -> 2,6,10,...,50 (12 steps in acquire)
-r4 = simulate(PFDPhaseDetector(), LockedController(6, 2, acquire_step=4,
-              track_step=1, quiet_cycles=4), dcdl_b, T, 40)
-check("PFD+Lock+Behav: locks", r4["phase_error"][-1] == 0.0)
-check("PFD+Lock+Behav: ctrl=50", r4["ctrl"][-1] == 50)
-fz_lock = first_zero(r4)
-check("Lock faster than Sat", fz_lock < fz_sat)
-print(f"  PFD+Locked locks at cycle {fz_lock}")
-
-print("\n--- DLL: EdgeLevel + VariableStep x Behavioral ---")
-r5 = simulate(EdgeLevelPhaseDetector(), VariableStepController(6, 0), dcdl_b, T, 70)
-check("Edge+VStep+Behav: locks", r5["phase_error"][-1] == 0.0)
-check("Edge+VStep+Behav: ctrl=50", r5["ctrl"][-1] == 50)
-fz_vs = first_zero(r5)
-check("VStep faster than Sat", fz_vs < fz_sat)
-print(f"  Edge+VarStep locks at cycle {fz_vs}")
-
-print("\n--- DLL: PFD + TwoMode x Behavioral ---")
-# Use a target divisible by coarse granularity (8): 100ps/cell, T=4800
-dcdl_2m = BehavioralDCDL(63, 100, 100)
-r6 = simulate(PFDPhaseDetector(), TwoModeController(6, 0, coarse_bits=3,
-              fine_bits=3, switch_quiet=3), dcdl_2m, 4800, 60)
-final_err = abs(r6["phase_error"][-1])
-check("PFD+2Mode+Behav: converges", final_err == 0,
-      f"err={r6['phase_error'][-1]}")
-print(f"  PFD+TwoMode final ctrl={r6['ctrl'][-1]}, err={r6['phase_error'][-1]}")
-
-# =====================================================================
-# PART 5: DLL with gate-level DCDLs
-# =====================================================================
-print("\n--- DLL: FF1 + Saturate x InverterDCDL ---")
-# 8 taps: delay = (200+k*150) + 3*50 = 350+150k
-# T=1250 -> k=6 exact. FF1 has 2348ps down delay -> pipeline > T
-# -> 1 extra cycle latency -> limit cycle around ctrl=6
-id_dcdl = InverterDCDL(8, 200, 150, mux_delay_ps=50)
-r7 = simulate(SingleFlipFlopPhaseDetector(), SaturateController(3, 0), id_dcdl, 1250, 30)
-avg7 = sum(r7["ctrl"][-10:]) / 10
-check("FF1+Sat+Inv: bounded", 5 <= avg7 <= 7, f"avg={avg7}")
-
-print("\n--- DLL: Edge + Saturate x InverterCondDCDL ---")
-# 4 taps: delay = (200+k*150) + 2*50 + 30 = 330+150k
-# T=780 -> k=3
-ic_dcdl = InverterCondDCDL(4, 200, 150, mux_delay_ps=50, xnor_delay_ps=30)
-r8 = simulate(EdgeLevelPhaseDetector(), SaturateController(2, 0), ic_dcdl, 780, 20)
-check("Edge+Sat+InvCond: locks", r8["phase_error"][-1] == 0.0)
-check("Edge+Sat+InvCond: ctrl=3", r8["ctrl"][-1] == 3)
-
-print("\n--- DLL: PFD + Saturate x InverterGlitchFreeDCDL ---")
-# 4 taps: tap k = cells_delay(k) + 40 + 60
-# tap0: 0+100=100, tap1: 50+100=150, tap2: 90+100=190, tap3: 130+100=230
-# PFD prop ~354ps >> T=190ps -> limit cycle. Use EdgeLevel (243ps) with
-# longer T to get clean lock.
-gf_dcdl = InverterGlitchFreeDCDL(4, 50, 40, nand_delay_ps=20)
-r9 = simulate(EdgeLevelPhaseDetector(), SaturateController(2, 0), gf_dcdl, 190, 20)
-avg9 = sum(r9["ctrl"][-10:]) / 10
-check("Edge+Sat+GF: bounded around 2", 1 <= avg9 <= 3, f"avg={avg9}")
-
-# =====================================================================
-# PART 6: Pipeline latency
-# =====================================================================
-print("\n--- Pipeline latency ---")
-dcdl_u = BehavioralDCDL(63, 100, 100)
-
-r_l0 = simulate(PFDPhaseDetector(), SaturateController(6, 0), dcdl_u, T, 70)
-fz0 = first_zero(r_l0)
-
-# pipeline = 1500 < T -> extra=0 (use worst-case pd delay = 500)
-r_l1 = simulate(PhaseDetector(up_prop_delay_ps=500, down_prop_delay_ps=400),
-                SaturateController(6, 0, prop_delay_ps=1000), dcdl_u, T, 70)
-fz1 = first_zero(r_l1)
-check("Pipe: <T same speed", fz0 == fz1)
-
-# pipeline = 7000 -> extra=1 (worst-case pd = 3000)
-r_l2 = simulate(PhaseDetector(up_prop_delay_ps=3000, down_prop_delay_ps=2500),
-                SaturateController(6, 0, prop_delay_ps=4000), dcdl_u, T, 70)
-fz2 = first_zero(r_l2)
-check("Pipe: 1 extra slower", fz2 is not None and fz2 > fz0)
-print(f"  No latency: {fz0}, +1 extra: {fz2}")
-
-# pipeline = 13000 -> extra=2 (worst-case pd = 5000)
-r_l3 = simulate(PhaseDetector(up_prop_delay_ps=5000, down_prop_delay_ps=4500),
-                SaturateController(6, 0, prop_delay_ps=8000), dcdl_u, T, 80)
-fz3 = first_zero(r_l3)
-check("Pipe: 2 extra even slower", fz3 is not None and fz3 > fz2)
-print(f"  +2 extra: {fz3}")
-
-# =====================================================================
-# PART 7: Edge cases
-# =====================================================================
-print("\n--- Edge cases ---")
-
-# 1 cycle
-r_1c = simulate(PFDPhaseDetector(), SaturateController(6, 0), dcdl_u, T, 1)
-check("1 cycle runs", len(r_1c["ctrl"]) == 1)
-
-# init_ctrl overflow/underflow clamped
-check("init_ctrl > max clamped", SaturateController(3, 100).ctrl == 7)
-check("init_ctrl < 0 clamped", SaturateController(3, -5).ctrl == 0)
-
-# Reset after simulation restores state
-c_rs = SaturateController(6, 10)
-c_rs.update(1, 0)
-c_rs.update(1, 0)
-check("pre-reset", c_rs.ctrl == 12)
-c_rs.reset()
-check("post-reset", c_rs.ctrl == 10)
-
-# Filtered with filter_len=1 acts like saturate
-fc1 = FilteredController(6, 32, filter_len=1)
-fc1.update(1, 0)
-check("Filt len=1: instant", fc1.ctrl == 33)
-
-# All trace arrays same length
-r_len = simulate(EdgeLevelPhaseDetector(), SaturateController(6, 0), dcdl_u, T, 42)
-lens = {k: len(v) for k, v in r_len.items() if isinstance(v, list)}
-check("Trace lengths", all(v == 42 for v in lens.values()), str(lens))
-
-# Simulate is repeatable (reset works)
-c_rep = SaturateController(6, 0)
-pd_rep = SingleFlipFlopPhaseDetector()
-r_a = simulate(pd_rep, c_rep, dcdl_u, T, 50)
-r_b = simulate(pd_rep, c_rep, dcdl_u, T, 50)
-check("Repeatable", r_a["ctrl"] == r_b["ctrl"])
-
-# =====================================================================
-# SUMMARY
-# =====================================================================
-print()
-if fails:
-    print(f"=== {len(fails)} FAILURES ===")
-    for f in fails:
-        print(f)
-    sys.exit(1)
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    from simulator import (
+        EdgeLevelPhaseDetector,
+        FilteredController,
+        InverterCondDCDL,
+        InverterDCDL,
+        InverterGlitchFreeDCDL,
+        LockedController,
+        NandDCDL,
+        PhaseDetector,
+        PFDPhaseDetector,
+        SaturateController,
+        SingleFlipFlopPhaseDetector,
+        VariableStepController,
+        simulate,
+    )
+    from simulator.zdb_demo import run_zdb_demo
 else:
-    print("=== ALL TESTS PASSED ===")
+    from . import (
+        EdgeLevelPhaseDetector,
+        FilteredController,
+        InverterCondDCDL,
+        InverterDCDL,
+        InverterGlitchFreeDCDL,
+        LockedController,
+        NandDCDL,
+        PhaseDetector,
+        PFDPhaseDetector,
+        SaturateController,
+        SingleFlipFlopPhaseDetector,
+        VariableStepController,
+        simulate,
+    )
+    from .zdb_demo import run_zdb_demo
+
+
+ROOT = Path(__file__).resolve().parents[1]
+DESIGN_ROOT = ROOT / "librelane" / "design"
+
+
+def load_config(config_dir: str) -> dict:
+    with (DESIGN_ROOT / config_dir / "config.json").open() as f:
+        return json.load(f)
+
+
+PHASE_DETECTOR_CONFIGS = {
+    "phase_detector_syn_ff1": "phase_detector_syn_ff1",
+    "phase_detector_syn_edge": "phase_detector_syn_edge",
+    "phase_detector_syn_pfd": "phase_detector_syn_pfd",
+}
+
+
+@dataclass(frozen=True)
+class ControllerSpec:
+    config_dir: str
+    factory: object
+
+
+@dataclass(frozen=True)
+class DCDLSpec:
+    config_dir: str
+    factory: object
+    integration_target_ctrl: int | None
+    wrapped_one_hot: bool = False
+
+
+CONTROLLERS = {
+    "controller_saturate": ControllerSpec(
+        config_dir="controller_saturate",
+        factory=lambda bits, init=0: SaturateController(ctrl_bits=bits, init_ctrl=init),
+    ),
+    "controller_filtered": ControllerSpec(
+        config_dir="controller_filtered",
+        factory=lambda bits, init=0: FilteredController(
+            ctrl_bits=bits, init_ctrl=init, filter_len=3
+        ),
+    ),
+    "controller_locked": ControllerSpec(
+        config_dir="controller_locked",
+        factory=lambda bits, init=0: LockedController(
+            ctrl_bits=bits, init_ctrl=init, acquire_step=2, track_step=1, quiet_cycles=4
+        ),
+    ),
+    "controller_variable_step": ControllerSpec(
+        config_dir="controller_variable_step",
+        factory=lambda bits, init=0: VariableStepController(
+            ctrl_bits=bits, init_ctrl=init, big_step=2, med_step=1, big_thresh=4, med_thresh=2
+        ),
+    ),
+}
+
+
+DCDLS = {
+    "inv_dcdl": DCDLSpec(
+        config_dir="inv_dcdl",
+        factory=lambda: InverterDCDL(
+            num_cells=8,
+            first_cell_delay_ps=200.0,
+            remaining_cell_delay_ps=150.0,
+            mux_delay_ps=50.0,
+        ),
+        integration_target_ctrl=4,
+    ),
+    "inv_dcdl_cond": DCDLSpec(
+        config_dir="inv_dcdl_cond",
+        factory=lambda: InverterCondDCDL(
+            num_cells=8,
+            first_cell_delay_ps=200.0,
+            remaining_cell_delay_ps=150.0,
+            mux_delay_ps=50.0,
+            xnor_delay_ps=30.0,
+        ),
+        integration_target_ctrl=4,
+    ),
+    "glitch_free_reference": DCDLSpec(
+        config_dir="inv_dcdl",
+        factory=lambda: InverterGlitchFreeDCDL(
+            num_cells=8,
+            first_cell_delay_ps=50.0,
+            remaining_cell_delay_ps=40.0,
+            nand_delay_ps=20.0,
+        ),
+        integration_target_ctrl=4,
+    ),
+    "nand_dcdl": DCDLSpec(
+        config_dir="nand_dcdl",
+        factory=lambda: NandDCDL(num_cells=8, first_cell_delay_ps=106.67, remaining_cell_delay_ps=72.68),
+        integration_target_ctrl=4,
+    ),
+}
+
+
+class ConfigDiscoveryTests(unittest.TestCase):
+    def test_phase_detector_configs_exist(self) -> None:
+        for name, config_dir in PHASE_DETECTOR_CONFIGS.items():
+            config = load_config(config_dir)
+            self.assertIn("VERILOG_FILES", config, name)
+
+    def test_controller_configs_exist(self) -> None:
+        for name, spec in CONTROLLERS.items():
+            config = load_config(spec.config_dir)
+            self.assertIn("VERILOG_FILES", config, name)
+
+    def test_dcdl_configs_exist(self) -> None:
+        for name, spec in DCDLS.items():
+            config = load_config(spec.config_dir)
+            self.assertIn("VERILOG_FILES", config, name)
+
+
+class ControllerModelTests(unittest.TestCase):
+    def test_all_supported_controllers_update_and_reset(self) -> None:
+        for name, spec in CONTROLLERS.items():
+            with self.subTest(controller=name):
+                c = spec.factory(6, 8)
+                before = c.ctrl
+                c.update(1, 0)
+                self.assertGreaterEqual(c.ctrl, before)
+                c.reset()
+                self.assertEqual(c.ctrl, 8)
+
+
+class PhaseDetectorModelTests(unittest.TestCase):
+    def test_base_phase_detector_direction_and_timing(self) -> None:
+        pd = PhaseDetector(up_prop_delay_ps=80.0, down_prop_delay_ps=120.0)
+
+        self.assertEqual(pd.detect(0.0, 500.0), (1, 0, 580.0))
+        self.assertEqual(pd.detect(500.0, 0.0), (0, 1, 620.0))
+        self.assertEqual(pd.detect(100.0, 100.0), (0, 0, 100.0))
+        self.assertEqual(pd.prop_delay_ps, 120.0)
+
+    def test_single_flip_flop_phase_detector_uses_characterized_delays(self) -> None:
+        pd = SingleFlipFlopPhaseDetector()
+
+        self.assertAlmostEqual(pd.up_prop_delay_ps, 348.78)
+        self.assertAlmostEqual(pd.down_prop_delay_ps, 2348.25)
+        self.assertEqual(pd.detect(0.0, 100.0), (1, 0, 448.78))
+        self.assertEqual(pd.detect(100.0, 0.0), (0, 1, 2448.25))
+
+    def test_concrete_phase_detectors_expose_expected_delays(self) -> None:
+        edge = EdgeLevelPhaseDetector()
+        pfd = PFDPhaseDetector()
+
+        self.assertAlmostEqual(edge.up_prop_delay_ps, 242.81)
+        self.assertAlmostEqual(edge.down_prop_delay_ps, 242.81)
+        self.assertAlmostEqual(pfd.up_prop_delay_ps, 353.95)
+        self.assertAlmostEqual(pfd.down_prop_delay_ps, 352.99)
+        self.assertLess(abs(pfd.up_prop_delay_ps - pfd.down_prop_delay_ps), 1.0)
+
+
+class DCDLModelTests(unittest.TestCase):
+    def test_binary_tap_dcdls_are_monotonic(self) -> None:
+        for name in ("inv_dcdl", "inv_dcdl_cond", "glitch_free_reference"):
+            with self.subTest(dcdl=name):
+                d = DCDLS[name].factory()
+                delays = [d.delay(i) for i in range(8)]
+                self.assertTrue(all(a < b for a, b in zip(delays, delays[1:])), delays)
+
+    def test_nand_dcdl_stage_enable_semantics(self) -> None:
+        d = DCDLS["nand_dcdl"].factory()
+        full_delay = 106.67 + 7 * 72.68
+
+        self.assertAlmostEqual(d.delay(0x00), full_delay, places=6)
+        self.assertAlmostEqual(d.delay(0xFF), 0.0, places=6)
+        self.assertAlmostEqual(d.delay(0x01), full_delay - 106.67, places=6)
+        self.assertAlmostEqual(d.delay(0x02), full_delay - 72.68, places=6)
+        self.assertAlmostEqual(d.delay(0x03), full_delay - 106.67 - 72.68, places=6)
+
+    def test_nand_dcdl_prefix_clear_words_increase_delay(self) -> None:
+        d = DCDLS["nand_dcdl"].factory()
+        full_mask = (1 << 8) - 1
+        words = [full_mask ^ ((1 << active) - 1) if active > 0 else full_mask for active in range(9)]
+        delays = [d.delay(word) for word in words]
+        self.assertTrue(all(a < b for a, b in zip(delays, delays[1:])), delays)
+
+
+class ClosedLoopDLLTests(unittest.TestCase):
+    def test_zdb_path_converges_with_pfd_saturate_nand(self) -> None:
+        trace, clk_period_ps = run_zdb_demo(target_tap=41, init_ctrl=0, num_cycles=120, settle_cycles=3)
+
+        self.assertGreater(len(trace), 0)
+        self.assertAlmostEqual(clk_period_ps, 3013.87, places=2)
+        self.assertEqual(trace[-1].phase_error_ps, 0.0)
+        self.assertEqual(trace[-1].up, 0)
+        self.assertEqual(trace[-1].down, 0)
+        self.assertEqual(trace[-1].ctrl_index, 41)
+
+    def test_pfd_detector_reaches_zero_error_on_binary_dcdls(self) -> None:
+        detector = PFDPhaseDetector()
+
+        for dcdl_name in ("inv_dcdl", "inv_dcdl_cond"):
+            dcdl_spec = DCDLS[dcdl_name]
+            target_period_ps = dcdl_spec.factory().delay(dcdl_spec.integration_target_ctrl)
+            trace = simulate(
+                detector,
+                SaturateController(ctrl_bits=3, init_ctrl=max(0, dcdl_spec.integration_target_ctrl - 2)),
+                dcdl_spec.factory(),
+                target_period_ps,
+                120,
+            )
+            self.assertIn(0.0, trace["phase_error"][-20:], trace["phase_error"][-10:])
+
+    def test_supported_controllers_reach_zero_error_on_binary_dcdls(self) -> None:
+        detector = EdgeLevelPhaseDetector()
+
+        for dcdl_name in ("inv_dcdl", "inv_dcdl_cond"):
+            dcdl_spec = DCDLS[dcdl_name]
+            target_period_ps = dcdl_spec.factory().delay(dcdl_spec.integration_target_ctrl)
+            for controller_name, controller_spec in CONTROLLERS.items():
+                with self.subTest(dcdl=dcdl_name, controller=controller_name):
+                    trace = simulate(
+                        detector,
+                        controller_spec.factory(3, max(0, dcdl_spec.integration_target_ctrl - 2)),
+                        dcdl_spec.factory(),
+                        target_period_ps,
+                        120,
+                    )
+                    self.assertIn(0.0, trace["phase_error"][-20:], trace["phase_error"][-10:])
+
+    def test_glitch_free_dcdl_reaches_target_window(self) -> None:
+        spec = DCDLS["glitch_free_reference"]
+        trace = simulate(
+            EdgeLevelPhaseDetector(),
+            SaturateController(ctrl_bits=3, init_ctrl=0),
+            spec.factory(),
+            spec.factory().delay(spec.integration_target_ctrl),
+            80,
+        )
+        self.assertLessEqual(min(abs(err) for err in trace["phase_error"][-20:]), 40.0, trace["phase_error"][-10:])
+
+    def test_nand_dcdl_one_hot_words_remove_exact_stage_delay(self) -> None:
+        dcdl = DCDLS["nand_dcdl"].factory()
+        full_delay = 106.67 + 7 * 72.68
+        expected = [full_delay - 106.67] + [full_delay - 72.68 for _ in range(7)]
+        actual = [dcdl.delay(1 << i) for i in range(8)]
+        for idx, (got, want) in enumerate(zip(actual, expected)):
+            self.assertAlmostEqual(got, want, places=6, msg=f"tap {idx}")
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)

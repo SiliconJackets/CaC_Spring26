@@ -135,17 +135,16 @@ class InverterGlitchFreeDCDL(DCDL):
 
 
 class NandDCDL(DCDL):
-    """
-    NAND DCDL
-    """
-
     def __init__(self, num_cells=64, first_cell_delay_ps=106.67, remaining_cell_delay_ps=72.68):
         super().__init__(num_cells, first_cell_delay_ps, remaining_cell_delay_ps)
 
     def _delay(self, ctrl: int) -> float:
-        pos = 0
+        total = 0.0
         for i in range(self.num_cells):
-            if ctrl & (1 << i):
-                pos = i
-                break
-        return self._cells_delay(pos + 1)
+            if not (ctrl & (1 << i)):
+                if i == 0:
+                    total += self.first_cell_delay_ps
+                else:
+                    total += self.remaining_cell_delay_ps
+        return total
+
