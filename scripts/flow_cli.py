@@ -28,21 +28,6 @@ def run_flow(design_name, base_dir, num_dcdl_stages):
         print(f"Error: Could not find config.json at {CONFIG_PATH}")
         exit(1)
 
-    # Replace number of stages in the dcdl template RTL
-    if design_name in ["inv_dcdl_glitchless"]:
-        print(f"The number of stages for {design_name} is set to {num_dcdl_stages}")
-        TEMPLATE_PATH = DESIGN_DIR / f"{design_name}" / f"TEMPLATE_{design_name}.sv"
-        if not os.path.exists(CONFIG_PATH):
-            print(f"Error: Could not find config.json at {CONFIG_PATH}")
-            exit(1)
-
-        rtl_template = TEMPLATE_PATH.read_text()
-
-        rtl_resolved = rtl_template.replace("__NUM_DCDL_STAGES__", str(num_dcdl_stages))
-
-        resolved_path = DESIGN_DIR / f"{design_name}" / f"{design_name}.sv"
-        resolved_path.write_text(rtl_resolved)
-
     print(f"-> Starting flow for '{design_name}'...")
 
     print(CONFIG_PATH)
@@ -212,13 +197,6 @@ def main():
         type=str,
         default="20n",
         help="Delay (in ns) of CLK_OUT, only used for phase detector spice simulations",
-    )
-
-    parser.add_argument(
-        "--num-dcdl-stages",
-        type=str,
-        default="64",
-        help="The number of stages in the DCDL",
     )
 
     args = parser.parse_args()
