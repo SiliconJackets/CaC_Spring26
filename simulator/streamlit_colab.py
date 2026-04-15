@@ -7,6 +7,7 @@ from dataclasses import asdict
 import sys
 from pathlib import Path
 
+import pandas as pd
 import streamlit as st
 
 if __package__ in (None, ""):
@@ -112,7 +113,7 @@ def render_streamlit_colab_app() -> None:
     last = trace[-1]
 
     st.subheader("Closed-Loop Trace")
-    st.dataframe([asdict(entry) for entry in trace])
+    st.dataframe(pd.DataFrame([asdict(entry) for entry in trace]))
 
     st.subheader("Summary")
     st.write(
