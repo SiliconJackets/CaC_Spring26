@@ -38,7 +38,7 @@ module zdb_top #(
     input  wire                 rst,
     output wire                 clk_out,
 
-// Debug / visibility signals
+    // Debug / visibility signals
     output wire [CTRL_BITS-1:0] ctrl_dbg,
     output wire                 up_dbg,
     output wire                 down_dbg,
@@ -47,7 +47,7 @@ module zdb_top #(
 );
 
 
-// Internal Signals
+    // Internal Signals
     wire [CTRL_BITS-1:0] ctrl;
     wire up;
     wire down;
@@ -58,7 +58,7 @@ module zdb_top #(
 
     wire dcdl_clk;
 
-// Phase detector
+    // Phase detector
     phase_detector u_pd (
         .clk_in  (clk_in),
         .clk_out (clk_out),
@@ -67,7 +67,7 @@ module zdb_top #(
         .down    (down)
     );
 
-// Controller
+    // Controller
     controller #(
         .CTRL_BITS (CTRL_BITS),
         .INIT_CTRL (INIT_CTRL)
@@ -79,8 +79,8 @@ module zdb_top #(
         .ctrl   (ctrl)
     );
 
-// If ctrl increased relative to previous cycle, generate shift_left.
-// If ctrl decreased, generate shift_right.
+    // If ctrl increased relative to previous cycle, generate shift_left.
+    // If ctrl decreased, generate shift_right.
     always @(posedge clk_in or posedge rst) begin
         if (rst)
             ctrl_d <= INIT_CTRL[CTRL_BITS-1:0];
@@ -91,7 +91,7 @@ module zdb_top #(
     assign shift_left  = (ctrl > ctrl_d);
     assign shift_right = (ctrl < ctrl_d);
 
-// Declare DCDL
+    // Declare DCDL
     nand_dcdl_top u_dcdl_top (
         .clk         (clk_in),
         .rst_n       (~rst),
@@ -103,7 +103,7 @@ module zdb_top #(
 
     assign clk_out = dcdl_clk;
 
-// Debug outputs
+    // Debug outputs
     assign ctrl_dbg        = ctrl;
     assign up_dbg          = up;
     assign down_dbg        = down;
