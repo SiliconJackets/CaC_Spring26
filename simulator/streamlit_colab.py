@@ -51,24 +51,39 @@ def render_streamlit_colab_app() -> None:
     st.caption("clk_in -> phase detector -> controller -> DCDL, with clk_out fed back into the phase detector")
     st.caption("phase_error_ps = clk_out - clk_in")
 
-    phase_detector_name = st.selectbox("Phase Detector", list(PHASE_DETECTORS.keys()), index=0)
-    controller_name = st.selectbox("Controller", list(CONTROLLERS.keys()), index=0)
-    dcdl_name = st.selectbox("DCDL", list(DCDLS.keys()), index=0)
+    st.subheader("Configuration")
+
+    st.write("Phase Detector")
+    phase_detector_name = st.selectbox("", list(PHASE_DETECTORS.keys()), index=0, key="phase_detector_name")
+
+    st.write("Controller")
+    controller_name = st.selectbox("", list(CONTROLLERS.keys()), index=0, key="controller_name")
+
+    st.write("DCDL")
+    dcdl_name = st.selectbox("", list(DCDLS.keys()), index=0, key="dcdl_name")
 
     defaults = DCDLS[dcdl_name]
     ctrl_max = (1 << defaults["ctrl_bits"]) - 1
 
+    st.write("Reference Clock Period (ps)")
     clk_period_ps_str = st.text_input(
-        "Reference Clock Period (ps)",
+        "",
         value=str(float(defaults["default_clk_period_ps"])),
+        key="clk_period_ps",
     )
+
+    st.write("Initial Controller Code")
     init_ctrl_str = st.text_input(
-        "Initial Controller Code",
+        "",
         value=str(int(min(defaults["default_init_ctrl"], ctrl_max))),
+        key="init_ctrl",
     )
+
+    st.write("clk_in Start (ps)")
     clk_in_start_str = st.text_input(
-        "clk_in Start (ps)",
+        "",
         value="0.0",
+        key="clk_in_start",
     )
 
     use_auto_clk_out_start = st.checkbox("Auto clk_out Start", value=True)
@@ -77,14 +92,17 @@ def render_streamlit_colab_app() -> None:
         st.caption("Using auto start: clk_out = clk_period - initial cell_delay")
         clk_out_start_str = None
     else:
+        st.write("clk_out Start (ps)")
         clk_out_start_str = st.text_input(
-            "clk_out Start (ps)",
+            "",
             value=str(float(defaults["default_clk_period_ps"] - 100.0)),
+            key="clk_out_start",
         )
 
     cycle_options = list(range(5, 101))
     default_cycle_index = cycle_options.index(20)
-    num_cycles = st.selectbox("Number of Cycles", cycle_options, index=default_cycle_index)
+    st.write("Number of Cycles")
+    num_cycles = st.selectbox("", cycle_options, index=default_cycle_index, key="num_cycles")
 
     try:
         clk_period_ps = _parse_float("Reference Clock Period (ps)", clk_period_ps_str, min_value=1.0)
