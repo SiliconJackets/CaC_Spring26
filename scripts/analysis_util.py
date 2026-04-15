@@ -143,11 +143,11 @@ def decode_ctrl(traces, vthresh=0.9):
     return (time, ctrl_int)
 
 
-def decode_q(traces, vthresh=0.9):
+def decode_q(traces, vthresh=0.9, bits = 6):
     """Convert 6 Q bit traces into a single integer waveform."""
     time = traces["Q0_node"][0]
     ctrl_int = np.zeros(len(time))
-    for i in range(6):
+    for i in range(bits):
         _, v = traces[f"Q{i}_node"]
         ctrl_int += (v > vthresh).astype(float) * (1 << i)
     return (time, ctrl_int)
