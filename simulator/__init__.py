@@ -21,3 +21,4 @@ from .dcdl import (
 from .dll import simulate
 from .gui_common import DCDLS, CONTROLLERS, PHASE_DETECTORS, TraceEntry, run_closed_loop_simulation
 from .notebook_widgets import display_dll_simulator
+from .streamlit_colab import render_streamlit_colab_app
