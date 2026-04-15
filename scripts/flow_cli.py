@@ -13,10 +13,11 @@ def __is_valid_time_value(value):
     return bool(re.fullmatch(r"\d+(\.\d+)?[pnfum]", value))
 
 
-def run_flow(design_name, base_dir):
+def run_flow(design_name, base_dir, num_dcdl_stages):
     """
     Runs the flow and places the SPICE netlist in spice/netlists/
     """
+
     Classic = Flow.factory.get("Classic")
     librelane.logging.set_log_level("ERROR")
 
@@ -26,6 +27,21 @@ def run_flow(design_name, base_dir):
     if not os.path.exists(CONFIG_PATH):
         print(f"Error: Could not find config.json at {CONFIG_PATH}")
         exit(1)
+
+    # Replace number of stages in the dcdl template RTL
+    if design_name in ["inv_dcdl_glitchless"]:
+        print(f"The number of stages for {design_name} is set to {num_dcdl_stages}")
+        TEMPLATE_PATH = DESIGN_DIR / f"{design_name}" / f"TEMPLATE_{design_name}.sv"
+        if not os.path.exists(CONFIG_PATH):
+            print(f"Error: Could not find config.json at {CONFIG_PATH}")
+            exit(1)
+
+        rtl_template = TEMPLATE_PATH.read_text()
+
+        rtl_resolved = rtl_template.replace("__NUM_DCDL_STAGES__", str(num_dcdl_stages))
+
+        resolved_path = DESIGN_DIR / f"{design_name}" / f"{design_name}.sv"
+        resolved_path.write_text(rtl_resolved)
 
     print(f"-> Starting flow for '{design_name}'...")
 
@@ -92,7 +108,7 @@ def run_ngspice(design_name, base_dir, pdk_root, clk_in_delay, clk_out_delay):
         "controller_variable_step",
         "controller_saturate",
         "controller_filtered",
-        "controller_locked"
+        "controller_locked",
     ]:
         # DCDLs have distinct spice testbenches
         TB_PATH = TB_DIR / f"tb_{design_name}.sp"
@@ -198,11 +214,19 @@ def main():
         help="Delay (in ns) of CLK_OUT, only used for phase detector spice simulations",
     )
 
+    parser.add_argument(
+        "--num-dcdl-stages",
+        type=str,
+        default="64",
+        help="The number of stages in the DCDL",
+    )
+
     args = parser.parse_args()
     design_name = args.design_name
     base_dir = args.base_dir
     process = args.process
     pdk_root = args.pdk_root
+    num_dcdl_stages = args.num_dcdl_stages
 
     clk_in_delay = args.clk_in_delay
     if not __is_valid_time_value(clk_in_delay):
@@ -215,7 +239,7 @@ def main():
         exit(1)
 
     if process.lower() == "flow":
-        run_flow(design_name=design_name, base_dir=base_dir)
+        run_flow(design_name=design_name, base_dir=base_dir, num_dcdl_stages=num_dcdl_stages)
     elif process.lower() == "spice":
         run_ngspice(
             design_name=design_name,
