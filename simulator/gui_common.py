@@ -118,7 +118,6 @@ DCDLS = {
                 num_cells=64,
                 first_cell_delay_ps=106.67,
                 remaining_cell_delay_ps=73.76,
-                mux_delay_ps=0,
         )),
         "ctrl_bits": 6,
         "default_init_ctrl": 50,
