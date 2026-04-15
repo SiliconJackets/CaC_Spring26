@@ -215,7 +215,6 @@ def display_dll_simulator():
 
         with results_output:
             results_output.clear_output(wait=True)
-            display(
             display(HTML("<h3>Phase Error Plot</h3>"))
             display(HTML("<div style='font-size:1.05rem; margin-bottom:8px;'>phase_error_ps = clk_out - clk_in</div>"))
             _render_phase_error_plot(trace)
