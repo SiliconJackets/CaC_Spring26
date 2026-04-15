@@ -10,9 +10,7 @@ module tdc_top #(
     output wire [$clog2(STAGES)-1:0] tdc_out
 );
 
-    // -------------------------------------------------
     // Internal signals
-    // -------------------------------------------------
     wire [STAGES-1:0] clk_phases;
 
     // Tie off control (STATIC delay line for TDC)
@@ -21,9 +19,7 @@ module tdc_top #(
 
     wire rst_n = ~rst;
 
-    // -------------------------------------------------
     // Delay line (FIXED instantiation)
-    // -------------------------------------------------
     nand_dcdl_top #(
         .STAGES(STAGES)
     ) dcdl (
@@ -35,9 +31,7 @@ module tdc_top #(
         .phases(clk_phases)        // event_in correct port
     );
 
-    // -------------------------------------------------
     // Sampling
-    // -------------------------------------------------
     wire [STAGES-1:0] thermo_code;
 
     tdc_sampler #(
@@ -48,9 +42,7 @@ module tdc_top #(
         .thermo_code(thermo_code)
     );
 
-    // -------------------------------------------------
     // Encoding
-    // -------------------------------------------------
     thermometer_encoder #(
         .STAGES(STAGES)
     ) encoder (

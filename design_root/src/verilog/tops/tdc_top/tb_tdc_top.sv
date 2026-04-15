@@ -2,42 +2,32 @@
 
 module tb_tdc_top;
 
-    // -----------------------------------------
     // Parameters
-    // -----------------------------------------
     parameter STAGES = 8;
     parameter CLK_PERIOD = 10000; // 10ns
 
-    // -----------------------------------------
     // DUT signals
-    // -----------------------------------------
     reg clk_in;
     reg rst;
-    reg event_in;   // ✅ renamed (event is keyword)
+    reg event_in;  
 
     wire [$clog2(STAGES)-1:0] tdc_out;
 
-    // -----------------------------------------
     // DUT
-    // -----------------------------------------
     tdc_top #(
         .STAGES(STAGES)
     ) dut (
         .clk_in(clk_in),
         .rst(rst),
-        .event_in(event_in),   // ✅ fixed
+        .event_in(event_in), 
         .tdc_out(tdc_out)
     );
 
-    // -----------------------------------------
     // Clock generation
-    // -----------------------------------------
     initial clk_in = 0;
     always #(CLK_PERIOD/2) clk_in = ~clk_in;
 
-    // -----------------------------------------
     // Reset
-    // -----------------------------------------
     initial begin
         rst = 1;
         event_in = 0;
@@ -45,30 +35,22 @@ module tb_tdc_top;
         rst = 0;
     end
 
-    // -----------------------------------------
     // Wave dump
-    // -----------------------------------------
     initial begin
         $dumpfile("tdc.vcd");
-        $dumpvars(0, tb_tdc_top);  // ✅ fixed module name
+        $dumpvars(0, tb_tdc_top);
     end
 
-    // -----------------------------------------
-    // Self-check variables
-    // -----------------------------------------
     integer i;
     integer errors = 0;
 
     reg [$clog2(STAGES)-1:0] prev_code;
 
-    // -----------------------------------------
-    // Stimulus + Check
-    // -----------------------------------------
     initial begin
         wait(!rst);
 
         $display("\n========================================");
-        $display("🔍 Starting TDC sweep test");
+        $display("Starting TDC sweep test");
         $display("========================================");
 
         prev_code = 0;
@@ -93,7 +75,7 @@ module tb_tdc_top;
             // CHECK: Monotonic increase
             // ---------------------------------
             if (tdc_out < prev_code) begin
-                $display("❌ ERROR: Non-monotonic output!");
+                $display("ERROR: Non-monotonic output!");
                 $display("   prev = %0d, curr = %0d", prev_code, tdc_out);
                 errors++;
             end
@@ -107,9 +89,9 @@ module tb_tdc_top;
         $display("\n========================================");
 
         if (errors == 0) begin
-            $display("🎉 ALL TDC CHECKS PASSED");
+            $display("ALL TDC CHECKS PASSED");
         end else begin
-            $display("⚠️ TDC FAILED with %0d errors", errors);
+            $display("TDC FAILED with %0d errors", errors);
         end
 
         $display("========================================");
