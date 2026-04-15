@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict
 import sys
 from pathlib import Path
 
@@ -10,11 +9,27 @@ import streamlit as st
 
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-    from simulator.gui_common import DCDLS, CONTROLLERS, PHASE_DETECTORS, run_closed_loop_simulation
+    from simulator.gui_common import (
+        DCDLS,
+        CONTROLLERS,
+        DISPLAY_COLUMNS,
+        FIXED_INIT_CTRL,
+        PHASE_DETECTORS,
+        run_closed_loop_simulation,
+        trace_rows,
+        trace_summary_lines,
+    )
 else:
-    from .gui_common import DCDLS, CONTROLLERS, PHASE_DETECTORS, run_closed_loop_simulation
-
-DISPLAY_COLUMNS = ["cycle", "clk_in", "clk_out", "up", "down", "phase_error_ps"]
+    from .gui_common import (
+        DCDLS,
+        CONTROLLERS,
+        DISPLAY_COLUMNS,
+        FIXED_INIT_CTRL,
+        PHASE_DETECTORS,
+        run_closed_loop_simulation,
+        trace_rows,
+        trace_summary_lines,
+    )
 
 
 st.set_page_config(page_title="DLL Simulator", layout="wide")
@@ -65,27 +80,17 @@ trace = run_closed_loop_simulation(
     controller_name=controller_name,
     dcdl_name=dcdl_name,
     clk_period_ps=clk_period_ps,
-    init_ctrl=0,
+    init_ctrl=FIXED_INIT_CTRL,
     num_cycles=num_cycles,
     clk_in_start=clk_in_start,
     clk_out_start=clk_out_start,
 )
 
-first = trace[0]
-last = trace[-1]
+start_summary, end_summary = trace_summary_lines(trace)
 
 st.subheader("Closed-Loop Trace")
-st.dataframe(
-    [{key: asdict(entry)[key] for key in DISPLAY_COLUMNS} for entry in trace],
-    use_container_width=True,
-)
+st.dataframe(trace_rows(trace), use_container_width=True)
 
 st.subheader("Summary")
-st.write(
-    f"Start: clk_out={first.clk_out:.2f} ps, "
-    f"phase_err={first.phase_error_ps:.2f} ps"
-)
-st.write(
-    f"End: clk_out={last.clk_out:.2f} ps, "
-    f"phase_err={last.phase_error_ps:.2f} ps"
-)
+st.write(start_summary)
+st.write(end_summary)

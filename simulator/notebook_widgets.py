@@ -24,11 +24,25 @@ MODULE_ROOT = Path(__file__).resolve().parents[1]
 
 if __package__ in (None, ""):
     sys.path.insert(0, str(MODULE_ROOT))
-    from simulator.gui_common import DCDLS, CONTROLLERS, PHASE_DETECTORS, run_closed_loop_simulation
+    from simulator.gui_common import (
+        DCDLS,
+        CONTROLLERS,
+        FIXED_INIT_CTRL,
+        PHASE_DETECTORS,
+        run_closed_loop_simulation,
+        trace_rows,
+        trace_summary_lines,
+    )
 else:
-    from .gui_common import DCDLS, CONTROLLERS, PHASE_DETECTORS, run_closed_loop_simulation
-
-DISPLAY_COLUMNS = ["cycle", "clk_in", "clk_out", "up", "down", "phase_error_ps"]
+    from .gui_common import (
+        DCDLS,
+        CONTROLLERS,
+        FIXED_INIT_CTRL,
+        PHASE_DETECTORS,
+        run_closed_loop_simulation,
+        trace_rows,
+        trace_summary_lines,
+    )
 
 
 def _styled_caption(text: str):
@@ -44,7 +58,7 @@ def _styled_caption(text: str):
 
 
 def _render_table(trace):
-    rows = [{key: asdict(entry)[key] for key in DISPLAY_COLUMNS} for entry in trace]
+    rows = trace_rows(trace)
     if pd is not None:
         display(pd.DataFrame(rows))
     else:
@@ -171,13 +185,12 @@ def display_dll_simulator():
             controller_name=controller.value,
             dcdl_name=dcdl.value,
             clk_period_ps=float(clk_period_ps.value),
-            init_ctrl=0,
+            init_ctrl=FIXED_INIT_CTRL,
             num_cycles=int(num_cycles.value),
             clk_in_start=float(clk_in_start.value),
             clk_out_start=None if auto_clk_out_start.value else float(clk_out_start.value),
         )
-        first = trace[0]
-        last = trace[-1]
+        start_summary, end_summary = trace_summary_lines(trace)
 
         with trace_output:
             trace_output.clear_output(wait=True)
@@ -191,18 +204,8 @@ def display_dll_simulator():
             display(HTML("<h3>Closed-Loop Trace</h3>"))
             _render_table(trace)
             display(HTML("<h3>Summary</h3>"))
-            display(
-                HTML(
-                    f"<div>Start: clk_out={first.clk_out:.2f} ps, "
-                    f"phase_err={first.phase_error_ps:.2f} ps</div>"
-                )
-            )
-            display(
-                HTML(
-                    f"<div>End: clk_out={last.clk_out:.2f} ps, "
-                    f"phase_err={last.phase_error_ps:.2f} ps</div>"
-                )
-            )
+            display(HTML(f"<div>{start_summary}</div>"))
+            display(HTML(f"<div>{end_summary}</div>"))
 
         with plot_output:
             plot_output.clear_output(wait=True)
