@@ -1,41 +1,37 @@
-//**************************************************************************
-// Author: Alfi Misha Antony Selvin Raj
-// Description: 4-NAND Delay line (DCDL)
-//**************************************************************************
 (* dont_touch = "true" *)
-module nand_dcdl(
-    input logic A,
-    input logic [3:0] Q, 
+module nand_dcdl #(
+    parameter int N = 32
+)(
+    input  logic A,
+    input  logic [N-1:0] Q,
     output logic Y
 );
-    (* keep = "true" *) logic s3;
-    (* keep = "true" *) logic s2;
-    (* keep = "true" *) logic s1;
-    (* keep = "true" *) logic s0;
-    //delay cell 3 :)
-    nand_dcdl_cell cell3 (
-        .in1(1'b0),
-        .in0(A),
-        .ctl(Q[3]),
-        .out(s3)
-    );
-    nand_dcdl_cell cell2(
-        .in1(s3),
-        .in0(A),
-        .ctl(Q[2]),
-        .out(s2)
-    );
-    nand_dcdl_cell cell1 (
-        .in1(s2),
-        .in0(A),
-        .ctl(Q[1]),
-        .out(s1)
-    );
-    nand_dcdl_cell cell0 (
-        .in1(s1),
-        .in0(A),
-        .ctl(Q[0]),
-        .out(s0)
-    );
-    assign Y = s0;
+
+    (* keep = "true" *) logic [N-1:0] s;
+
+    genvar i;
+    generate
+        for (i = 0; i < N; i++) begin : dcdl_chain
+
+            if (i == N-1) begin
+                nand_dcdl_cell cell_instance0 (
+                    .in1(1'b0),
+                    .in0(A),
+                    .ctl(Q[i]),
+                    .out(s[i])
+                );
+            end else begin
+                nand_dcdl_cell cell_instance1 (
+                    .in1(s[i+1]),
+                    .in0(A),
+                    .ctl(Q[i]),
+                    .out(s[i])
+                );
+            end
+
+        end
+    endgenerate
+
+    assign Y = s[0];
+
 endmodule

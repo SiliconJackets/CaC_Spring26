@@ -3,7 +3,7 @@
 * ============================================================
 
 * --- Technology models ---
-.lib "/Users/phevos/.ciel/ciel/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/libs.tech/ngspice/sky130.lib.spice" tt
+.lib "__PDK_ROOT__/sky130A/libs.tech/ngspice/sky130.lib.spice" tt
 
 * --- Post-layout extracted netlist ---
 .include "../netlists/phase_detector_syn_pfd.spice"
