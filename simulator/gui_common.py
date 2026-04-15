@@ -134,7 +134,7 @@ DCDLS = {
         ),
         "ctrl_bits": 6,
         "default_init_ctrl": 50,
-        "default_clk_period_ps": 3013,
+        "default_clk_period_ps": 3013.87,
     },
     "InverterGlitchFreeDCDL": {
         "factory": lambda: BinaryTapDCDLAdapter(
@@ -145,9 +145,9 @@ DCDLS = {
                 nand_delay_ps=0,
             )
         ),
-        "ctrl_bits": 3,
-        "default_init_ctrl": 6,
-        "default_clk_period_ps": 3013,
+        "ctrl_bits": 6,
+        "default_init_ctrl": 50,
+        "default_clk_period_ps": 3013.87,
     },
 }
 
