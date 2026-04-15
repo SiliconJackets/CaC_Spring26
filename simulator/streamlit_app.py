@@ -14,6 +14,8 @@ if __package__ in (None, ""):
 else:
     from .gui_common import DCDLS, CONTROLLERS, PHASE_DETECTORS, run_closed_loop_simulation
 
+DISPLAY_COLUMNS = ["cycle", "clk_in", "clk_out", "up", "down", "phase_error_ps"]
+
 
 st.set_page_config(page_title="DLL Simulator", layout="wide")
 st.title("DLL Simulator Frontend")
@@ -30,22 +32,12 @@ with col3:
 
 defaults = DCDLS[dcdl_name]
 
-col4, col5 = st.columns(2)
-with col4:
-    clk_period_ps = st.number_input(
-        "Reference Clock Period (ps)",
-        min_value=1.0,
-        value=float(defaults["default_clk_period_ps"]),
-        step=10.0,
-    )
-with col5:
-    init_ctrl = st.number_input(
-        "Initial Controller Code",
-        min_value=0,
-        max_value=(1 << defaults["ctrl_bits"]) - 1,
-        value=int(min(defaults["default_init_ctrl"], (1 << defaults["ctrl_bits"]) - 1)),
-        step=1,
-    )
+clk_period_ps = st.number_input(
+    "Reference Clock Period (ps)",
+    min_value=1.0,
+    value=float(defaults["default_clk_period_ps"]),
+    step=10.0,
+)
 
 col6, col7 = st.columns(2)
 with col6:
@@ -73,7 +65,7 @@ trace = run_closed_loop_simulation(
     controller_name=controller_name,
     dcdl_name=dcdl_name,
     clk_period_ps=clk_period_ps,
-    init_ctrl=init_ctrl,
+    init_ctrl=0,
     num_cycles=num_cycles,
     clk_in_start=clk_in_start,
     clk_out_start=clk_out_start,
@@ -83,14 +75,17 @@ first = trace[0]
 last = trace[-1]
 
 st.subheader("Closed-Loop Trace")
-st.dataframe([asdict(entry) for entry in trace], use_container_width=True)
+st.dataframe(
+    [{key: asdict(entry)[key] for key in DISPLAY_COLUMNS} for entry in trace],
+    use_container_width=True,
+)
 
 st.subheader("Summary")
 st.write(
-    f"Start: ctrl_idx={first.ctrl_idx}, cell_delay={first.cell_delay_ps:.2f} ps, "
+    f"Start: clk_out={first.clk_out:.2f} ps, "
     f"phase_err={first.phase_error_ps:.2f} ps"
 )
 st.write(
-    f"End: ctrl_idx={last.ctrl_idx}, cell_delay={last.cell_delay_ps:.2f} ps, "
+    f"End: clk_out={last.clk_out:.2f} ps, "
     f"phase_err={last.phase_error_ps:.2f} ps"
 )

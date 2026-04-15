@@ -16,6 +16,8 @@ if __package__ in (None, ""):
 else:
     from .gui_common import DCDLS, CONTROLLERS, PHASE_DETECTORS, run_closed_loop_simulation
 
+DISPLAY_COLUMNS = ["cycle", "clk_in", "clk_out", "up", "down", "phase_error_ps"]
+
 
 def _parse_float(label: str, value: str, min_value: float | None = None) -> float:
     try:
@@ -27,22 +29,6 @@ def _parse_float(label: str, value: str, min_value: float | None = None) -> floa
         raise ValueError(f"{label} must be at least {min_value}.")
 
     return parsed
-
-
-def _parse_int(label: str, value: str, min_value: int | None = None, max_value: int | None = None) -> int:
-    try:
-        parsed = int(value)
-    except ValueError as exc:
-        raise ValueError(f"{label} must be an integer.") from exc
-
-    if min_value is not None and parsed < min_value:
-        raise ValueError(f"{label} must be at least {min_value}.")
-    if max_value is not None and parsed > max_value:
-        raise ValueError(f"{label} must be at most {max_value}.")
-
-    return parsed
-
-
 def render_streamlit_colab_app() -> None:
     """Render the simulator with Streamlit APIs supported by streamlit-jupyter."""
 
@@ -63,20 +49,12 @@ def render_streamlit_colab_app() -> None:
     dcdl_name = st.selectbox("", list(DCDLS.keys()), index=0, key="dcdl_name")
 
     defaults = DCDLS[dcdl_name]
-    ctrl_max = (1 << defaults["ctrl_bits"]) - 1
 
     st.write("Reference Clock Period (ps)")
     clk_period_ps_str = st.text_input(
         "",
         value=str(float(defaults["default_clk_period_ps"])),
         key="clk_period_ps",
-    )
-
-    st.write("Initial Controller Code")
-    init_ctrl_str = st.text_input(
-        "",
-        value=str(int(min(defaults["default_init_ctrl"], ctrl_max))),
-        key="init_ctrl",
     )
 
     st.write("clk_in Start (ps)")
@@ -87,17 +65,16 @@ def render_streamlit_colab_app() -> None:
     )
 
     use_auto_clk_out_start = st.checkbox("Auto clk_out Start", value=True)
+    st.write("clk_out Start (ps)")
+    clk_out_start_str = st.text_input(
+        "",
+        value=str(float(defaults["default_clk_period_ps"] - 100.0)),
+        key="clk_out_start",
+    )
     if use_auto_clk_out_start:
-        clk_out_start = None
-        st.caption("Using auto start: clk_out = clk_period - initial cell_delay")
-        clk_out_start_str = None
+        st.caption("Auto mode is enabled: manual clk_out Start is ignored.")
     else:
-        st.write("clk_out Start (ps)")
-        clk_out_start_str = st.text_input(
-            "",
-            value=str(float(defaults["default_clk_period_ps"] - 100.0)),
-            key="clk_out_start",
-        )
+        st.caption("Manual mode is enabled: the clk_out Start value above will be used.")
 
     cycle_options = list(range(5, 101))
     default_cycle_index = cycle_options.index(20)
@@ -106,7 +83,6 @@ def render_streamlit_colab_app() -> None:
 
     try:
         clk_period_ps = _parse_float("Reference Clock Period (ps)", clk_period_ps_str, min_value=1.0)
-        init_ctrl = _parse_int("Initial Controller Code", init_ctrl_str, min_value=0, max_value=ctrl_max)
         clk_in_start = _parse_float("clk_in Start (ps)", clk_in_start_str)
         if use_auto_clk_out_start:
             clk_out_start = None
@@ -121,7 +97,7 @@ def render_streamlit_colab_app() -> None:
         controller_name=controller_name,
         dcdl_name=dcdl_name,
         clk_period_ps=clk_period_ps,
-        init_ctrl=init_ctrl,
+        init_ctrl=0,
         num_cycles=num_cycles,
         clk_in_start=clk_in_start,
         clk_out_start=clk_out_start,
@@ -131,15 +107,15 @@ def render_streamlit_colab_app() -> None:
     last = trace[-1]
 
     st.subheader("Closed-Loop Trace")
-    st.dataframe(pd.DataFrame([asdict(entry) for entry in trace]))
+    st.dataframe(pd.DataFrame([{key: asdict(entry)[key] for key in DISPLAY_COLUMNS} for entry in trace]))
 
     st.subheader("Summary")
     st.write(
-        f"Start: ctrl_idx={first.ctrl_idx}, cell_delay={first.cell_delay_ps:.2f} ps, "
+        f"Start: clk_out={first.clk_out:.2f} ps, "
         f"phase_err={first.phase_error_ps:.2f} ps"
     )
     st.write(
-        f"End: ctrl_idx={last.ctrl_idx}, cell_delay={last.cell_delay_ps:.2f} ps, "
+        f"End: clk_out={last.clk_out:.2f} ps, "
         f"phase_err={last.phase_error_ps:.2f} ps"
     )
 

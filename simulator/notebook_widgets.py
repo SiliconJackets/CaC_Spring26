@@ -24,6 +24,8 @@ if __package__ in (None, ""):
 else:
     from .gui_common import DCDLS, CONTROLLERS, PHASE_DETECTORS, run_closed_loop_simulation
 
+DISPLAY_COLUMNS = ["cycle", "clk_in", "clk_out", "up", "down", "phase_error_ps"]
+
 
 def _styled_caption(text: str):
     if widgets is None:
@@ -38,7 +40,7 @@ def _styled_caption(text: str):
 
 
 def _render_table(trace):
-    rows = [asdict(entry) for entry in trace]
+    rows = [{key: asdict(entry)[key] for key in DISPLAY_COLUMNS} for entry in trace]
     if pd is not None:
         display(pd.DataFrame(rows))
     else:
@@ -76,22 +78,12 @@ def display_dll_simulator():
     )
 
     defaults = DCDLS[dcdl.value]
-    ctrl_max = (1 << defaults["ctrl_bits"]) - 1
 
     clk_period_ps = widgets.BoundedFloatText(
         value=float(defaults["default_clk_period_ps"]),
         min=1.0,
         step=10.0,
         description="Reference Clock Period (ps)",
-        style={"description_width": "initial"},
-        layout=widgets.Layout(width="100%"),
-    )
-    init_ctrl = widgets.BoundedIntText(
-        value=int(min(defaults["default_init_ctrl"], ctrl_max)),
-        min=0,
-        max=ctrl_max,
-        step=1,
-        description="Initial Controller Code",
         style={"description_width": "initial"},
         layout=widgets.Layout(width="100%"),
     )
@@ -132,9 +124,6 @@ def display_dll_simulator():
 
     def sync_dcdl_defaults(*_args) -> None:
         selected = DCDLS[dcdl.value]
-        max_ctrl = (1 << selected["ctrl_bits"]) - 1
-        init_ctrl.max = max_ctrl
-        init_ctrl.value = int(min(selected["default_init_ctrl"], max_ctrl))
         clk_period_ps.value = float(selected["default_clk_period_ps"])
         if auto_clk_out_start.value:
             clk_out_start.value = float(clk_period_ps.value - 100.0)
@@ -157,7 +146,7 @@ def display_dll_simulator():
             controller_name=controller.value,
             dcdl_name=dcdl.value,
             clk_period_ps=float(clk_period_ps.value),
-            init_ctrl=int(init_ctrl.value),
+            init_ctrl=0,
             num_cycles=int(num_cycles.value),
             clk_in_start=float(clk_in_start.value),
             clk_out_start=None if auto_clk_out_start.value else float(clk_out_start.value),
@@ -179,15 +168,13 @@ def display_dll_simulator():
             display(HTML("<h3>Summary</h3>"))
             display(
                 HTML(
-                    f"<div>Start: ctrl_idx={first.ctrl_idx}, "
-                    f"cell_delay={first.cell_delay_ps:.2f} ps, "
+                    f"<div>Start: clk_out={first.clk_out:.2f} ps, "
                     f"phase_err={first.phase_error_ps:.2f} ps</div>"
                 )
             )
             display(
                 HTML(
-                    f"<div>End: ctrl_idx={last.ctrl_idx}, "
-                    f"cell_delay={last.cell_delay_ps:.2f} ps, "
+                    f"<div>End: clk_out={last.clk_out:.2f} ps, "
                     f"phase_err={last.phase_error_ps:.2f} ps</div>"
                 )
             )
@@ -201,7 +188,6 @@ def display_dll_simulator():
         controller,
         dcdl,
         clk_period_ps,
-        init_ctrl,
         clk_in_start,
         auto_clk_out_start,
         clk_out_start,
@@ -225,7 +211,7 @@ def display_dll_simulator():
                 layout=widgets.Layout(width="100%"),
             ),
             widgets.HBox(
-                [clk_period_ps, init_ctrl],
+                [clk_period_ps],
                 layout=widgets.Layout(width="100%"),
             ),
             widgets.HBox(
