@@ -216,21 +216,16 @@ def display_dll_simulator():
         with results_output:
             results_output.clear_output(wait=True)
             display(
-                HTML(
-                    "<div>clk_in -> phase detector -> controller -> DCDL, "
-                    "with clk_out fed back into the phase detector</div>"
-                )
-            )
-            display(HTML("<div>phase_error_ps = clk_out - clk_in</div>"))
-            display(HTML("<h3>Closed-Loop Trace</h3>"))
-            _render_table(trace)
+            display(HTML("<h3>Phase Error Plot</h3>"))
+            display(HTML("<div style='font-size:1.05rem; margin-bottom:8px;'>phase_error_ps = clk_out - clk_in</div>"))
+            _render_phase_error_plot(trace)
             display(HTML("<h3>Clock Plot</h3>"))
             _render_clk_plot(trace)
-            display(HTML("<h3>Phase Error Plot</h3>"))
-            _render_phase_error_plot(trace)
+            display(HTML("<h3>DLL Data Table</h3>"))
+            _render_table(trace)
             display(HTML("<h3>Summary</h3>"))
-            display(HTML(f"<div>{start_summary}</div>"))
-            display(HTML(f"<div>{end_summary}</div>"))
+            display(HTML(f"<div style='font-size:1.15rem; margin-bottom:6px;'>{start_summary}</div>"))
+            display(HTML(f"<div style='font-size:1.15rem;'>{end_summary}</div>"))
 
     dcdl.observe(sync_dcdl_defaults, names="value")
     auto_clk_out_start.observe(sync_clk_out_visibility, names="value")
@@ -242,11 +237,6 @@ def display_dll_simulator():
     ui = widgets.VBox(
         [
             widgets.HTML("<h2>DLL Simulator Frontend</h2>"),
-            _styled_caption(
-                "clk_in -> phase detector -> controller -> DCDL, with clk_out fed back "
-                "into the phase detector"
-            ),
-            _styled_caption("phase_error_ps = clk_out - clk_in"),
             widgets.HBox(
                 [phase_detector, controller, dcdl],
                 layout=widgets.Layout(width="100%"),
