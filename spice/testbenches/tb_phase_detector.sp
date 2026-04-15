@@ -3,10 +3,10 @@
 * ============================================================
 
 * --- Technology models ---
-.lib "/Users/phevos/.ciel/ciel/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/libs.tech/ngspice/sky130.lib.spice" tt
+.lib "__PDK_ROOT__/sky130A/libs.tech/ngspice/sky130.lib.spice" tt
 
 * --- Post-layout extracted netlist ---
-.include "../netlists/phase_detector_syn_pfd.spice"
+.include "__NETLIST_PATH__"
 
 
 * ============================================================
@@ -67,7 +67,7 @@ Cload_down DOWN VGND 5f
 .control
 run
 
-wrdata ../results/phase_detector_syn_pfd_clkout_leads.csv v(CLK_IN) v(CLK_OUT) v(RST) v(UP) v(DOWN)
+wrdata __RESULTS_DIR__/__RESULT_NAME__ v(CLK_IN) v(CLK_OUT) v(RST) v(UP) v(DOWN)
 
 quit
 .endc
