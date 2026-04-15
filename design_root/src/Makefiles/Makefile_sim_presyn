@@ -1,4 +1,4 @@
-TOPLEVEL=zdb_top_with_ro
+TOPLEVEL=zdb_top_behav
 TESTNAME=default
 SRC_VERILOG=../../src/verilog/
 SRC_FOLDER= $(SRC_VERILOG)
@@ -7,12 +7,12 @@ SDF=0
 
 #Build up a list of verilog define statements to be used by vcs
 
-VERILOG_DEFINES:= 
+VERILOG_DEFINES :=
 ifeq ($(SIM), 1)
-		VERILOG_DEFINES := $(VERILOG_DEFINES)+SIM=1
+    VERILOG_DEFINES += SIM
 endif
 ifeq ($(SDF), 1)
-		VERILOG_DEFINES := $(VERILOG_DEFINES)+SDF=1
+    VERILOG_DEFINES += SDF
 endif
 
 
@@ -40,13 +40,21 @@ link_src:
 		# simv +vpdfile+./$(TOPLEVEL).vpd
 
 
-vcs:$(TOPLEVEL).include
+# vcs:$(TOPLEVEL).include
+# 	vcs -f $(TOPLEVEL).include +v2k -R +lint=all -sverilog -full64 \
+# 		-timescale=1ns/10ps -debug_access+all -debug_region+cell+encrypt \
+# 		-debug_access -l $(TOPLEVEL).log +define+$(VERILOG_DEFINES) +testname=$(TESTNAME) \
+# 		-lca -kdb
+# 		# simv 
+
+vcs: $(TOPLEVEL).include
 	vcs -f $(TOPLEVEL).include +v2k -R +lint=all -sverilog -full64 \
 		-timescale=1ns/10ps -debug_access+all -debug_region+cell+encrypt \
-		-debug_access -l $(TOPLEVEL).log +define+$(VERILOG_DEFINES) +testname=$(TESTNAME) \
+		-debug_access -l $(TOPLEVEL).log \
+		$(addprefix +define+ccd,$(VERILOG_DEFINES)) \
+		$(EXTRA_DEFINES) \
+		+testname=$(TESTNAME) \
 		-lca -kdb
-		# simv 
-
 
 wipe:
 	rm -rf $(TOPLEVEL).include

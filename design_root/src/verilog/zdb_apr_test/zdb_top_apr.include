@@ -1,0 +1,7 @@
+./tb_zdb_top_apr.sv
+./zdb_top_apr.sv
+
+./zdb_phase_detector.sv
+./zdb_dcdl_behav.sv
+./zdb_controller.sv
+
