@@ -8,9 +8,7 @@ from pathlib import Path
 import importlib.util
 
 from IPython.display import HTML, display
-from bokeh.io import output_notebook
-from bokeh.embed import file_html
-from bokeh.resources import CDN
+from bokeh.io import output_notebook, show
 
 try:
     import pandas as pd
@@ -100,8 +98,7 @@ def _render_clk_plot(trace) -> None:
             label=label,
         )
     _style_legend(figure)
-    html = file_html(figure, CDN, "clk_in vs clk_out")
-    display(HTML(html))
+    show(figure)
 
 
 def display_dll_simulator():
@@ -177,7 +174,8 @@ def display_dll_simulator():
         layout=widgets.Layout(width="100%"),
     )
 
-    output = widgets.Output()
+    trace_output = widgets.Output()
+    plot_output = widgets.Output()
 
     def sync_dcdl_defaults(*_args) -> None:
         selected = DCDLS[dcdl.value]
@@ -211,8 +209,8 @@ def display_dll_simulator():
         first = trace[0]
         last = trace[-1]
 
-        with output:
-            output.clear_output(wait=True)
+        with trace_output:
+            trace_output.clear_output(wait=True)
             display(
                 HTML(
                     "<div>clk_in -> phase detector -> controller -> DCDL, "
@@ -222,8 +220,6 @@ def display_dll_simulator():
             display(HTML("<div>phase_error_ps = clk_out - clk_in</div>"))
             display(HTML("<h3>Closed-Loop Trace</h3>"))
             _render_table(trace)
-            display(HTML("<h3>Clock Plot</h3>"))
-            _render_clk_plot(trace)
             display(HTML("<h3>Summary</h3>"))
             display(
                 HTML(
@@ -237,6 +233,11 @@ def display_dll_simulator():
                     f"phase_err={last.phase_error_ps:.2f} ps</div>"
                 )
             )
+
+        with plot_output:
+            plot_output.clear_output(wait=True)
+            display(HTML("<h3>Clock Plot</h3>"))
+            _render_clk_plot(trace)
 
     dcdl.observe(sync_dcdl_defaults, names="value")
     auto_clk_out_start.observe(sync_clk_out_visibility, names="value")
@@ -281,7 +282,8 @@ def display_dll_simulator():
                 layout=widgets.Layout(width="100%"),
             ),
             num_cycles,
-            output,
+            trace_output,
+            plot_output,
         ]
     )
     return ui
