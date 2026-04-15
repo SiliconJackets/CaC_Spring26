@@ -1,14 +1,8 @@
-/*
+//**************************************************************************
 Module      : dll_controller_acquire_track
 Author      : Mythri Muralikannan
 Description : Acquire/track DLL controller
-
-Function:
-Uses two operating modes:
-- Acquire mode for fast lock
-- Track mode for fine steady-state adjustment
-*/
-
+//**************************************************************************
 
 `timescale 1ps/1ps
 

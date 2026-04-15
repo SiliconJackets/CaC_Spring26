@@ -1,23 +1,10 @@
 `timescale 1ps/1ps
 
-/*
-Module      : single_ff_phase_detector
-Author      : Mythri Muralikannan
-Description : Single-flip-flop bang-bang phase detector
-
-Function:
-Samples the feedback clock (clk_out) on the rising edge of the
-reference clock (clk_in) and generates a 1-bit phase decision.
-
-Output meaning:
-up   = 1 -> reference clock leads feedback clock -> speed up
-down = 1 -> feedback clock leads reference clock -> slow down
-
-Operation:
-- On each rising edge of clk_in, clk_out is sampled
-- If clk_out is low, feedback has not risen yet -> up = 1
-- If clk_out is high, feedback is assumed to be ahead -> down = 1
-*/
+//**************************************************************************
+// Module      : single_ff_phase_detector
+// Author      : Mythri Muralikannan
+// Description : Single-flip-flop bang-bang phase detector
+//**************************************************************************
 
 module phase_detector (
     input  wire clk_in,    // Reference input clock

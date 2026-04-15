@@ -1,14 +1,10 @@
 `timescale 1ps/1ps
 
-/*
-Module      : dll_controller_updown_filtered
-Author      : Mythri Muralikannan
-Description : Filtered up/down DLL controller
-
-Function:
-Updates the delay-control word only after repeated UP or DOWN
-requests over multiple cycles.
-*/
+//**************************************************************************
+// Module      : dll_controller_updown_filtered
+// Author      : Mythri Muralikannan
+// Description : Filtered up/down DLL controller
+//**************************************************************************
 
 module controller #(
     parameter integer CTRL_BITS   = 6,

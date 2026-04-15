@@ -1,18 +1,10 @@
 `timescale 1ps/1ps
 
-/*
-Module      : phase_frequency_detector
-Author      : Mythri Muralikannan
-Description : Two-flip-flop phase-frequency detector (PFD)
-
-Function:
-Compares the rising edges of the reference clock (clk_in) and the
-feedback clock (clk_out) and generates UP/DOWN control signals.
-
-Output meaning:
-up = 1 -> reference clock leads feedback clock -> speed up loop
-down = 1 -> feedback clock leads reference clock -> slow down loop
-*/
+//**************************************************************************
+// Module      : phase_frequency_detector
+// Author      : Mythri Muralikannan
+// Description : Two-flip-flop phase-frequency detector (PFD)
+//**************************************************************************
 
 module phase_detector (
     input  wire clk_in,     // Reference clock

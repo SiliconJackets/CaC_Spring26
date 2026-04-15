@@ -1,9 +1,9 @@
 `timescale 1ps/1ps
 
-/*
- Module      : tb_zdb_top
- Description : Functional testbench for zero-delay buffer top-level
-*/
+//**************************************************************************
+// Module      : tb_zdb_top
+// Description : Functional testbench for zero-delay buffer top-level
+//**************************************************************************
 
 module tb_zdb_top;
 

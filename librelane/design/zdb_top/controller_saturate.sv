@@ -1,22 +1,10 @@
 `timescale 1ps/1ps
 
-/*
-Module      : controller
-Author      : Mythri Muralikannan
-Description : Saturating up/down DLL controller
-
-Function:
-Updates the delay-control word based on the phase detector outputs.
-
-Inputs:
-clk_in : Reference/control clock
-rst    : Asynchronous active-high reset
-up     : Increment control request
-down   : Decrement control request
-
-Output:
-ctrl   : Delay control word
-*/
+//**************************************************************************
+// Module      : controller
+// Author      : Mythri Muralikannan
+// Description : Saturating up/down DLL controller
+//**************************************************************************
 
 module controller #(
     parameter integer CTRL_BITS = 6,

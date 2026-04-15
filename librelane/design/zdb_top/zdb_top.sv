@@ -1,34 +1,10 @@
 `timescale 1ps/1ps
 
-/*
- Module      : zdb_top
- Author      : Mythri Muralikannan
- Description : Zero-Delay Buffer (ZDB) top-level wrapper
-
- Function:
-   Connects the phase detector, digital controller, and delay line
-   to form a digital DLL / zero-delay buffer loop.
-
- Implementation notes:
-   - The phase detector compares clk_in and clk_out
-   - The controller updates the digital control word ctrl
-   - Since nand_dcdl_top expects shift_left / shift_right instead of
-     a multi-bit control word, a small adapter converts ctrl changes
-     into one-cycle shift pulses
-   - The distribution block (DIST) is modeled here as a pass-through
-
- Inputs:
-   clk_in : Reference input clock
-   rst    : Asynchronous active-high reset
-
- Outputs:
-   clk_out        : Buffered / delayed output clock
-   ctrl_dbg       : Controller output word (for debug/observation)
-   up_dbg         : Phase detector UP output
-   down_dbg       : Phase detector DOWN output
-   shift_left_dbg : Shift-left pulse into DCDL control
-   shift_right_dbg: Shift-right pulse into DCDL control
-*/
+//**************************************************************************
+// Module      : zdb_top
+// Author      : Mythri Muralikannan
+// Description : Zero-Delay Buffer (ZDB) top-level wrapper
+//**************************************************************************
 
 module zdb_top #(
     parameter integer CTRL_BITS = 6,

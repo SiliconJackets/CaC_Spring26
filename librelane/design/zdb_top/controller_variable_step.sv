@@ -1,19 +1,8 @@
-/*
-Module      : dll_controller_varstep
-Author      : Mythri Muralikannan
-Description : Variable-step DLL controller
-
-Function:
-Updates the delay-control word using larger steps when repeated
-phase error requests indicate the loop is far from lock.
-
-Operation:
-- On reset, ctrl is initialized to INIT_CTRL
-- Consecutive requests in the same direction increase confidence
-- Small phase corrections use 1-LSB steps
-- Persistent phase corrections use medium or large step sizes
-- ctrl saturates at the valid minimum and maximum values
-*/
+//**************************************************************************
+// Module      : dll_controller_varstep
+// Author      : Mythri Muralikannan
+// Description : Variable-step DLL controller
+//**************************************************************************
 
 
 `timescale 1ps/1ps
