@@ -1,13 +1,25 @@
+#!/usr/bin/env python3
 import numpy as np
 import matplotlib.pyplot as plt
 from vcdvcd import VCDVCD
 import imageio
+import argparse
 
-VCD_FILE = "zdb.vcd"
-CLK_PERIOD = 4.0   # ns (match your TB)
-DELAY_PS = 700     # ps
+# ================= ARGPARSE =================
+parser = argparse.ArgumentParser()
+parser.add_argument("--clk", type=float, required=True)
+parser.add_argument("--delay", type=int, required=True)
+args = parser.parse_args()
+
+CLK_PERIOD = args.clk
+DELAY_PS = args.delay
+
+# ================= DERIVED =================
+delay_ns = DELAY_PS * 1e-3
+tol = min(1.5 * delay_ns, 0.25 * CLK_PERIOD)
 
 # ================= LOAD VCD =================
+VCD_FILE = "zdb.vcd"
 vcd = VCDVCD(VCD_FILE, signals=[])
 
 def get_signal(name):
@@ -36,35 +48,42 @@ print("\n====================================")
 print("🧠 DLL LOCKING EXPLANATION")
 print("====================================\n")
 
+print(f"Clock period = {CLK_PERIOD:.3f} ns")
+print(f"Delay per stage = {delay_ns:.3f} ns\n")
+
 print("1. WHAT IS HAPPENING?")
-print("- You have a reference clock (clk_in)")
-print("- The DLL creates a delayed version (clk_out)")
-print("- The goal: align clk_out edges with clk_in edges\n")
+print("- clk_in is the reference")
+print("- clk_out is delayed")
+print("- DLL adjusts delay until edges align\n")
 
-print("2. HOW DOES IT DO THIS?")
-print("- A delay line adds delay in discrete steps")
-print(f"- Each step = {DELAY_PS} ps")
-print("- A controller adjusts how many steps are used (ctrl)\n")
+print("2. QUANTIZATION LIMIT")
+min_err = delay_ns / 2
+print(f"- Minimum possible error ≈ ±{min_err:.3f} ns")
+print("- Perfect alignment is impossible due to discrete steps\n")
 
-print("3. TOTAL DELAY:")
-print("   total_delay = ctrl × delay_per_stage")
-print(f"   Example: ctrl=32 → delay ≈ {32 * DELAY_PS / 1000:.2f} ns\n")
+print("3. TOLERANCE SELECTION")
 
-print("4. WHAT IS PHASE ERROR?")
-print("   phase_error = clk_out_edge - clk_in_edge")
-print("- If positive → clk_out is LATE")
-print("- If negative → clk_out is EARLY\n")
+tol_delay = 1.5 * delay_ns
+tol_clk = 0.25 * CLK_PERIOD
 
-print("5. LOCK CONDITION:")
-tol = CLK_PERIOD * 0.1
-print(f"- We consider it LOCKED when |phase_error| < {tol:.3f} ns")
-print("- And this stays stable for many cycles\n")
+print(f"- Hardware limit (1.5×delay) = {tol_delay:.3f} ns")
+print(f"- Clock limit (0.25×clk)     = {tol_clk:.3f} ns")
 
-print("6. WHAT YOU SHOULD SEE:")
-print("- Initially: large phase error")
-print("- Controller adjusts delay")
-print("- Phase error shrinks toward 0")
-print("- Eventually stays within tolerance → LOCK\n")
+print(f"\n👉 Final tolerance = {tol:.3f} ns")
+
+if tol == tol_delay:
+    print("→ Limited by delay resolution")
+else:
+    print("→ Limited by clock requirement")
+
+print("\n4. LOCK CONDITION")
+print(f"- LOCK when |phase_error| < {tol:.3f} ns\n")
+
+print("5. EXPECTED BEHAVIOR")
+print("- Phase error starts large")
+print("- Decreases step-by-step")
+print("- Cannot reach zero")
+print("- Settles inside tolerance → LOCK\n")
 
 print("====================================\n")
 
@@ -81,10 +100,19 @@ plt.legend()
 
 plt.subplot(2,1,2)
 plt.title("Phase Error Convergence")
-plt.plot(phase_t, phase_v)
+plt.plot(phase_t, phase_v, label="phase_error")
+
+# zero line
 plt.axhline(0, linestyle='--')
+
+# tolerance
 plt.axhline(tol, linestyle=':', color='green', label="lock tolerance")
 plt.axhline(-tol, linestyle=':', color='green')
+
+# quantization limit
+plt.axhline(delay_ns/2, linestyle='--', color='orange', label="quantization limit")
+plt.axhline(-delay_ns/2, linestyle='--', color='orange')
+
 plt.xlabel("Time (ns)")
 plt.ylabel("Phase Error (ns)")
 plt.legend()
@@ -108,7 +136,9 @@ for i in range(window, len(phase_t), 10):
     plt.axhline(tol, linestyle=':', color='green')
     plt.axhline(-tol, linestyle=':', color='green')
 
-    # Highlight "locked region"
+    plt.axhline(delay_ns/2, linestyle='--', color='orange')
+    plt.axhline(-delay_ns/2, linestyle='--', color='orange')
+
     if i > 100 and np.all(np.abs(phase_v[i-20:i]) < tol):
         plt.text(phase_t[i-1], 0, "LOCKED", color="green")
 

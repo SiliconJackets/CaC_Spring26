@@ -103,7 +103,8 @@ module tb_zdb;
     integer stable_count = 0;
     integer print_div    = 0;
     real delay_ns = DELAY_PS * 1e-3;
-    real tol = 1.5 * (delay_ns);  // 1.5 × delay step 
+    real tol = (1.5 * delay_ns < CLK_PERIOD * 0.25) ? 1.5 * delay_ns :
+CLK_PERIOD * 0.25;
 
     always @(posedge clk_in) begin
         print_div = print_div + 1;
