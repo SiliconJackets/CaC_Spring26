@@ -157,9 +157,13 @@ def display_dll_simulator():
         style={"description_width": "initial"},
         layout=widgets.Layout(width="100%"),
     )
+    run_button = widgets.Button(
+        description="Run Simulation",
+        button_style="primary",
+        layout=widgets.Layout(width="200px"),
+    )
 
-    trace_output = widgets.Output()
-    plot_output = widgets.Output()
+    results_output = widgets.Output()
 
     def sync_dcdl_defaults(*_args) -> None:
         selected = DCDLS[dcdl.value]
@@ -192,8 +196,8 @@ def display_dll_simulator():
         )
         start_summary, end_summary = trace_summary_lines(trace)
 
-        with trace_output:
-            trace_output.clear_output(wait=True)
+        with results_output:
+            results_output.clear_output(wait=True)
             display(
                 HTML(
                     "<div>clk_in -> phase detector -> controller -> DCDL, "
@@ -203,33 +207,18 @@ def display_dll_simulator():
             display(HTML("<div>phase_error_ps = clk_out - clk_in</div>"))
             display(HTML("<h3>Closed-Loop Trace</h3>"))
             _render_table(trace)
+            display(HTML("<h3>Clock Plot</h3>"))
+            _render_clk_plot(trace)
             display(HTML("<h3>Summary</h3>"))
             display(HTML(f"<div>{start_summary}</div>"))
             display(HTML(f"<div>{end_summary}</div>"))
 
-        with plot_output:
-            plot_output.clear_output(wait=True)
-            display(HTML("<h3>Clock Plot</h3>"))
-            _render_clk_plot(trace)
-
     dcdl.observe(sync_dcdl_defaults, names="value")
     auto_clk_out_start.observe(sync_clk_out_visibility, names="value")
     clk_period_ps.observe(sync_clk_out_default, names="value")
-
-    for control in (
-        phase_detector,
-        controller,
-        dcdl,
-        clk_period_ps,
-        clk_in_start,
-        auto_clk_out_start,
-        clk_out_start,
-        num_cycles,
-    ):
-        control.observe(render, names="value")
+    run_button.on_click(render)
 
     sync_clk_out_visibility()
-    render()
 
     ui = widgets.VBox(
         [
@@ -255,8 +244,8 @@ def display_dll_simulator():
                 layout=widgets.Layout(width="100%"),
             ),
             num_cycles,
-            trace_output,
-            plot_output,
+            run_button,
+            results_output,
         ]
     )
     return ui
