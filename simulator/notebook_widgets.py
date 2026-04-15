@@ -239,5 +239,4 @@ def display_dll_simulator():
             output,
         ]
     )
-    display(ui)
     return ui
