@@ -1,3 +1,0 @@
-Command Line: /tools/software/synopsys/vcs/latest/linux64/bin/elabcom -simflow -KDBRESOLVER -simvdaidir simv.daidir -saveLevel -enable_vfsXCmp -enable_smXCmp -ssz -ssv -ssy -q -logdir simv.daidir/kdbresolverLog -elabcom_partial_load
-uname(Linux ece-linlabsrv01 4.18.0-553.111.1.el8_10.x86_64 #1 SMP Sat Feb 28 00:49:56 EST 2026 x86_64)
-au time 0.085549 0.010116 0.029103 delta 103063552 103063552 total 379060224 379060224

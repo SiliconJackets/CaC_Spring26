@@ -1,4 +1,0 @@
-./inverter.sv
-./nand2.sv
-./inv_dcdl_glitch_free.sv
-./tb_inv_dcdl_glitch_free_viz.sv

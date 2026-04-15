@@ -1,1 +1,0 @@
-../../src/verilog/parts/dcdl/inv_dcdl_glitch_free/tb_inv_dcdl_glitch_free.sv

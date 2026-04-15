@@ -1,4 +1,0 @@
-./inverter.sv
-./mux.sv
-./inv_dcdl.sv
-./tb_inv_dcdl_viz.sv
