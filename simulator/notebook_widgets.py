@@ -11,11 +11,6 @@ from IPython.display import HTML, Image, display
 import matplotlib.pyplot as plt
 
 try:
-    import pandas as pd
-except ImportError:  # pragma: no cover - optional dependency in notebooks
-    pd = None
-
-try:
     import ipywidgets as widgets
 except ImportError:  # pragma: no cover - optional dependency in notebooks
     widgets = None
@@ -30,7 +25,6 @@ if __package__ in (None, ""):
         PHASE_DETECTORS,
         default_init_ctrl_for_dcdl,
         run_closed_loop_simulation,
-        trace_rows,
         trace_summary_lines,
     )
 else:
@@ -40,7 +34,6 @@ else:
         PHASE_DETECTORS,
         default_init_ctrl_for_dcdl,
         run_closed_loop_simulation,
-        trace_rows,
         trace_summary_lines,
     )
 
@@ -55,14 +48,6 @@ def _styled_caption(text: str):
             "</div>"
         )
     )
-
-
-def _render_table(trace):
-    rows = trace_rows(trace)
-    if pd is not None:
-        display(pd.DataFrame(rows))
-    else:
-        display(rows)
 
 
 def _render_clk_plot(trace) -> None:
@@ -220,8 +205,6 @@ def display_dll_simulator():
             _render_phase_error_plot(trace)
             display(HTML("<h3>Clock Plot</h3>"))
             _render_clk_plot(trace)
-            display(HTML("<h3>DLL Data Table</h3>"))
-            _render_table(trace)
             display(HTML("<h3>Summary</h3>"))
             display(HTML(f"<div style='font-size:1.15rem; margin-bottom:6px;'>{start_summary}</div>"))
             display(HTML(f"<div style='font-size:1.15rem;'>{end_summary}</div>"))
