@@ -2,18 +2,14 @@
 
 module tb_multiphase_top;
 
-    // -------------------------------------------------
     // Parameters
-    // -------------------------------------------------
     parameter CTRL_BITS = 6;
     parameter STAGES    = 8;
 
     parameter LOCK_STABLE_CYCLES = 50;
     parameter TIMEOUT_CYCLES     = 2000;
 
-    // -------------------------------------------------
     // DUT signals
-    // -------------------------------------------------
     reg clk_in;
     reg rst;
 
@@ -26,9 +22,7 @@ module tb_multiphase_top;
     wire shift_left_dbg;
     wire shift_right_dbg;
 
-    // -------------------------------------------------
     // Instantiate DUT
-    // -------------------------------------------------
     multiphase_top #(
         .CTRL_BITS (CTRL_BITS),
         .INIT_CTRL (32),
@@ -48,32 +42,24 @@ module tb_multiphase_top;
         .shift_right_dbg(shift_right_dbg)
     );
 
-    // -------------------------------------------------
     // Clock generation (10ns period)
-    // -------------------------------------------------
     initial clk_in = 0;
     always #5000 clk_in = ~clk_in;
 
-    // -------------------------------------------------
     // Reset
-    // -------------------------------------------------
     initial begin
         rst = 1;
         #20000;
         rst = 0;
     end
 
-    // -------------------------------------------------
     // Wave dump
-    // -------------------------------------------------
     initial begin
         $dumpfile("dll_selfcheck.vcd");
         $dumpvars(0, tb_multiphase_top);
     end
 
-    // -------------------------------------------------
     // Lock detection logic
-    // -------------------------------------------------
     integer cycle_count = 0;
     integer stable_count = 0;
 
@@ -107,7 +93,7 @@ module tb_multiphase_top;
             if (!locked && stable_count > LOCK_STABLE_CYCLES) begin
                 locked <= 1;
                 $display("========================================");
-                $display("✅ DLL LOCKED at time %0t ps", $time);
+                $display(" DLL LOCKED at time %0t ps", $time);
                 $display("   Cycles to lock: %0d", cycle_count);
                 $display("   Final ctrl: %0d", ctrl_dbg);
                 $display("========================================");
@@ -117,7 +103,7 @@ module tb_multiphase_top;
             if (!locked && cycle_count > TIMEOUT_CYCLES) begin
                 fail <= 1;
                 $display("========================================");
-                $display("❌ DLL FAILED TO LOCK");
+                $display(" DLL FAILED TO LOCK");
                 $display("   Timeout cycles: %0d", TIMEOUT_CYCLES);
                 $display("   Last ctrl: %0d", ctrl_dbg);
                 $display("========================================");
@@ -126,9 +112,7 @@ module tb_multiphase_top;
         end
     end
 
-    // -------------------------------------------------
     // Phase sanity check
-    // -------------------------------------------------
     integer toggle_count [0:STAGES-1];
 
     integer i;
@@ -150,32 +134,30 @@ module tb_multiphase_top;
         end
         prev_phases = clk_phases;  // blocking is correct here
     end
-    // -------------------------------------------------
-    // Final checks
-    // -------------------------------------------------
+
     initial begin
         wait(locked || fail);
 
         #10000; // let it run a bit after lock
 
         if (locked) begin
-            $display("\n🔍 Phase Activity Check:");
+            $display("\n Phase Activity Check:");
 
             for (i = 0; i < STAGES; i = i + 1) begin
                 if (toggle_count[i] == 0) begin
-                    $display("❌ Phase %0d is NOT toggling!", i);
+                    $display("Phase %0d is NOT toggling!", i);
                     fail = 1;
                 end
                 else begin
-                    $display("✅ Phase %0d toggles (%0d times)", i, toggle_count[i]);
+                    $display("Phase %0d toggles (%0d times)", i, toggle_count[i]);
                 end
             end
 
             if (!fail) begin
-                $display("\n🎉 ALL CHECKS PASSED");
+                $display("\nALL CHECKS PASSED");
             end
             else begin
-                $display("\n⚠️ SOME CHECKS FAILED");
+                $display("\nSOME CHECKS FAILED");
             end
         end
 
