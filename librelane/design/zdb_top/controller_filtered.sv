@@ -1,27 +1,13 @@
 `timescale 1ps/1ps
 
 /*
-|=======================================================================
-| Module      : dll_controller_updown_filtered
-| Author      : Mythri Muralikannan
-| Description : Filtered up/down DLL controller
-|
-| Function:
-|   Updates the delay-control word only after repeated UP or DOWN
-|   requests over multiple cycles.
-|
-| Operation:
-|   - On reset, ctrl is initialized to INIT_CTRL
-|   - Consecutive UP requests are counted
-|   - Consecutive DOWN requests are counted
-|   - ctrl changes only when the selected filter threshold is reached
-|   - Mixed or idle requests clear the filter counters
-|
-| Notes:
-|   - Fully synthesizable
-|   - Reduces control chatter and jitter near lock
-|   - Slower than a direct up/down controller, but more stable
-|=======================================================================
+Module      : dll_controller_updown_filtered
+Author      : Mythri Muralikannan
+Description : Filtered up/down DLL controller
+
+Function:
+Updates the delay-control word only after repeated UP or DOWN
+requests over multiple cycles.
 */
 
 module controller #(
