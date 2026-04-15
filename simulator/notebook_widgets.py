@@ -117,9 +117,8 @@ def display_dll_simulator():
 
     defaults = DCDLS[dcdl.value]
 
-    clk_period_ps = widgets.BoundedFloatText(
+    clk_period_ps = widgets.FloatText(
         value=float(defaults["default_clk_period_ps"]),
-        min=1.0,
         step=10.0,
         description="Reference Clock Period (ps)",
         style={"description_width": "initial"},
