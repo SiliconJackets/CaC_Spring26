@@ -85,6 +85,24 @@ def _render_clk_plot(trace) -> None:
     plt.close(fig)
 
 
+def _render_phase_error_plot(trace) -> None:
+    cycles = [entry.cycle for entry in trace]
+    phase_error_values = [entry.phase_error_ps for entry in trace]
+    fig, ax = plt.subplots(figsize=(10, 4))
+    ax.plot(cycles, phase_error_values, marker="o", linewidth=2, color="#d62728")
+    ax.axhline(0.0, color="black", linewidth=1, linestyle="--", alpha=0.7)
+    ax.set_title("phase_error_ps over time")
+    ax.set_xlabel("Cycle")
+    ax.set_ylabel("phase_error_ps")
+    ax.grid(True, alpha=0.3)
+    fig.tight_layout()
+    buffer = BytesIO()
+    fig.savefig(buffer, format="png", dpi=150, bbox_inches="tight")
+    buffer.seek(0)
+    display(Image(data=buffer.getvalue()))
+    plt.close(fig)
+
+
 def display_dll_simulator():
     """Render the simulator controls and outputs inside a notebook cell."""
     if widgets is None:
@@ -117,9 +135,8 @@ def display_dll_simulator():
 
     defaults = DCDLS[dcdl.value]
 
-    clk_period_ps = widgets.BoundedFloatText(
+    clk_period_ps = widgets.FloatText(
         value=float(defaults["default_clk_period_ps"]),
-        min=1.0,
         step=10.0,
         description="Reference Clock Period (ps)",
         style={"description_width": "initial"},
@@ -209,6 +226,8 @@ def display_dll_simulator():
             _render_table(trace)
             display(HTML("<h3>Clock Plot</h3>"))
             _render_clk_plot(trace)
+            display(HTML("<h3>Phase Error Plot</h3>"))
+            _render_phase_error_plot(trace)
             display(HTML("<h3>Summary</h3>"))
             display(HTML(f"<div>{start_summary}</div>"))
             display(HTML(f"<div>{end_summary}</div>"))
