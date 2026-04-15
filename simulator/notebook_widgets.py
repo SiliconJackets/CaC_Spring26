@@ -9,6 +9,8 @@ import importlib.util
 
 from IPython.display import HTML, display
 from bokeh.io import output_notebook
+from bokeh.embed import file_html
+from bokeh.resources import CDN
 
 try:
     import pandas as pd
@@ -36,7 +38,10 @@ if _plot_framework_spec is None or _plot_framework_spec.loader is None:
     raise ImportError("Could not load plot_framework.py from the scripts directory.")
 _plot_framework = importlib.util.module_from_spec(_plot_framework_spec)
 _plot_framework_spec.loader.exec_module(_plot_framework)
-ioverlay = _plot_framework.ioverlay
+_make_figure = _plot_framework._make_figure
+_add_trace = _plot_framework._add_trace
+_style_legend = _plot_framework._style_legend
+COLORS = _plot_framework.COLORS
 
 DISPLAY_COLUMNS = ["cycle", "clk_in", "clk_out", "up", "down", "phase_error_ps"]
 _BOKEH_READY = False
@@ -74,18 +79,29 @@ def _render_clk_plot(trace) -> None:
     cycles = [entry.cycle for entry in trace]
     clk_in_values = [entry.clk_in for entry in trace]
     clk_out_values = [entry.clk_out for entry in trace]
-    ioverlay(
-        {
-            "clk_in": (cycles, clk_in_values),
-            "clk_out": (cycles, clk_out_values),
-        },
-        title="clk_in vs clk_out",
-        xlabel="Cycle",
-        ylabel="Edge Time (ps)",
-        kind="line+scatter",
-        width=900,
-        height=350,
+    figure = _make_figure(
+        "clk_in vs clk_out",
+        "Cycle",
+        "Edge Time (ps)",
+        900,
+        350,
     )
+    for index, (label, y_values) in enumerate(
+        (("clk_in", clk_in_values), ("clk_out", clk_out_values))
+    ):
+        source = _plot_framework.ColumnDataSource(
+            data=dict(x=cycles, y=y_values)
+        )
+        _add_trace(
+            figure,
+            source,
+            "line+scatter",
+            COLORS[index % len(COLORS)],
+            label=label,
+        )
+    _style_legend(figure)
+    html = file_html(figure, CDN, "clk_in vs clk_out")
+    display(HTML(html))
 
 
 def display_dll_simulator():
