@@ -1,28 +1,12 @@
 /*
-|=======================================================================
-| Module      : dll_controller_acquire_track
-| Author      : Mythri Muralikannan
-| Description : Acquire/track DLL controller
-|
-| Function:
-|   Uses two operating modes:
-|     - Acquire mode for fast lock
-|     - Track mode for fine steady-state adjustment
-|
-| Operation:
-|   - On reset, ctrl is initialized to INIT_CTRL and mode starts in
-|     acquire mode
-|   - In acquire mode, larger control steps are used for fast locking
-|   - After a period of quiet detector activity, the controller
-|     switches to track mode
-|   - In track mode, smaller steps are used to reduce steady-state
-|     jitter and overshoot
-|
-| Notes:
-|   - Fully synthesizable
-|   - Provides a good balance between lock speed and stability
-|   - Useful for practical ZDB / DLL implementations
-|=======================================================================
+Module      : dll_controller_acquire_track
+Author      : Mythri Muralikannan
+Description : Acquire/track DLL controller
+
+Function:
+Uses two operating modes:
+- Acquire mode for fast lock
+- Track mode for fine steady-state adjustment
 */
 
 
