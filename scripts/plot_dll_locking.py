@@ -191,39 +191,40 @@ def plot_animated(data, width=900, layer_height=200,
     )
 
 
-def plot_animated_full(data, width=900, layer_height=200,
-                       interval_ms=30, step_size=5):
-    """
-    Full animated stacked view with both clock edges and phase error
-    drawn progressively in sync.
+# Doesn't quite work
+# def plot_animated_full(data, width=900, layer_height=200,
+#                        interval_ms=30, step_size=5):
+#     """
+#     Full animated stacked view with both clock edges and phase error
+#     drawn progressively in sync.
 
-    Uses ianimate_stack with two layers.
-    """
-    clk_in_edges  = data["clk_in_edges"]
-    clk_out_edges = data["clk_out_edges"]
-    phase_t       = data["phase_t"]
-    phase_v       = data["phase_v"]
-    tol           = data["tol"]
+#     Uses ianimate_stack with two layers.
+#     """
+#     clk_in_edges  = data["clk_in_edges"]
+#     clk_out_edges = data["clk_out_edges"]
+#     phase_t       = data["phase_t"]
+#     phase_v       = data["phase_v"]
+#     tol           = data["tol"]
 
-    clock_layer = {
-        "clk_in":  (clk_in_edges,  np.zeros_like(clk_in_edges)),
-        "clk_out": (clk_out_edges, np.ones_like(clk_out_edges)),
-    }
+#     clock_layer = {
+#         "clk_in":  (clk_in_edges,  np.zeros_like(clk_in_edges)),
+#         "clk_out": (clk_out_edges, np.ones_like(clk_out_edges)),
+#     }
 
-    phase_layer = {"phase_error": (phase_t, phase_v)}
-    phase_layer.update(_make_tolerance_traces(phase_t, tol))
+#     phase_layer = {"phase_error": (phase_t, phase_v)}
+#     phase_layer.update(_make_tolerance_traces(phase_t, tol))
 
-    ianimate_stack(
-        [clock_layer, phase_layer],
-        title="DLL Locking Process (animated)",
-        xlabel="Time (ns)",
-        ylabels=["Clock Edge", "Phase Error (ns)"],
-        kind="line",
-        width=width,
-        layer_height=layer_height,
-        interval_ms=interval_ms,
-        step_size=step_size,
-    )
+#     ianimate_stack(
+#         [clock_layer, phase_layer],
+#         title="DLL Locking Process (animated)",
+#         xlabel="Time (ns)",
+#         ylabels=["Clock Edge", "Phase Error (ns)"],
+#         kind="line",
+#         width=width,
+#         layer_height=layer_height,
+#         interval_ms=interval_ms,
+#         step_size=step_size,
+#     )
 
 
 def print_lock_summary(data):

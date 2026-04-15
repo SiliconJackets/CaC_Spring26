@@ -134,10 +134,20 @@ def apply_time_shift(
 
 
 def decode_ctrl(traces, vthresh=0.9):
-    """Convert 6 analog CTRL bit traces into a single integer waveform."""
+    """Convert 6 CTRL bit traces into a single integer waveform."""
     time = traces["CTRL0"][0]
     ctrl_int = np.zeros(len(time))
     for i in range(6):
         _, v = traces[f"CTRL{i}"]
+        ctrl_int += (v > vthresh).astype(float) * (1 << i)
+    return (time, ctrl_int)
+
+
+def decode_q(traces, vthresh=0.9):
+    """Convert 6 Q bit traces into a single integer waveform."""
+    time = traces["Q0_node"][0]
+    ctrl_int = np.zeros(len(time))
+    for i in range(6):
+        _, v = traces[f"Q{i}_node"]
         ctrl_int += (v > vthresh).astype(float) * (1 << i)
     return (time, ctrl_int)
