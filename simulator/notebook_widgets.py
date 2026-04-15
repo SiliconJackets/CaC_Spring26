@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 from IPython.display import HTML, display
+from bokeh.io import output_notebook
 
 try:
     import pandas as pd
@@ -21,10 +22,13 @@ except ImportError:  # pragma: no cover - optional dependency in notebooks
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
     from simulator.gui_common import DCDLS, CONTROLLERS, PHASE_DETECTORS, run_closed_loop_simulation
+    from scripts.plot_framework import ioverlay
 else:
     from .gui_common import DCDLS, CONTROLLERS, PHASE_DETECTORS, run_closed_loop_simulation
+    from scripts.plot_framework import ioverlay
 
 DISPLAY_COLUMNS = ["cycle", "clk_in", "clk_out", "up", "down", "phase_error_ps"]
+_BOKEH_READY = False
 
 
 def _styled_caption(text: str):
@@ -45,6 +49,32 @@ def _render_table(trace):
         display(pd.DataFrame(rows))
     else:
         display(rows)
+
+
+def _ensure_bokeh_ready() -> None:
+    global _BOKEH_READY
+    if not _BOKEH_READY:
+        output_notebook(hide_banner=True)
+        _BOKEH_READY = True
+
+
+def _render_clk_plot(trace) -> None:
+    _ensure_bokeh_ready()
+    cycles = [entry.cycle for entry in trace]
+    clk_in_values = [entry.clk_in for entry in trace]
+    clk_out_values = [entry.clk_out for entry in trace]
+    ioverlay(
+        {
+            "clk_in": (cycles, clk_in_values),
+            "clk_out": (cycles, clk_out_values),
+        },
+        title="clk_in vs clk_out",
+        xlabel="Cycle",
+        ylabel="Edge Time (ps)",
+        kind="line+scatter",
+        width=900,
+        height=350,
+    )
 
 
 def display_dll_simulator():
@@ -165,6 +195,8 @@ def display_dll_simulator():
             display(HTML("<div>phase_error_ps = clk_out - clk_in</div>"))
             display(HTML("<h3>Closed-Loop Trace</h3>"))
             _render_table(trace)
+            display(HTML("<h3>Clock Plot</h3>"))
+            _render_clk_plot(trace)
             display(HTML("<h3>Summary</h3>"))
             display(
                 HTML(
