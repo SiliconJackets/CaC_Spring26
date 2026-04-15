@@ -5,10 +5,9 @@ from __future__ import annotations
 from dataclasses import asdict
 import sys
 from pathlib import Path
-import importlib.util
 
 from IPython.display import HTML, display
-from bokeh.io import output_notebook, show
+import matplotlib.pyplot as plt
 
 try:
     import pandas as pd
@@ -28,21 +27,7 @@ if __package__ in (None, ""):
 else:
     from .gui_common import DCDLS, CONTROLLERS, PHASE_DETECTORS, run_closed_loop_simulation
 
-_plot_framework_spec = importlib.util.spec_from_file_location(
-    "cac_plot_framework",
-    MODULE_ROOT / "scripts" / "plot_framework.py",
-)
-if _plot_framework_spec is None or _plot_framework_spec.loader is None:
-    raise ImportError("Could not load plot_framework.py from the scripts directory.")
-_plot_framework = importlib.util.module_from_spec(_plot_framework_spec)
-_plot_framework_spec.loader.exec_module(_plot_framework)
-_make_figure = _plot_framework._make_figure
-_add_trace = _plot_framework._add_trace
-_style_legend = _plot_framework._style_legend
-COLORS = _plot_framework.COLORS
-
 DISPLAY_COLUMNS = ["cycle", "clk_in", "clk_out", "up", "down", "phase_error_ps"]
-_BOKEH_READY = False
 
 
 def _styled_caption(text: str):
@@ -65,40 +50,22 @@ def _render_table(trace):
         display(rows)
 
 
-def _ensure_bokeh_ready() -> None:
-    global _BOKEH_READY
-    if not _BOKEH_READY:
-        output_notebook(hide_banner=True)
-        _BOKEH_READY = True
-
-
 def _render_clk_plot(trace) -> None:
-    _ensure_bokeh_ready()
     cycles = [entry.cycle for entry in trace]
     clk_in_values = [entry.clk_in for entry in trace]
     clk_out_values = [entry.clk_out for entry in trace]
-    figure = _make_figure(
-        "clk_in vs clk_out",
-        "Cycle",
-        "Edge Time (ps)",
-        900,
-        350,
-    )
-    for index, (label, y_values) in enumerate(
-        (("clk_in", clk_in_values), ("clk_out", clk_out_values))
-    ):
-        source = _plot_framework.ColumnDataSource(
-            data=dict(x=cycles, y=y_values)
-        )
-        _add_trace(
-            figure,
-            source,
-            "line+scatter",
-            COLORS[index % len(COLORS)],
-            label=label,
-        )
-    _style_legend(figure)
-    show(figure)
+    plt.close("all")
+    fig, ax = plt.subplots(figsize=(10, 4))
+    ax.plot(cycles, clk_in_values, marker="o", linewidth=2, label="clk_in")
+    ax.plot(cycles, clk_out_values, marker="o", linewidth=2, label="clk_out")
+    ax.set_title("clk_in vs clk_out")
+    ax.set_xlabel("Cycle")
+    ax.set_ylabel("Edge Time (ps)")
+    ax.grid(True, alpha=0.3)
+    ax.legend()
+    fig.tight_layout()
+    display(fig)
+    plt.close(fig)
 
 
 def display_dll_simulator():
