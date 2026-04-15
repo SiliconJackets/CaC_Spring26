@@ -1,18 +1,8 @@
 `timescale 1ps/1ps
 
 /*
-|=======================================================================
-| Module      : tb_zdb_top
-| Description : Functional testbench for zero-delay buffer top-level
-|
-| Tests:
-|   1. Reset initializes the controller to INIT_CTRL
-|   2. clk_out toggles after reset is released
-|   3. Control word remains within valid bounds
-|   4. No unknowns on key outputs after reset
-|   5. Phase detector / controller activity is observable
-|   6. Asynchronous reset restores initial control state
-|=======================================================================
+ Module      : tb_zdb_top
+ Description : Functional testbench for zero-delay buffer top-level
 */
 
 module tb_zdb_top;
@@ -39,9 +29,7 @@ module tb_zdb_top;
     integer shift_left_events;
     integer shift_right_events;
 
-    // -----------------------------------------------------------------
     // DUT
-    // -----------------------------------------------------------------
     zdb_top #(
         .CTRL_BITS (CTRL_BITS),
         .INIT_CTRL (INIT_CTRL)
@@ -56,17 +44,15 @@ module tb_zdb_top;
         .shift_right_dbg (shift_right_dbg)
     );
 
-    // -----------------------------------------------------------------
     // Reference clock: 10 ns period
-    // -----------------------------------------------------------------
+
     initial begin
         clk_in = 1'b0;
         forever #5000 clk_in = ~clk_in;
     end
 
-    // -----------------------------------------------------------------
     // Edge/event counters
-    // -----------------------------------------------------------------
+
     always @(posedge clk_in)
         clk_in_edges = clk_in_edges + 1;
 
@@ -85,9 +71,7 @@ module tb_zdb_top;
     always @(posedge shift_right_dbg)
         shift_right_events = shift_right_events + 1;
 
-    // -----------------------------------------------------------------
     // Monitor
-    // -----------------------------------------------------------------
     initial begin
         $display(" time   rst clk_in clk_out | up down shiftL shiftR | ctrl");
         $display("-------------------------------------------------------------");
@@ -96,9 +80,7 @@ module tb_zdb_top;
                  up_dbg, down_dbg, shift_left_dbg, shift_right_dbg, ctrl_dbg);
     end
 
-    // -----------------------------------------------------------------
     // Helpers
-    // -----------------------------------------------------------------
     task expect_ctrl_exact;
         input integer expected;
         begin
@@ -146,9 +128,7 @@ module tb_zdb_top;
         end
     endtask
 
-    // -----------------------------------------------------------------
     // Test sequence
-    // -----------------------------------------------------------------
     initial begin
         errors = 0;
         clk_in_edges      = 0;
