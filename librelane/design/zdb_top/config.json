@@ -2,7 +2,7 @@
   "DESIGN_NAME": "zdb_top",
   "VERILOG_FILES": [
     "dir::phase_detector_syn_ff1.sv",
-    "dir::controller_filtered.sv",    
+    "dir::controller_saturate.sv",    
     "dir::nand_dcdl/nand_dcdl_cell.sv",    
     "dir::nand_dcdl/dll_shift_register.sv",  
     "dir::nand_dcdl/nand_dcdl.sv",    
