@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import asdict
 import sys
 from pathlib import Path
+import importlib.util
 
 from IPython.display import HTML, display
 from bokeh.io import output_notebook
@@ -19,13 +20,23 @@ try:
 except ImportError:  # pragma: no cover - optional dependency in notebooks
     widgets = None
 
+MODULE_ROOT = Path(__file__).resolve().parents[1]
+
 if __package__ in (None, ""):
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    sys.path.insert(0, str(MODULE_ROOT))
     from simulator.gui_common import DCDLS, CONTROLLERS, PHASE_DETECTORS, run_closed_loop_simulation
-    from scripts.plot_framework import ioverlay
 else:
     from .gui_common import DCDLS, CONTROLLERS, PHASE_DETECTORS, run_closed_loop_simulation
-    from scripts.plot_framework import ioverlay
+
+_plot_framework_spec = importlib.util.spec_from_file_location(
+    "cac_plot_framework",
+    MODULE_ROOT / "scripts" / "plot_framework.py",
+)
+if _plot_framework_spec is None or _plot_framework_spec.loader is None:
+    raise ImportError("Could not load plot_framework.py from the scripts directory.")
+_plot_framework = importlib.util.module_from_spec(_plot_framework_spec)
+_plot_framework_spec.loader.exec_module(_plot_framework)
+ioverlay = _plot_framework.ioverlay
 
 DISPLAY_COLUMNS = ["cycle", "clk_in", "clk_out", "up", "down", "phase_error_ps"]
 _BOKEH_READY = False
