@@ -13,7 +13,7 @@ def __is_valid_time_value(value):
     return bool(re.fullmatch(r"\d+(\.\d+)?[pnfum]", value))
 
 
-def run_flow(design_name, base_dir, num_dcdl_stages):
+def run_flow(design_name, base_dir):
     """
     Runs the flow and places the SPICE netlist in spice/netlists/
     """
@@ -204,7 +204,6 @@ def main():
     base_dir = args.base_dir
     process = args.process
     pdk_root = args.pdk_root
-    num_dcdl_stages = args.num_dcdl_stages
 
     clk_in_delay = args.clk_in_delay
     if not __is_valid_time_value(clk_in_delay):
@@ -217,7 +216,7 @@ def main():
         exit(1)
 
     if process.lower() == "flow":
-        run_flow(design_name=design_name, base_dir=base_dir, num_dcdl_stages=num_dcdl_stages)
+        run_flow(design_name=design_name, base_dir=base_dir)
     elif process.lower() == "spice":
         run_ngspice(
             design_name=design_name,
