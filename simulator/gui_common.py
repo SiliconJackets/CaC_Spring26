@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 
 import sys
 from pathlib import Path
@@ -160,6 +160,9 @@ DCDLS = {
     },
 }
 
+FIXED_INIT_CTRL = 0
+DISPLAY_COLUMNS = ["cycle", "clk_in", "clk_out", "up", "down", "phase_error_ps"]
+
 
 def run_closed_loop_simulation(
     phase_detector_name: str,
@@ -225,3 +228,17 @@ def run_closed_loop_simulation(
         prev_delay_ps = current_delay_ps
 
     return trace
+
+
+def trace_rows(trace: list[TraceEntry]) -> list[dict]:
+    """Return the reduced table view used by the GUIs."""
+    return [{key: asdict(entry)[key] for key in DISPLAY_COLUMNS} for entry in trace]
+
+
+def trace_summary_lines(trace: list[TraceEntry]) -> tuple[str, str]:
+    """Return the shared start/end summary strings used by the GUIs."""
+    first = trace[0]
+    last = trace[-1]
+    start = f"Start: clk_out={first.clk_out:.2f} ps, phase_err={first.phase_error_ps:.2f} ps"
+    end = f"End: clk_out={last.clk_out:.2f} ps, phase_err={last.phase_error_ps:.2f} ps"
+    return start, end

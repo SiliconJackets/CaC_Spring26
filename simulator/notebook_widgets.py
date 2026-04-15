@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 from dataclasses import asdict
+from io import BytesIO
 import sys
 from pathlib import Path
 
-from IPython.display import HTML, display
-from bokeh.io import output_notebook
+from IPython.display import HTML, Image, display
+import matplotlib.pyplot as plt
 
 try:
     import pandas as pd
@@ -19,16 +20,29 @@ try:
 except ImportError:  # pragma: no cover - optional dependency in notebooks
     widgets = None
 
-if __package__ in (None, ""):
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-    from simulator.gui_common import DCDLS, CONTROLLERS, PHASE_DETECTORS, run_closed_loop_simulation
-    from scripts.plot_framework import ioverlay
-else:
-    from .gui_common import DCDLS, CONTROLLERS, PHASE_DETECTORS, run_closed_loop_simulation
-    from scripts.plot_framework import ioverlay
+MODULE_ROOT = Path(__file__).resolve().parents[1]
 
-DISPLAY_COLUMNS = ["cycle", "clk_in", "clk_out", "up", "down", "phase_error_ps"]
-_BOKEH_READY = False
+if __package__ in (None, ""):
+    sys.path.insert(0, str(MODULE_ROOT))
+    from simulator.gui_common import (
+        DCDLS,
+        CONTROLLERS,
+        FIXED_INIT_CTRL,
+        PHASE_DETECTORS,
+        run_closed_loop_simulation,
+        trace_rows,
+        trace_summary_lines,
+    )
+else:
+    from .gui_common import (
+        DCDLS,
+        CONTROLLERS,
+        FIXED_INIT_CTRL,
+        PHASE_DETECTORS,
+        run_closed_loop_simulation,
+        trace_rows,
+        trace_summary_lines,
+    )
 
 
 def _styled_caption(text: str):
@@ -44,37 +58,31 @@ def _styled_caption(text: str):
 
 
 def _render_table(trace):
-    rows = [{key: asdict(entry)[key] for key in DISPLAY_COLUMNS} for entry in trace]
+    rows = trace_rows(trace)
     if pd is not None:
         display(pd.DataFrame(rows))
     else:
         display(rows)
 
 
-def _ensure_bokeh_ready() -> None:
-    global _BOKEH_READY
-    if not _BOKEH_READY:
-        output_notebook(hide_banner=True)
-        _BOKEH_READY = True
-
-
 def _render_clk_plot(trace) -> None:
-    _ensure_bokeh_ready()
     cycles = [entry.cycle for entry in trace]
     clk_in_values = [entry.clk_in for entry in trace]
     clk_out_values = [entry.clk_out for entry in trace]
-    ioverlay(
-        {
-            "clk_in": (cycles, clk_in_values),
-            "clk_out": (cycles, clk_out_values),
-        },
-        title="clk_in vs clk_out",
-        xlabel="Cycle",
-        ylabel="Edge Time (ps)",
-        kind="line+scatter",
-        width=900,
-        height=350,
-    )
+    fig, ax = plt.subplots(figsize=(10, 4))
+    ax.plot(cycles, clk_in_values, marker="o", linewidth=2, label="clk_in")
+    ax.plot(cycles, clk_out_values, marker="o", linewidth=2, label="clk_out")
+    ax.set_title("clk_in vs clk_out")
+    ax.set_xlabel("Cycle")
+    ax.set_ylabel("Edge Time (ps)")
+    ax.grid(True, alpha=0.3)
+    ax.legend()
+    fig.tight_layout()
+    buffer = BytesIO()
+    fig.savefig(buffer, format="png", dpi=150, bbox_inches="tight")
+    buffer.seek(0)
+    display(Image(data=buffer.getvalue()))
+    plt.close(fig)
 
 
 def display_dll_simulator():
@@ -149,8 +157,13 @@ def display_dll_simulator():
         style={"description_width": "initial"},
         layout=widgets.Layout(width="100%"),
     )
+    run_button = widgets.Button(
+        description="Run Simulation",
+        button_style="primary",
+        layout=widgets.Layout(width="200px"),
+    )
 
-    output = widgets.Output()
+    results_output = widgets.Output()
 
     def sync_dcdl_defaults(*_args) -> None:
         selected = DCDLS[dcdl.value]
@@ -176,16 +189,15 @@ def display_dll_simulator():
             controller_name=controller.value,
             dcdl_name=dcdl.value,
             clk_period_ps=float(clk_period_ps.value),
-            init_ctrl=0,
+            init_ctrl=FIXED_INIT_CTRL,
             num_cycles=int(num_cycles.value),
             clk_in_start=float(clk_in_start.value),
             clk_out_start=None if auto_clk_out_start.value else float(clk_out_start.value),
         )
-        first = trace[0]
-        last = trace[-1]
+        start_summary, end_summary = trace_summary_lines(trace)
 
-        with output:
-            output.clear_output(wait=True)
+        with results_output:
+            results_output.clear_output(wait=True)
             display(
                 HTML(
                     "<div>clk_in -> phase detector -> controller -> DCDL, "
@@ -198,37 +210,15 @@ def display_dll_simulator():
             display(HTML("<h3>Clock Plot</h3>"))
             _render_clk_plot(trace)
             display(HTML("<h3>Summary</h3>"))
-            display(
-                HTML(
-                    f"<div>Start: clk_out={first.clk_out:.2f} ps, "
-                    f"phase_err={first.phase_error_ps:.2f} ps</div>"
-                )
-            )
-            display(
-                HTML(
-                    f"<div>End: clk_out={last.clk_out:.2f} ps, "
-                    f"phase_err={last.phase_error_ps:.2f} ps</div>"
-                )
-            )
+            display(HTML(f"<div>{start_summary}</div>"))
+            display(HTML(f"<div>{end_summary}</div>"))
 
     dcdl.observe(sync_dcdl_defaults, names="value")
     auto_clk_out_start.observe(sync_clk_out_visibility, names="value")
     clk_period_ps.observe(sync_clk_out_default, names="value")
-
-    for control in (
-        phase_detector,
-        controller,
-        dcdl,
-        clk_period_ps,
-        clk_in_start,
-        auto_clk_out_start,
-        clk_out_start,
-        num_cycles,
-    ):
-        control.observe(render, names="value")
+    run_button.on_click(render)
 
     sync_clk_out_visibility()
-    render()
 
     ui = widgets.VBox(
         [
@@ -254,7 +244,8 @@ def display_dll_simulator():
                 layout=widgets.Layout(width="100%"),
             ),
             num_cycles,
-            output,
+            run_button,
+            results_output,
         ]
     )
     return ui
